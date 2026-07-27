@@ -21,7 +21,7 @@ dataPath <- paste0(Sys.getenv("HOME"), "/data/shiny_data/")
 
 ################################################################################
 # APP INFO
-appTitle <- "template"
+appTitle <- "NYC Taxi"
 
 isLiveVersion <- grepl("live", codePath)
 
