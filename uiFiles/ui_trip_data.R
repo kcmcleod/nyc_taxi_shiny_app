@@ -9,10 +9,48 @@ tabItem(
         status = "info",
         solidHeader = TRUE,
         fluidRow(
-          # selectors
+          column(
+            width = 3,
+            pickerInput("pi_level", 
+                        label = "Granularity:", 
+                        multiple = FALSE, 
+                        choices = c("Day", "Week", "Month"),
+                        selected = "Day"
+            )
+          ),
+          column(
+            width = 3,
+            pickerInput("pi_vendor", 
+                        label = "Vendors:", 
+                        multiple = TRUE, 
+                        choices = c(), 
+                        options = pickerOptions(
+                          `actions-box` = TRUE
+                        ))
+          ),
+          column(
+            width = 3,
+            pickerInput("pi_pay_type", 
+                        label = "Payment:", 
+                        multiple = TRUE, 
+                        choices = c(), 
+                        options = pickerOptions(
+                          `actions-box` = TRUE
+                        ))
+          ),
+          column(
+            width = 3,
+            radioButtons("rb_journeys_or_passengers", 
+                         label = "Y axis:",
+                         choices = c("Journey Count", "Total Distance")
+                         )
+          )
         ),
         fluidRow(
-          plotlyOutput("po_tripVolumesOverTime")
+          column(
+            width = 12,
+            plotlyOutput("po_tripVolumesOverTime")
+          )
         )
       )
     )

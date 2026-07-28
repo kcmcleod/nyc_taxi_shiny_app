@@ -10,6 +10,12 @@ suppressPackageStartupMessages(library("bslib"))
 suppressPackageStartupMessages(library("fresh"))
 suppressPackageStartupMessages(library("shinydisconnect"))
 
+suppressPackageStartupMessages(library("plotly"))
+suppressPackageStartupMessages(library("logger"))
+suppressPackageStartupMessages(library("arrow"))
+suppressPackageStartupMessages(library("shinyWidgets"))
+
+
 
 ################################################################################
 # PATHS
