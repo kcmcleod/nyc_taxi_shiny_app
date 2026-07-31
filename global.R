@@ -15,6 +15,20 @@ suppressPackageStartupMessages(library("logger"))
 suppressPackageStartupMessages(library("arrow"))
 suppressPackageStartupMessages(library("shinyWidgets"))
 
+suppressPackageStartupMessages(library(cachem))
+
+
+################################################################################
+# SETUP
+# share cache across users
+shared_app_cache <- cachem::cache_disk(
+  dir = "./shared_app_cache", 
+  max_size = 1024 * 1024^2 # 1GB limit
+)
+
+shinyOptions(cache = shared_app_cache)
+
+
 
 
 ################################################################################
