@@ -3,7 +3,7 @@
 observeEvent(yellow_taxi_data(), {
 
   tDF <- yellow_taxi_data()
-  vendor_values = sort(unique(tDF$VendorID))
+  vendor_values = sort(unique(tDF$Vendor))
   payment_types = sort(unique(tDF$payment_type))
   
   updatePickerInput(
@@ -52,7 +52,7 @@ output$po_tripVolumesOverTime <- renderPlotly({
     filter(
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg,
-      VendorID %in% input$pi_vendor,
+      Vendor %in% input$pi_vendor,
       payment_type %in% input$pi_pay_type
     ) |> 
     select(date, data_field) |> 

@@ -57,6 +57,7 @@ combinedDF <- arrange(combinedDF, across(all_of(sort_cols)))
 
 ################################################################################
 # LOOKUPS
+# todo need to check files exists 
 zone_lookups <- read_csv(paste0(dataPath, "src/taxi_zone_lookup.csv")) |> 
   select("LocationID", "Borough")
 rate_lookups <- read_csv(paste0(dataPath, "src/rate_code_lookup.csv"), col_types = c("ic"))
@@ -71,6 +72,8 @@ combinedDF <- fn_perform_lookup(combinedDF, rate_lookups, "RatecodeID", "Ratecod
   fn_perform_lookup(payment_lookups, "payment_type", "payment_type", "payment_type", "payment", 
                     post_process_fn = function(df) mutate(df, payment_type = payment_class)) |> 
   fn_perform_lookup(vendor_lookups, "VendorID", "VendorID", "Vendor", "vendor")
+
+# todo checks on joins
 
 ################################################################################
 # WRITE ASSET
