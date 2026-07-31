@@ -22,6 +22,31 @@ observeEvent(yellow_taxi_data(), {
 })
 
 
+rv_main_table_filtered_data <- reactive({
+  req(yellow_taxi_data(), input$rb_journeys_or_passengers, input$pi_vendor,
+      input$pi_pay_type, input$pi_level)
+  
+  month_agg <- ifelse(input$pi_level == "Month", TRUE, FALSE)
+  week_agg <- ifelse(input$pi_level == "Week", TRUE, FALSE)  
+  
+  data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance", 
+                       "total_distance", "total_number_trips")
+  
+  tmpDF <- yellow_taxi_data() |> 
+    filter(
+      full_month_aggregation == month_agg,
+      full_week_aggregation == week_agg,
+      Vendor %in% input$pi_vendor,
+      payment_type %in% input$pi_pay_type
+    ) |> 
+    select(date, all_of(data_field)) |> 
+    group_by(date) |> 
+    summarise(total_value = sum(.data[[data_field]], na.rm = TRUE), .groups = 'drop') 
+
+  return(tmpDF)
+})
+
+
 # main trip volumes chart
 output$po_tripVolumesOverTime <- renderPlotly({
   req(yellow_taxi_data(), input$rb_journeys_or_passengers)
@@ -32,12 +57,7 @@ output$po_tripVolumesOverTime <- renderPlotly({
     need(length(input$pi_pay_type) > 0, "Please select at least one payment type."),
     need(length(input$pi_level) == 1, "Please select exactly one payment type.")
   )
-  
-  month_agg <- ifelse(input$pi_level == "Month", TRUE, FALSE)
-  week_agg <- ifelse(input$pi_level == "Week", TRUE, FALSE)  
-  data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance", 
-                       "total_distance", "total_number_trips")
-  
+
   x_lab_format <- switch (
     input$pi_level,
     "Month" = "%b %Y",
@@ -48,17 +68,13 @@ output$po_tripVolumesOverTime <- renderPlotly({
                         "Distance in miles", "Total number of trips"  
   )
   
-  tmpDF <- yellow_taxi_data() |> 
-    filter(
-      full_month_aggregation == month_agg,
-      full_week_aggregation == week_agg,
-      Vendor %in% input$pi_vendor,
-      payment_type %in% input$pi_pay_type
-    ) |> 
-    select(date, data_field) |> 
-    group_by(date) |> 
-    summarise(total_value = sum(.data[[data_field]], na.rm = TRUE), .groups = 'drop') 
+  tmpDF <- rv_main_table_filtered_data()
   
+  validate(
+    need(nrow(tmpDF) > 0, "No data for that query")
+  )
+  
+
   fig <- plot_ly(tmpDF, x = ~date, y = ~total_value, type = 'scatter', mode = 'line') |> 
     layout(
       title = "Yellow Taxi journeys",
@@ -78,3 +94,10 @@ output$po_tripVolumesOverTime <- renderPlotly({
   return(fig)    
   
 })
+
+
+# --- EXPORT FOR TESTING ---
+# These values are invisible to the user but visible to shinytest2
+exportTestValues(
+  exported_filtered_rows = nrow(rv_main_table_filtered_data())
+)
