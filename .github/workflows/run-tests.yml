@@ -1,0 +1,39 @@
+name: Run Shiny Tests
+
+# This triggers the pipeline on every push to the main/master branch
+on:
+  push:
+    branches: [ main, yellow_taxi_mvp ]
+  pull_request:
+    branches: [ main, yellow_taxi_mvp ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    # Passes the default GitHub token to avoid API rate limits during setup
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true # Uses pre-compiled binaries to speed up installation
+
+      - name: Install system dependencies (required for some R packages)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Restore renv environment
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Run testthat and shinytest2
+        run: |
+          # Runs all test files in your tests/testthat directory
+          testthat::test_dir("tests/testthat", stop_on_failure = TRUE)
+        shell: Rscript {0}
