@@ -6,7 +6,7 @@ test_that("{shinytest2} recording: main_chart_month_vendor1_cash", {
   app$set_inputs(pi_vendor = "Creative Mobile Technologies LLC")
   app$set_inputs(pi_pay_type = "Cash")
   app$set_inputs(pi_level = "Month")
-  app$expect_values(output = "po_tripVolumesOverTime")
+  app$expect_values(output = "po_tripVolumesOverTime", screenshot_args = FALSE)
 })
 
 
@@ -17,7 +17,7 @@ test_that("{shinytest2} recording: main_chart_month_vendor6_flex_flare_distance"
   app$set_inputs(pi_vendor = "Myle Technologies Inc")
   app$set_inputs(pi_pay_type = "Flex Fare trip")
   app$set_inputs(rb_journeys_or_passengers = "Total Distance")
-  app$expect_values()
+  app$expect_values(screenshot_args = FALSE)
 })
 
 
@@ -30,6 +30,6 @@ test_that("{shinytest2} recording: info_page", {
   # Wait a fraction of a second for the UI to render the new tab
   app$wait_for_idle()
   
-  app$expect_values(output = "ui_text_appName")
-  app$expect_values(output = "ui_text_appVersion")
+  app$expect_values(output = "ui_text_appName", screenshot_args = FALSE)
+  app$expect_values(output = "ui_text_appVersion", screenshot_args = FALSE)
 })

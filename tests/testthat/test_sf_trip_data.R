@@ -2,6 +2,8 @@ test_that("sf_trip_data - main chart", {
   
   app <- AppDriver$new()
   
+  app$wait_for_idle()
+  
   # 1. Test the default state
   expect_equal(app$get_value(export = "exported_filtered_rows"), 151)
 
