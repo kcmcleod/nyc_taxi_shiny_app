@@ -27,7 +27,7 @@ jobs:
       - name: Install system dependencies (required for some R packages)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev
 
       - name: Restore renv environment
         uses: r-lib/actions/setup-renv@v2
