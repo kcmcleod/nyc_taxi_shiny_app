@@ -2,7 +2,7 @@ library(shinytest2)
 
 test_that("{shinytest2} recording: main_chart_month_vendor1_cash", {
   app <- AppDriver$new(test_path("../.."), name = "main_chart_month_vendor1_cash", 
-      height = 928, width = 1619, variant = shinytest2::platform_variant())
+      height = 928, width = 1619)
   app$set_inputs(pi_vendor = "Creative Mobile Technologies LLC")
   app$set_inputs(pi_pay_type = "Cash")
   app$set_inputs(pi_level = "Month")
@@ -12,7 +12,7 @@ test_that("{shinytest2} recording: main_chart_month_vendor1_cash", {
 
 test_that("{shinytest2} recording: main_chart_month_vendor6_flex_flare_distance", {
   app <- AppDriver$new(test_path("../.."), name = "main_chart_month_vendor6_flex_flare_distance", 
-      height = 928, width = 1619, variant = shinytest2::platform_variant())
+      height = 928, width = 1619)
   app$set_inputs(pi_level = "Month")
   app$set_inputs(pi_vendor = "Myle Technologies Inc")
   app$set_inputs(pi_pay_type = "Flex Fare trip")
@@ -24,7 +24,7 @@ test_that("{shinytest2} recording: main_chart_month_vendor6_flex_flare_distance"
 
 test_that("{shinytest2} recording: info_page", {
   app <- AppDriver$new(test_path("../.."), name = "info_page", height = 928, 
-                       width = 1619, variant = shinytest2::platform_variant())
+                       width = 1619)
   app$set_inputs(sidebar_id = "info_page")
   
   # Wait a fraction of a second for the UI to render the new tab
