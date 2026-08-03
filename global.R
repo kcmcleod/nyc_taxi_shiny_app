@@ -88,6 +88,29 @@ sourceRFilesFromFolder <- function(folderPath) {
   return(sapply(listOfFiles(folderPath), function(x) source(x)))
 }
 
-sourceRFilesFromFolder(paste(codePath, "/R"))
+# disable autoload of R folder using: touch R/_disable_autoload.R
+sourceRFilesFromFolder(paste0(codePath, "/R"))
 
 config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr = TRUE)
+
+################################################################################
+# DATA
+
+raw_taxi_data <- get_initial_taxi_data(data_path = dataPath)
+
+# # might move to database in future
+# db_pool <- pool::dbPool(
+#   drv = RPostgres::Postgres(), # Or whichever driver you use (e.g., odbc::odbc())
+#   dbname = "taxi_db",
+#   host = "localhost",
+#   user = "your_user",
+#   password = Sys.getenv("DB_PASSWORD"),
+#   
+#   minSize = 2,  # Keep 2 connections open at all times
+#   maxSize = 10, # Allow up to 10 simultaneous queries during a traffic spike
+#   idleTimeout = 60000 # Close idle connections after 60 seconds
+# )
+# 
+# onStop(function() {
+#   pool::poolClose(db_pool)
+# })
