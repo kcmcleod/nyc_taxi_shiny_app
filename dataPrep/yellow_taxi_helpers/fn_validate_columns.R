@@ -22,15 +22,16 @@ fn_validate_columns <- function(df, expected_cols, df_name) {
   
   is_valid <- TRUE
   
+  # Rule 1: no missing cols
   if (length(missing_cols) > 0) {
     log_error("......", df_name, " is missing: ", paste0(missing_cols, collapse = ", "))
     is_valid <- FALSE
   }
   
+  # Rule 2: log but ignore extra cols
   if (length(extra_cols) > 0) {
-    log_error("......", df_name, " has extra cols: ", paste0(extra_cols, collapse = ", "))
-    is_valid <- FALSE
-  }
+    log_warn("...... ", df_name, " has extra column(s) (ignoring): ", extra_cols)
+  } 
   
   return(is_valid)
 }

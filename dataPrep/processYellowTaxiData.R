@@ -15,15 +15,63 @@ log_appender(appender_tee(log_name))
 log_threshold(INFO)
 log_info("STARTING TO PROCESS YELLOW DATA")
 
-yellowFiles <- list.files(path = paste0(dataPath, "src"), pattern = "yellow.*.parquet", 
-                          recursive = TRUE, full.names = TRUE)
+################################################################################
+# GETTING EXISTING PROCESSED DATA
 
-if(length(yellowFiles) == 0) {
-  log_error("Cannot find any files to process")
+log_info("Getting and extending existing data...")
+
+all_master_files <- sort(
+  list.files(dataPath, 
+             pattern = "_yellow_aggregation\\.parquet", 
+             full.names = TRUE), 
+  decreasing = TRUE)
+
+latest_master_file <- all_master_files[1]
+
+processed_months <- character(0)
+existing_master_df <- NULL
+
+if (!is.na(latest_master_file) && file.exists(latest_master_file)) {
+  log_info(".. found existing master file: ", latest_master)
+  existing_master_df <- read_parquet(latest_master_file)
+  
+  processed_months <- unique(format(existing_master_df$date, "%Y-%m"))
+  processed_months <- sort(processed_months)
+  log_info(".. already processed months: ", paste0(processed_months, collapse = ", "))
+}
+
+################################################################################
+# CHECKING FOR FILES TO PROCESS
+all_yellow_files <- list.files(path = paste0(dataPath, "src"), pattern = "yellow.*.parquet", 
+                               recursive = TRUE, full.names = TRUE)
+
+new_files <- c()
+for(file in all_yellow_files) {
+  file_month <- str_match(file, pattern="\\d{4}-\\d{2}")[1]
+  if(is_na(file_month)) {
+    log_error("Cannot process date from: ", file)
+  } else if(!file_month %in% processed_months) {
+    new_files <- c(new_files, file)
+  }
+}
+
+if(length(new_files) == 0) {
+  log_error("Cannot find any files to process. STOPPING!")
   return(NULL)
 }
 
-log_info("Found ", length(yellowFiles), " files to process...")
+log_info("Found ", length(new_files), " files to process...")
+
+latest_master_file <- sort(
+  list.files(dataPath, 
+             pattern = "_yellow_aggregation.parquet", 
+             full.names = TRUE), 
+  decreasing = TRUE)[1]
+
+if (!is.na(latest_master_file)) {
+  existing_master_df <- read_parquet(latest_master_file)
+}
+
 
 ################################################################################
 # LOOP THRU DATA FILES
@@ -40,10 +88,9 @@ for(file in yellowFiles) {
     {
       combinedDF <- tmp
       expected_cols <- names(tmp)
-    } else if(identical(expected_cols, names(tmp))) {
-      combinedDF <- as_tibble(rbindlist(list(combinedDF, tmp)))
     } else {
-      log_error("Error adding ", file, " it's columns don't match what already exists")
+      # should ignore any extra cols
+      combinedDF <- as_tibble(rbindlist(list(combinedDF, tmp), fill = TRUE)) 
     }
     remove(tmp)
     log_info("size of combined data is now: ", nrow(combinedDF))
@@ -58,6 +105,9 @@ combinedDF <- arrange(combinedDF, across(all_of(sort_cols)))
 ################################################################################
 # LOOKUPS
 # todo need to check files exists 
+
+log_info("Starting to join lookups...")
+
 zone_lookups <- read_csv(paste0(dataPath, "src/taxi_zone_lookup.csv")) |> 
   select("LocationID", "Borough")
 rate_lookups <- read_csv(paste0(dataPath, "src/rate_code_lookup.csv"), col_types = c("ic"))
@@ -75,14 +125,54 @@ combinedDF <- fn_perform_lookup(combinedDF, rate_lookups, "RatecodeID", "Ratecod
 
 # todo checks on joins
 
+
 ################################################################################
-# WRITE ASSET
+# GETTING EXISTING PROCESSED DATA
+
+log_info("Extending OG data...")
+if (!is.null(existing_master_df)) {
+  
+  # drop any extra cols
+  combinedDF <- select(combinedDF, across(any_of(nams(existing_master_df))))
+  
+  combinedDF <- as_tibble(rbindlist(list(existing_master_df, combinedDF), fill = TRUE)) |> 
+    arrange(across(all_of(sort_cols)))
+  log_info("... merged with existing master. Total rows now: ", nrow(combinedDF))
+}
+
+
+################################################################################
+# WRITE NEW ASSET
+
+log_info("Writing new complete data asset...")
+
 write_parquet(combinedDF, 
               sink = paste0(dataPath, format(Sys.Date(), "%Y%m%d"), "_yellow_aggregation.parquet"))
 
-remove(combinedDF)
+remove(existing_master_df, combinedDF)
 gc()
 
+
+################################################################################
+# CLEAN UP OLD BACKUPS (> 90 DAYS)
+cutoff_date <- Sys.time() - as.difftime(90, units = "days")
+
+if(! exists("all_master_files")) {
+  all_master_files <- list.files(path = dataPath, 
+                                 pattern = "_yellow_aggregation\\.parquet$", 
+                                 full.names = TRUE)
+}
+
+old_files <- all_master_files[file.info(all_master_files)$mtime < cutoff_date]
+
+if (length(old_files) > 0) {
+  file.remove(old_files)
+  log_info("Cleaned up ", length(old_files), " old aggregation files (>90 days old).")
+}
+
+
+################################################################################
+# BYE TIME!
 total_time = Sys.time() - start_time
 pretty_duration <- pretty_ms(as.numeric(total_time, units = "secs") * 1000)
 log_info("Finished! This took: ", pretty_duration)
