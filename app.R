@@ -39,7 +39,7 @@ source(paste0(uiFilesPath, "header.R"))
 source(paste0(uiFilesPath, "body.R"))
 
 ui <- bootstrapPage(
-  use_idle_timer(timeout_minutes = 1.16),                    
+  use_idle_timer(timeout_minutes = 15),                    
   useShinyjs(),
   tagList(
     tags$head(
@@ -58,17 +58,13 @@ ui <- bootstrapPage(
     ),
     #add_busy_gif(),
     disconnectMessage(
-      text = "Something went wrong. Please refresh the page",
-      refresh = "REFRESH",
-      background = '#6495ED',
-      size = 26,
-      width = "full",
-      top = "center",
-      colour = '#FFFFF7',
-      overlayColour = '#D3D3D3',
-      overlayOpacity = 0.3,
-      refreshColour = '#8B0000',
-      css = "padding: 15px !important; box-shadow: none !important;"
+      text = "Your session has timed out due to inactivity.",
+      refresh = "Reconnect to NYC Taxi Data",
+      background = "#FFC107",        # Classic Taxi Yellow
+      colour = "#000000",            # Black text
+      overlayColour = "#000000",     # Dark grey/black overlay to dim the frozen app
+      overlayOpacity = 0.75,         # 75% opacity makes the app barely visible
+      refreshColour = "#333333"
     )
   )
 )
