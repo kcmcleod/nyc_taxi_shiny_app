@@ -1,14 +1,11 @@
 app_theme <- create_theme(
-  # 1. Map your primary and secondary colours
-  # shinydashboard uses "light_blue" as the default primary accent 
   adminlte_color(
-    light_blue = "#00539F", # Replaces bs_theme 'primary'
-    aqua = "#6C757D"        # Replaces bs_theme 'secondary'
+    light_blue = config$colors$theme$primary_accent, 
+    aqua = config$colors$theme$secondary_accent
   ),
   
-  # 2. Map your background and text colours
   adminlte_global(
-    content_bg = "#F8F9FA", # Replaces bs_theme 'bg'
+    content_bg = config$colors$theme$body_bg
   )
 )
 

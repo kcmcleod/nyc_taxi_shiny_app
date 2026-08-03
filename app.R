@@ -60,11 +60,11 @@ ui <- bootstrapPage(
     disconnectMessage(
       text = "Your session has timed out due to inactivity.",
       refresh = "Reconnect to NYC Taxi Data",
-      background = "#FFC107",        # Classic Taxi Yellow
-      colour = "#000000",            # Black text
-      overlayColour = "#000000",     # Dark grey/black overlay to dim the frozen app
-      overlayOpacity = 0.75,         # 75% opacity makes the app barely visible
-      refreshColour = "#333333"
+      background = config$colors$disconnect$background,
+      colour = config$colors$disconnect$text,
+      overlayColour = config$colors$disconnect$overlay,
+      overlayOpacity = 0.75,
+      refreshColour = config$colors$disconnect$button
     )
   )
 )

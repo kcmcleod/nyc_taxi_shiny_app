@@ -1,0 +1,13 @@
+---
+colors:
+  theme:
+    primary_accent: "#00539F"   # Used for adminlte light_blue
+    secondary_accent: "#6C757D" # Used for adminlte aqua
+    body_bg: "#F8F9FA"          # Used for adminlte content_bg
+  disconnect:
+    background: "#FFC107"       # Classic Taxi Yellow
+    text: "#000000"             # Black
+    overlay: "#000000"          # Black
+    button: "#333333"           # Dark grey
+  icons:
+    taxi: "#FFC107"             # Classic Taxi Yellow
