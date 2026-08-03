@@ -69,12 +69,12 @@ if(isLiveVersion) {
 
 dataPath <- paste0(dataPath, folder, "/", appTitle, "/")
 if(!dir.exists(dataPath)) {
-  dir.create(dataPath)
+  dir.create(dataPath, recursive = TRUE)
 }
 
 logPath <- paste0(dataPath, "logs/")
 if(!dir.exists(logPath)) {
-  dir.create(logPath)
+  dir.create(logPath, recursive = TRUE)
 }
 
 ################################################################################
