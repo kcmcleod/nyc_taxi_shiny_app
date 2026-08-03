@@ -1,6 +1,7 @@
 get_initial_taxi_data <- function(data_path) {
   
   if (isTRUE(getOption("shiny.testmode"))) {
+    log_info(".... loading TEST data !")
     return(readRDS("tests/testdata/mock_taxi_trips.rds"))
   }
   
