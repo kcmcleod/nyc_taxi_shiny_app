@@ -1,11 +1,11 @@
 app_theme <- create_theme(
   adminlte_color(
-    light_blue = config$colors$theme$primary_accent, 
-    aqua = config$colors$theme$secondary_accent
+    light_blue = config$colours$theme$primary_accent, 
+    aqua = config$colours$theme$secondary_accent
   ),
   
   adminlte_global(
-    content_bg = config$colors$theme$body_bg
+    content_bg = config$colours$theme$body_bg
   )
 )
 

@@ -43,13 +43,19 @@ tabItem(
             radioButtons("rb_journeys_or_passengers", 
                          label = "Y axis:",
                          choices = c("Journey Count", "Total Distance")
-                         )
+            )
           )
         ),
         fluidRow(
           column(
             width = 12,
-            plotlyOutput("po_tripVolumesOverTime")
+            withSpinner(
+              plotlyOutput("po_tripVolumesOverTime"),
+              type = 2,
+              color.background = config$colours$icons$taxi,
+              color = config$colours$theme$primary_accent,
+              size = 0.5
+            )
           )
         )
       )

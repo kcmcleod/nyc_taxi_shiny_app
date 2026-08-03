@@ -60,11 +60,11 @@ ui <- bootstrapPage(
     disconnectMessage(
       text = "Your session has timed out due to inactivity.",
       refresh = "Reconnect to NYC Taxi Data",
-      background = config$colors$disconnect$background,
-      colour = config$colors$disconnect$text,
-      overlayColour = config$colors$disconnect$overlay,
+      background = config$colours$disconnect$background,
+      colour = config$colours$disconnect$text,
+      overlayColour = config$colours$disconnect$overlay,
       overlayOpacity = 0.75,
-      refreshColour = config$colors$disconnect$button
+      refreshColour = config$colours$disconnect$button
     )
   )
 )

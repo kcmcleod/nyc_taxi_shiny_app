@@ -18,6 +18,7 @@ suppressPackageStartupMessages(library("shinyWidgets"))
 suppressPackageStartupMessages(library("cachem"))
 
 suppressPackageStartupMessages(library("shinytoastr"))
+suppressPackageStartupMessages(library("shinycssloaders"))
 
 
 ################################################################################
