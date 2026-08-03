@@ -15,7 +15,9 @@ suppressPackageStartupMessages(library("logger"))
 suppressPackageStartupMessages(library("arrow"))
 suppressPackageStartupMessages(library("shinyWidgets"))
 
-suppressPackageStartupMessages(library(cachem))
+suppressPackageStartupMessages(library("cachem"))
+
+suppressPackageStartupMessages(library("shinytoastr"))
 
 
 ################################################################################
