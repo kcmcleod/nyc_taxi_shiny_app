@@ -37,3 +37,6 @@ jobs:
           # Runs all test files in your tests/testthat directory
           testthat::test_dir("tests/testthat", stop_on_failure = TRUE)
         shell: Rscript {0}
+        env:
+              CI: "true"
+              NOT_CRAN: "true"

@@ -1,3 +1,5 @@
+library(shinytest2)
+
 test_that("sf_trip_data - main chart", {
   
   app <- AppDriver$new()
