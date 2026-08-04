@@ -10,6 +10,7 @@ tabItem(
     tags$p(tags$b("DATA LOCATION:"), textOutput("ui_text_dataPath", inline = TRUE)),
     tags$p(tags$b("LIVE APP:"), textOutput("ui_text_liveApp", inline = TRUE)),
     hr(),
-    tags$p(tags$b("PACKAGE CACHE:"), textOutput("ui_text_renv", inline = TRUE))
+    tags$p(tags$b("PACKAGE CACHE:"), textOutput("ui_text_renv", inline = TRUE)),
+    tags$p(tags$b("APP CACHE:"), textOutput("ui_text_cache", inline = TRUE))
   )
 )

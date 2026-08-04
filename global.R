@@ -20,23 +20,6 @@ suppressPackageStartupMessages(library("shinytoastr"))
 suppressPackageStartupMessages(library("shinycssloaders"))
 suppressPackageStartupMessages(library("scales"))
 
-################################################################################
-# SETUP
-# share cache across users
-
-if(isNamespaceLoaded("shiny")) {
-  # no need to make cache if only doing local data processing
-  
-  shared_app_cache <- cachem::cache_disk(
-    dir = "./shared_app_cache", 
-    max_size = 1024 * 1024^2 # 1GB limit
-  )
-  
-  shinyOptions(cache = shared_app_cache)
-  
-  log_info("Cache enabled")
-}
-
 
 
 
@@ -46,6 +29,25 @@ codePath <- getwd()
 uiFilesPath <- paste0(codePath, "/uiFiles/")
 serverFilesPath <- paste0(codePath, "/serverFiles/")
 dataPath <- paste0(Sys.getenv("HOME"), "/data/shiny_data/")
+cachePath <- paste0(dataPath, "shared_app_cache")
+
+
+################################################################################
+# CACHE
+
+if(isNamespaceLoaded("shiny")) {
+  # no need to make cache if only doing local data processing
+  
+  shared_app_cache <- cachem::cache_disk(
+    dir = cachePath,
+    max_size = 1024 * 1024^2 # 1GB limit
+  )
+  
+  shinyOptions(cache = shared_app_cache)
+  
+  log_info("Cache enabled")
+}
+
 
 
 ################################################################################

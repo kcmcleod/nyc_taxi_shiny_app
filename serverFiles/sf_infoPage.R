@@ -23,3 +23,7 @@ output$ui_text_liveApp <- renderText({
 output$ui_text_renv <- renderText({
   renv::paths$cache()
 })
+
+output$ui_text_cache <- renderText({
+  cachePath
+})
