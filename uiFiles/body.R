@@ -36,5 +36,14 @@ body <- dashboardBody(
     HTML(".main-sidebar { font-size: 12px!important; }
          .treeview-menu>li>a { font-size: 12px!important; }")
   ),
-  getTabItems()
+  getTabItems(),
+  tags$footer(
+    align = "center",
+    em("Built by Kenneth McLeod using data from ",
+       a(
+         href = "https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page", 
+         "NYC TLC", 
+         target = "_blank")
+    )
+  )
 )

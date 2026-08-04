@@ -47,10 +47,7 @@ ui <- bootstrapPage(
     tags$head(
       # tags$script(type = "text/javascript", src = "sidebar.js")
     ),
-    tags$footer(
-      align = "center",
-      em("Kenneth McLeod")
-    ),
+    # use tags$footer() to have message at top of screen
     # includeCSS(paste0(getwd(), "/www/style.css")),
     dashboardPage(
       title = appTitle,
