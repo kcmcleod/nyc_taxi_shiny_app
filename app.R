@@ -1,5 +1,7 @@
 if (interactive()) sink(stderr(), type = "output")
 
+options(scipen = 999)
+
 source("global.R")
 
 server <- function(input, output, session) {

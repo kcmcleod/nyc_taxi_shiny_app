@@ -1,7 +1,7 @@
 
 
 observeEvent(yellow_taxi_data(), {
-
+  
   tDF <- yellow_taxi_data()
   
   vendor_values = sort(unique(tDF$Vendor))
@@ -20,11 +20,54 @@ observeEvent(yellow_taxi_data(), {
     choices = payment_types,
     selected = payment_types
   )
+  
+  #
+  
+  all_dates <- sort(unique(tDF$date))
+  num_dates <- length(all_dates)
+  final_date <- ymd(all_dates[num_dates])
+  initial_window_date <- floor_date(final_date %m-% weeks(13), unit = 'month')
+  
+  updateDateInput(
+    session = session,
+    "di_start_date",
+    min = all_dates[1],
+    max = all_dates[num_dates - 1],
+    value = initial_window_date
+  )
+  
+  updateDateInput(
+    session = session,
+    "di_end_date",
+    min = all_dates[2],
+    max = all_dates[num_dates],
+    value = all_dates[num_dates]
+  )
+  
+  enable("di_start_date")
+  enable("di_end_date")
+  enable("pi_vendor")
+  enable("pi_pay_type")
+})
+
+
+rv_main_date_filtered_date <- reactive({
+  req(yellow_taxi_data(), input$di_end_date, input$di_start_date)
+  
+  if(input$di_start_date == Sys.Date() || input$di_end_date == Sys.Date()) {
+    return(NULL)
+  }
+  
+  tmpDF <- yellow_taxi_data() |> 
+    filter(date <= input$di_end_date, 
+           date >= input$di_start_date)
+  
+  return(tmpDF)
 })
 
 
 rv_main_table_filtered_data <- reactive({
-  req(yellow_taxi_data(), input$rb_journeys_or_passengers, input$pi_vendor,
+  req(rv_main_date_filtered_date(), input$rb_journeys_or_passengers, input$pi_vendor,
       input$pi_pay_type, input$pi_level)
   
   month_agg <- ifelse(input$pi_level == "Month", TRUE, FALSE)
@@ -33,7 +76,7 @@ rv_main_table_filtered_data <- reactive({
   data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance", 
                        "total_distance", "total_number_trips")
   
-  tmpDF <- yellow_taxi_data() |> 
+  tmpDF <- rv_main_date_filtered_date() |> 
     filter(
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg,
@@ -43,16 +86,16 @@ rv_main_table_filtered_data <- reactive({
     select(date, all_of(data_field)) |> 
     group_by(date) |> 
     summarise(total_value = sum(.data[[data_field]], na.rm = TRUE), .groups = 'drop') 
-
+  
   return(tmpDF)
-}) |> 
-  bindCache(yellow_data_version(), input$pi_level, 
-            input$rb_journeys_or_passengers, input$pi_vendor, input$pi_pay_type)
+})  
+# bindCache(yellow_data_version(), input$pi_level, 
+#           input$rb_journeys_or_passengers, input$pi_vendor, input$pi_pay_type)
 
 
 # main trip volumes chart
 output$po_tripVolumesOverTime <- renderPlotly({
-  req(yellow_taxi_data(), input$rb_journeys_or_passengers)
+  req(rv_main_table_filtered_data(), input$rb_journeys_or_passengers)
   
   # User-facing validations for interactive selections
   validate(
@@ -60,7 +103,7 @@ output$po_tripVolumesOverTime <- renderPlotly({
     need(length(input$pi_pay_type) > 0, "Please select at least one payment type."),
     need(length(input$pi_level) == 1, "Please select exactly one payment type.")
   )
-
+  
   x_lab_format <- switch (
     input$pi_level,
     "Month" = "%b %Y",
@@ -77,7 +120,7 @@ output$po_tripVolumesOverTime <- renderPlotly({
     need(nrow(tmpDF) > 0, "No data for that query")
   )
   
-
+  
   fig <- plot_ly(tmpDF, x = ~date, y = ~total_value, type = 'scatter', mode = 'line') |> 
     layout(
       title = "Yellow Taxi journeys",
@@ -97,6 +140,95 @@ output$po_tripVolumesOverTime <- renderPlotly({
   return(fig)    
   
 }) 
+
+rv_main_heatmap_data <- reactive({
+  req(rv_main_date_filtered_date(), input$ri_heatmap_period)
+  
+  month_agg <- ifelse(input$ri_heatmap_period == "Monthly", TRUE, FALSE)
+  week_agg <- ifelse(input$ri_heatmap_period == "Weekly", TRUE, FALSE)  
+  
+  tDF <- rv_main_date_filtered_date() 
+  
+  grouping_cols <- c("PULocation", "DOLocation")
+  
+  if(month_agg) {
+    tDF <- tDF |> 
+      mutate(date_month = format(date, "%Y month:%m"))
+    
+    grouping_cols <- c(grouping_cols, "date_month")
+    
+  } else if(week_agg) {
+    tDF <- tDF |> 
+      mutate(date_week = format(date, "%G week:%V"))
+    
+    grouping_cols <- c(grouping_cols, "date_week")
+  }
+  
+  tDF <- tDF |> 
+    filter(
+      full_month_aggregation == month_agg,
+      full_week_aggregation == week_agg) |> 
+    group_by(across(all_of(grouping_cols))) %>%
+    summarise(trips = n(), .groups = 'drop')
+})
+
+
+output$po_heatmap <- renderPlotly({
+  req(rv_main_heatmap_data())
+  
+  plot_data <- rv_main_heatmap_data() |>
+    mutate(
+      PULocation = as.factor(PULocation),
+      DOLocation = as.factor(DOLocation)
+    )
+  
+  if("date_week" %in% names(plot_data)) {
+    split_variable <- "date_week"
+  } else if("date_month" %in% names(plot_data)) {
+    split_variable <- "date_month"
+  }
+  
+  validate(
+    need(nrow(plot_data) > 0, "Waiting on data becoming ready...")
+  )
+
+  p <- ggplot(plot_data, aes(x = PULocation, y = DOLocation, fill = trips)) +
+    geom_tile()
+  
+  if(exists("split_variable")) {
+    p <- p + facet_wrap(~ get(split_variable), scales = "fixed", ncol = 3) 
+    
+    n_facets <- n_distinct(plot_data[[split_variable]])
+    n_rows <- ceiling(n_facets / 3)
+    calc_height <- max(400, n_rows * 300)
+  } else {
+    calc_height <- 400
+  }   
+  
+  p <- p + 
+    scale_fill_gradientn(
+      colours = c(
+        config$colours$theme$body_bg,
+        config$colours$theme$primary_accent,
+        config$colours$icons$taxi
+      ),
+      name = "Total Trips",
+      labels = label_number(scale_cut = cut_short_scale())
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    ) +
+    labs(
+      title = "Pickup vs Dropoff Borough",
+      x = "Pickup Borough",
+      y = "Dropoff Borough"
+    )
+  
+  ggplotly(p, tooltip = c("x", "y", "fill"), height = calc_height)
+})
+
+
 
 # --- EXPORT FOR TESTING ---
 # These values are invisible to the user but visible to shinytest2

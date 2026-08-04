@@ -9,4 +9,5 @@ dev_data_folder
 # {shinytest2}: Ignore new debug snapshots for `$expect_values()`
 *_.new.png
 # creating code for AI
-*_shiny_app_code_bundle.txt 
+*_shiny_app_code_bundle.txt
+shared_app_cache
