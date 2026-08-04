@@ -14,14 +14,18 @@
 
       ]
     },
+    "di_end_date": "2026-05-31",
+    "di_start_date": "2026-03-01",
     "pi_level": "Month",
     "pi_pay_type": "Flex Fare trip",
     "pi_vendor": "Myle Technologies Inc",
     "plotly_afterplot-A": "\"po_tripVolumesOverTime\"",
     "rb_journeys_or_passengers": "Total Distance",
+    "ri_heatmap_period": "Weekly",
     "sidebarCollapsed": false,
     "sidebarItemExpanded": null,
-    "sidebar_id": "trip_data_page"
+    "sidebar_id": "trip_data_page",
+    "yellow_data_panel": "VOLUMES"
   },
   "output": {
     "po_tripVolumesOverTime": {
@@ -43,15 +47,11 @@
             "title": "Journey month",
             "tickmode": "array",
             "tickvals": [
-              "2026-01-01",
-              "2026-02-01",
               "2026-03-01",
               "2026-04-01",
               "2026-05-01"
             ],
             "ticktext": [
-              "Jan 2026",
-              "Feb 2026",
               "Mar 2026",
               "Apr 2026",
               "May 2026"
@@ -79,15 +79,11 @@
         "data": [
           {
             "x": [
-              "2026-01-01",
-              "2026-02-01",
               "2026-03-01",
               "2026-04-01",
               "2026-05-01"
             ],
             "y": [
-              10.57,
-              4.9699999999999998,
               19.09,
               22.439999999999998,
               3.3500000000000001
@@ -229,6 +225,6 @@
     }
   },
   "export": {
-    "exported_filtered_rows": 5
+    "exported_filtered_rows": 3
   }
 }
