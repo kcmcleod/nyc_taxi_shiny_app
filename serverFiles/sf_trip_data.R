@@ -58,9 +58,27 @@ rv_main_date_filtered_date <- reactive({
     return(NULL)
   }
   
+  user_start_date <- input$di_start_date
+  user_end_date <- input$di_end_date 
+  
   tmpDF <- yellow_taxi_data() |> 
-    filter(date <= input$di_end_date, 
-           date >= input$di_start_date)
+    filter(
+      # 1. Daily Data: Strict exact-day matching
+      (!full_month_aggregation & !full_week_aggregation & 
+         date >= user_start_date & date <= user_end_date) |
+        
+        # 2. Monthly Data: Snap the user's start date to the 1st of the month
+        # due to the data prep using the 1st of the month as the date
+        (full_month_aggregation & 
+           date >= floor_date(user_start_date, "month") & 
+           date <= user_end_date) |
+        
+        # 3. Weekly Data: Snap the user's start date to the start of the week.
+        # due to ata prep using week_start = 7 (Sunday)
+        (full_week_aggregation & 
+           date >= floor_date(user_start_date, "week", week_start = 7) & 
+           date <= user_end_date)
+    )
   
   return(tmpDF)
 })
