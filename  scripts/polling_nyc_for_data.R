@@ -1,12 +1,12 @@
+source(paste0(getwd(), "/global.R"))
 library(httr)
-library(logger)
 
 # Determine the target month to check (e.g., usually 2 months behind current time)
-target_date <- Sys.Date() %m-% months(3)
+target_date <- Sys.Date() %m-% months(2)
 year_month <- format(target_date, "%Y-%m")
 
 file_url <- paste0("https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_", year_month, ".parquet")
-destination_path <- paste0(Sys.getenv("HOME"), "/data/shiny_data/src/yellow_tripdata_", year_month, ".parquet")
+destination_path <- paste0(Sys.getenv("HOME"), "/data/nyc_taxi/yellow_tripdata_", year_month, ".parquet")
 
 # Check if we already have it locally
 if (file.exists(destination_path)) {

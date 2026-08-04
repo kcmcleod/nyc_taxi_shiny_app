@@ -2,7 +2,6 @@
 # PACKAGES
 suppressPackageStartupMessages(library("tidyverse"))
 
-
 suppressPackageStartupMessages(library("shinyjs"))
 
 suppressPackageStartupMessages(library("shinydashboard"))
@@ -24,12 +23,17 @@ suppressPackageStartupMessages(library("shinycssloaders"))
 ################################################################################
 # SETUP
 # share cache across users
-shared_app_cache <- cachem::cache_disk(
-  dir = "./shared_app_cache", 
-  max_size = 1024 * 1024^2 # 1GB limit
-)
 
-shinyOptions(cache = shared_app_cache)
+if(isNamespaceLoaded("shiny")) {
+  # no need to make cache if only doing local data processing
+  
+  shared_app_cache <- cachem::cache_disk(
+    dir = "./shared_app_cache", 
+    max_size = 1024 * 1024^2 # 1GB limit
+  )
+  
+  shinyOptions(cache = shared_app_cache)
+}
 
 
 
@@ -99,7 +103,10 @@ config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr
 ################################################################################
 # DATA
 
-raw_taxi_data <- get_initial_taxi_data(data_path = dataPath)
+if(isNamespaceLoaded("shiny")) {
+  # no need to load data if only doing local data processing
+  raw_taxi_data <- get_initial_taxi_data(data_path = dataPath)
+}
 
 # # might move to database in future
 # db_pool <- pool::dbPool(

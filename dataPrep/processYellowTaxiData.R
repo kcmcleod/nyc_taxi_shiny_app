@@ -6,7 +6,7 @@ library(data.table)
 library(logger)
 library(prettyunits)
 
-sourceRFilesFromFolder(paste0(getwd(), "/dataPrep/yellow_taxi_helpers"))
+sourceRFilesFromFolder(paste0(getwd(), "/dataPrep/yellow_taxi_helpers/"))
 
 ################################################################################
 # SETUP LOGGING
@@ -32,7 +32,7 @@ processed_months <- character(0)
 existing_master_df <- NULL
 
 if (!is.na(latest_master_file) && file.exists(latest_master_file)) {
-  log_info(".. found existing master file: ", latest_master)
+  log_info(".. found existing master file: ", latest_master_file)
   existing_master_df <- read_parquet(latest_master_file)
   
   processed_months <- unique(format(existing_master_df$date, "%Y-%m"))
@@ -48,7 +48,7 @@ all_yellow_files <- list.files(path = paste0(dataPath, "src"), pattern = "yellow
 new_files <- c()
 for(file in all_yellow_files) {
   file_month <- str_match(file, pattern="\\d{4}-\\d{2}")[1]
-  if(is_na(file_month)) {
+  if(is.na(file_month)) {
     log_error("Cannot process date from: ", file)
   } else if(!file_month %in% processed_months) {
     new_files <- c(new_files, file)
@@ -78,7 +78,7 @@ if (!is.na(latest_master_file)) {
 combinedDF <- NULL
 expected_cols <- NULL
 
-for(file in yellowFiles) {
+for(file in all_yellow_files) {
   log_info("Processing file: ", file)
   tmp <- fn_process_yellow_file(file)
   
@@ -106,6 +106,8 @@ combinedDF <- arrange(combinedDF, across(all_of(sort_cols)))
 # LOOKUPS
 # todo need to check files exists 
 
+browser()
+
 log_info("Starting to join lookups...")
 
 zone_lookups <- read_csv(paste0(dataPath, "src/taxi_zone_lookup.csv")) |> 
@@ -120,10 +122,25 @@ combinedDF <- fn_perform_lookup(combinedDF, rate_lookups, "RatecodeID", "Ratecod
   fn_perform_lookup(zone_lookups, c("DOLocationID" = "LocationID"), "DOLocationID", "DOLocation", "DO", 
                     post_process_fn = function(df) rename(df, DOLocation = Borough)) |> 
   fn_perform_lookup(payment_lookups, "payment_type", "payment_type", "payment_type", "payment", 
-                    post_process_fn = function(df) mutate(df, payment_type = payment_class)) |> 
-  fn_perform_lookup(vendor_lookups, "VendorID", "VendorID", "Vendor", "vendor")
+                    post_process_fn = function(df) mutate(df, payment_type = payment_class)) |>
+  select(-c(payment_class)) |>           
+  fn_perform_lookup(vendor_lookups, "VendorID", "VendorID", "Vendor", "vendor") 
 
-# todo checks on joins
+# checks on joins
+all_names <- names(combinedDF)
+expected_names <- c("PULocation", "DOLocation", "Rate", "Vendor") 
+
+join_results <- sapply(expected_names, function(field) fn_test_lookup_join(all_names, field))
+
+if(class(combinedDF$payment_type) != "character") {
+  log_error(".... payement join not complete")
+  join_results <- c(join_results, FALSE)
+}
+
+if(any(! join_results)) {
+  log_error("STOPPING DUE TO FAILED JOINS!")
+  stop()
+}
 
 
 ################################################################################
@@ -133,7 +150,7 @@ log_info("Extending OG data...")
 if (!is.null(existing_master_df)) {
   
   # drop any extra cols
-  combinedDF <- select(combinedDF, across(any_of(nams(existing_master_df))))
+  combinedDF <- select(combinedDF, any_of(names(existing_master_df)))
   
   combinedDF <- as_tibble(rbindlist(list(existing_master_df, combinedDF), fill = TRUE)) |> 
     arrange(across(all_of(sort_cols)))
