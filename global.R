@@ -33,6 +33,8 @@ if(isNamespaceLoaded("shiny")) {
   )
   
   shinyOptions(cache = shared_app_cache)
+  
+  log_info("Cache enabled")
 }
 
 

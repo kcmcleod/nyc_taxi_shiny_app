@@ -3,6 +3,7 @@
 observeEvent(yellow_taxi_data(), {
 
   tDF <- yellow_taxi_data()
+  
   vendor_values = sort(unique(tDF$Vendor))
   payment_types = sort(unique(tDF$payment_type))
   
@@ -44,7 +45,9 @@ rv_main_table_filtered_data <- reactive({
     summarise(total_value = sum(.data[[data_field]], na.rm = TRUE), .groups = 'drop') 
 
   return(tmpDF)
-})
+}) |> 
+  bindCache(yellow_data_version(), input$pi_level, 
+            input$rb_journeys_or_passengers, input$pi_vendor, input$pi_pay_type)
 
 
 # main trip volumes chart
@@ -93,8 +96,7 @@ output$po_tripVolumesOverTime <- renderPlotly({
   
   return(fig)    
   
-})
-
+}) 
 
 # --- EXPORT FOR TESTING ---
 # These values are invisible to the user but visible to shinytest2
