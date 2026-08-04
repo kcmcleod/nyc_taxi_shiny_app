@@ -31,13 +31,13 @@ tabItem(
   tabsetPanel(
     id = "yellow_data_panel",
     tabPanel(
-      title = "Volumes",  
+      title = "VOLUMES",  
       fluidRow(
         column(
           width = 12,
           box(
             width = 12,
-            title = "TRIP VOLUMES",
+            title = "Options",
             status = "info",
             solidHeader = TRUE,
             fluidRow(
@@ -99,12 +99,15 @@ tabItem(
       )
     ),
     tabPanel(
-      title = "Heatmaps",  
+      title = "JOURNEY PICKUP + DROP OFF",  
       fluidRow(
         column(
           width = 12,
-          column(
+          box(
             width = 12,
+            title = "Options",
+            status = "info",
+            solidHeader = TRUE,
             radioButtons(
               "ri_heatmap_period",
               label = "Heatmaps period:",
@@ -130,6 +133,26 @@ tabItem(
             )
           )
         ) 
+      )
+    ),
+    tabPanel(
+      title = "TABLES",
+      fluidRow(
+        column(
+          width = 12,
+          box(
+            width = 12,
+            title = "Options",
+            status = "info",
+            solidHeader = TRUE,
+            fluidRow(
+              column(
+                width = 12,
+                tags$p("TBC")
+              )
+            )
+          )
+        )
       )
     )
   )
