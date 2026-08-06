@@ -175,8 +175,16 @@ gc()
 
 Vendors <- sort(unique(vendor_lookups$Vendor))
 payment_types <- sort(unique(payment_lookups$payment_class))
+locations <- sort(unique(zone_lookups$Borough))
 
-yellow_taxi_meta_data <- list("Vendor" = Vendors, "payment_type" = payment_types)
+min_taxi_date <- min(combinedDF$date, na.rm = TRUE)
+max_taxi_date <- max(combinedDF$date, na.rm = TRUE)
+
+yellow_taxi_meta_data <- list("Vendor" = Vendors, 
+                              "payment_type" = payment_types,
+                              "min_date" = min_taxi_date,
+                              "max_date" = max_taxi_date,
+                              "Location" = locations)
 
 saveRDS(yellow_taxi_meta_data, file = paste0(dataPath, format(Sys.Date(), "%Y%m%d"), "_yellow_metadata.rds"))
 
