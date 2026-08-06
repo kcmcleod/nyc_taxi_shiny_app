@@ -43,16 +43,16 @@ fn_calculate_trip_volumes <- function(base_data, vendor_list, payment_list,
   }
 
   # check cols
-  required_cols <- c("date", "Vendor", "payment_type", 
+  required_cols <- c("date", "Vendor", "payment_type",
                      "full_month_aggregation", "full_week_aggregation", data_field)
-  missing_cols <- setdiff(required_cols, colnames(base_data))
-  
+  missing_cols <- setdiff(required_cols, names(base_data))
+
   if (length(missing_cols) > 0) {
-    err_msg <- sprintf("Data Error: The dataset is missing required columns: %s", 
+    err_msg <- sprintf("Data Error: The dataset is missing required columns: %s",
                        paste(missing_cols, collapse = ", "))
-    
-    log_error(err_msg) 
-    
+
+    log_error(err_msg)
+
     shiny::validate(
       shiny::need(FALSE, err_msg)
     )
@@ -107,12 +107,13 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
     logger::log_error(err_msg)
     shiny::validate(shiny::need(FALSE, err_msg))
   }
-  
+
+  # cols  
   required_cols <- c("date", "full_month_aggregation", "full_week_aggregation", "PULocation", "DOLocation")
-  missing_cols <- setdiff(required_cols, colnames(base_data))
-  
+  missing_cols <- setdiff(required_cols, names(base_data))
+
   if (length(missing_cols) > 0) {
-    err_msg <- sprintf("Data Error: The dataset is missing required columns: %s", 
+    err_msg <- sprintf("Data Error: The dataset is missing required columns: %s",
                        paste(missing_cols, collapse = ", "))
     logger::log_error(err_msg)
     shiny::validate(shiny::need(FALSE, err_msg))

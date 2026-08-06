@@ -14,7 +14,7 @@ rv_main_heatmap_data <- reactive({
 
 output$po_heatmap <- renderPlotly({
   
-  plot_data <- rv_main_heatmap_data() 
+  plot_data <- rv_main_heatmap_data()
   
   # Validation safely lives here on the main thread now
   validate(
@@ -38,16 +38,16 @@ output$po_heatmap <- renderPlotly({
     geom_tile()
   
   if(exists("split_variable")) {
-    p <- p + facet_wrap(~ get(split_variable), scales = "fixed", ncol = 3) 
+    p <- p + facet_wrap(~ get(split_variable), scales = "fixed", ncol = 3)
     
     n_facets <- n_distinct(plot_data[[split_variable]])
     n_rows <- ceiling(n_facets / 3)
     calc_height <- max(400, n_rows * 300)
   } else {
     calc_height <- 400
-  }   
+  }
   
-  p <- p + 
+  p <- p +
     scale_fill_gradientn(
       colours = c(
         config$colours$theme$body_bg,
@@ -70,7 +70,7 @@ output$po_heatmap <- renderPlotly({
   ggplotly(p, tooltip = c("x", "y", "fill"), height = calc_height)
   
   return(p)
-}) |>
+}) |> 
   bindCache(
     yellow_data_version(),
     input$di_start_date,

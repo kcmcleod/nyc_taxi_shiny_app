@@ -1,3 +1,4 @@
+---
 colours:
   theme:
     primary_accent: "#00539F"
@@ -12,13 +13,13 @@ colours:
     taxi: "#FFC107"
 ui_values:
   pi_level:
-    - "Day"
-    - "Week"
-    - "Month"
+    - Day
+    - Week
+    - Month
   metric_type:
-    - "Journey Count"
-    - "Total Distance"
+    - Journey Count
+    - Total Distance
   heatmap_level:
-    - "Combined"
-    - "Weekly"
-    - "Monthly"
+    - Combined
+    - Weekly
+    - Monthly

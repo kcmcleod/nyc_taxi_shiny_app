@@ -11,7 +11,7 @@ server <- function(input, output, session) {
     source(file, local = TRUE)
   }
   
-  # 1. Show the warning modal 60 seconds before timeout
+  # Show the warning modal 60 seconds before timeout
   observeEvent(input$idle_warning, {
     showModal(
       modalDialog(
@@ -23,7 +23,7 @@ server <- function(input, output, session) {
     )
   })
   
-  # 2. Close the modal automatically if the user moves their mouse
+  # Close the modal automatically if the user moves their mouse
   observeEvent(input$idle_active, {
     removeModal()
   })
@@ -69,6 +69,6 @@ ui <- bootstrapPage(
 )
 
 shinyApp(ui = ui, server = server, onStart = function() {
-  message("starting app... ")
+  logger::log_info("starting app... ")
 })
 
