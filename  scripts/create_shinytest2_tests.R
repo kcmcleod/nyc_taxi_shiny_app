@@ -18,7 +18,11 @@ record_test()
 # plotly_data <- app$get_value(output = "po_tripVolumesOverTime")
 # expect_true(length(plotly_data$x$data) > 0) 
 
-# run tests
+
+
+
+################################################################################
+# RUN TESTS
 test_app()
 
 

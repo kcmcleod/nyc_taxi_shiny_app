@@ -30,6 +30,34 @@
   "output": {
     "po_tripVolumesOverTime": {
       "x": {
+        "visdat": {
+          "2d704b27493": [
+            "function () ",
+            "plotlyVisDat"
+          ]
+        },
+        "cur_data": "2d704b27493",
+        "attrs": {
+          "2d704b27493": {
+            "x": {
+
+            },
+            "y": {
+
+            },
+            "mode": "line",
+            "alpha_stroke": 1,
+            "sizes": [
+              10,
+              100
+            ],
+            "spans": [
+              1,
+              20
+            ],
+            "type": "scatter"
+          }
+        },
         "layout": {
           "margin": {
             "b": 40,

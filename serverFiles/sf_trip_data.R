@@ -244,6 +244,6 @@ output$po_heatmap <- renderPlotly({
 
 # --- EXPORT FOR TESTING ---
 # These values are invisible to the user but visible to shinytest2
-# exportTestValues(
-#   exported_filtered_rows = nrow(rv_main_table_filtered_data())
-# )
+exportTestValues(
+  exported_filtered_rows = nrow(rv_main_table_filtered_data())
+)
