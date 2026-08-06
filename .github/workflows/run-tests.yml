@@ -38,5 +38,33 @@ jobs:
           testthat::test_dir("tests/testthat", stop_on_failure = TRUE)
         shell: Rscript {0}
         env:
-              CI: "true"
-              NOT_CRAN: "true"
+          CI: "true"
+          NOT_CRAN: "true"
+
+      - name: Calculate and Export Code Coverage
+        run: |
+          app_sources <- list.files("R", pattern = "\\.[Rr]$", full.names = TRUE)
+          app_tests <- list.files("tests/testthat", pattern = "\\.[Rr]$", full.names = TRUE)
+          
+          # 1. Filter out the shinytest2 tests and setup files
+          unit_tests <- grep("shinytest2|setup", app_tests, value = TRUE, invert = TRUE)
+          
+          # 2. Filter out non-function source files
+          core_sources <- grep("_disable", app_sources, value = TRUE, invert = TRUE)
+          
+          # 3. Run coverage only on the pure unit tests
+          cov_results <- covr::file_coverage(
+            source_files = core_sources, 
+            test_files = unit_tests 
+          )
+          
+          # 4. Export to a standard format that Codecov understands
+          covr::to_cobertura(cov_results, filename = "cobertura.xml")
+        shell: Rscript {0}
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./cobertura.xml
+          fail_ci_if_error: false # Prevents the whole pipeline failing if Codecov is down
+          token: ${{ secrets.CODECOV_TOKEN }}
