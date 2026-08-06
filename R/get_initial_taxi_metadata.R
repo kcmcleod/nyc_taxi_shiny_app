@@ -1,4 +1,9 @@
 get_initial_taxi_metadata <- function(data_path) {
+  
+  if (isTRUE(getOption("shiny.testmode"))) {
+    log_info(".... loading TEST metadata !")
+    return(readRDS("tests/testdata/yellow_metadata.rds"))
+  }
 
   all_yellow_metadata <- list.files(data_path, pattern="yellow.*rds", full.names = TRUE)
   latest_yellow_metadata <- sort(all_yellow_metadata, decreasing = TRUE)[1]
