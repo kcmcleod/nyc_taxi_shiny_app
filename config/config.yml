@@ -10,4 +10,15 @@ colours:
     button: "#333333"
   icons:
     taxi: "#FFC107"
-
+ui_values:
+  pi_level:
+    - "Day"
+    - "Week"
+    - "Month"
+  metric_type:
+    - "Journey Count"
+    - "Total Distance"
+  heatmap_level:
+    - "Combined"
+    - "Weekly"
+    - "Monthly"

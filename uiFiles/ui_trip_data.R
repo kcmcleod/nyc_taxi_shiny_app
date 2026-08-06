@@ -46,7 +46,7 @@ tabItem(
                 pickerInput("pi_level", 
                             label = "Granularity:", 
                             multiple = FALSE, 
-                            choices = c("Day", "Week", "Month"),
+                            choices = config$ui_values$pi_level,
                             selected = "Week"
                 )
               ),
@@ -78,7 +78,7 @@ tabItem(
                 width = 3,
                 radioButtons("rb_journeys_or_passengers", 
                              label = "Y axis:",
-                             choices = c("Journey Count", "Total Distance")
+                             choices = config$ui_values$metric_type
                 )
               )
             )
@@ -111,7 +111,7 @@ tabItem(
             radioButtons(
               "ri_heatmap_period",
               label = "Heatmaps period:",
-              choices = c("Combined", "Weekly", "Monthly"),
+              choices = config$ui_values$heatmap_level,
               selected = "Weekly", 
               inline = TRUE
             )
