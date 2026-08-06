@@ -1,0 +1,3 @@
+profvis::profvis({
+  shiny::runApp()
+})

@@ -3,46 +3,21 @@
 observeEvent(yellow_taxi_data(), {
   
   tDF <- yellow_taxi_data()
+
+  # filters
+  vendor_values <- app_metadata$Vendor
+  payment_types <- app_metadata$payment_type
   
-  vendor_values = sort(unique(tDF$Vendor))
-  payment_types = sort(unique(tDF$payment_type))
+  updatePickerInput(session = session, "pi_vendor", choices = vendor_values, selected = vendor_values)
+  updatePickerInput(session = session, "pi_pay_type", choices = payment_types, selected = payment_types)
   
-  updatePickerInput(
-    session = session,
-    "pi_vendor",
-    choices = vendor_values,
-    selected = vendor_values
-  )
+  # dates
+  min_date <- min(tDF$date, na.rm = TRUE)
+  max_date <- max(tDF$date, na.rm = TRUE)
+  initial_window_date <- floor_date(max_date %m-% weeks(13), unit = 'month')
   
-  updatePickerInput(
-    session = session,
-    "pi_pay_type",
-    choices = payment_types,
-    selected = payment_types
-  )
-  
-  #
-  
-  all_dates <- sort(unique(tDF$date))
-  num_dates <- length(all_dates)
-  final_date <- ymd(all_dates[num_dates])
-  initial_window_date <- floor_date(final_date %m-% weeks(13), unit = 'month')
-  
-  updateDateInput(
-    session = session,
-    "di_start_date",
-    min = all_dates[1],
-    max = all_dates[num_dates - 1],
-    value = initial_window_date
-  )
-  
-  updateDateInput(
-    session = session,
-    "di_end_date",
-    min = all_dates[2],
-    max = all_dates[num_dates],
-    value = all_dates[num_dates]
-  )
+  updateDateInput(session = session, "di_start_date", min = min_date, max = max_date, value = initial_window_date)
+  updateDateInput(session = session, "di_end_date", min = min_date, max = max_date, value = max_date)
   
   enable("di_start_date")
   enable("di_end_date")
