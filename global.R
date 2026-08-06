@@ -35,7 +35,7 @@ cachePath <- paste0(dataPath, "shared_app_cache")
 ################################################################################
 # CACHE
 
-if(isNamespaceLoaded("shiny")) {
+if(! exists("offline_data_prep")) {
   # no need to make cache if only doing local data processing
   
   shared_app_cache <- cachem::cache_disk(
@@ -107,7 +107,10 @@ config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr
 ################################################################################
 # DATA
 
-if(isNamespaceLoaded("shiny")) {
+if(! exists("offline_data_prep")) {
+  # Load the pre-computed metadata 
+  app_metadata <- get_initial_taxi_metadata(data_path = dataPath)
+  
   # no need to load data if only doing local data processing
   raw_taxi_data <- get_initial_taxi_data(data_path = dataPath)
 }

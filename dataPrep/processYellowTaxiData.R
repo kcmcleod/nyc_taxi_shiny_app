@@ -1,5 +1,7 @@
 start_time = Sys.time()
 
+offline_data_prep <- TRUE
+
 source(paste0(getwd(), "/global.R"))
 library(arrow)
 library(data.table)
@@ -106,8 +108,6 @@ combinedDF <- arrange(combinedDF, across(all_of(sort_cols)))
 # LOOKUPS
 # todo need to check files exists 
 
-browser()
-
 log_info("Starting to join lookups...")
 
 zone_lookups <- read_csv(paste0(dataPath, "src/taxi_zone_lookup.csv")) |> 
@@ -166,8 +166,19 @@ log_info("Writing new complete data asset...")
 write_parquet(combinedDF, 
               sink = paste0(dataPath, format(Sys.Date(), "%Y%m%d"), "_yellow_aggregation.parquet"))
 
-remove(existing_master_df, combinedDF)
+remove(combinedDF)
 gc()
+
+
+################################################################################
+# WRITE NEW ASSET FOR METADATA
+
+Vendors <- sort(unique(vendor_lookups$Vendor))
+payment_types <- sort(unique(payment_lookups$payment_class))
+
+yellow_taxi_meta_data <- list("Vendor" = Vendors, "payment_type" = payment_types)
+
+saveRDS(yellow_taxi_meta_data, file = paste0(dataPath, format(Sys.Date(), "%Y%m%d"), "_yellow_metadata.rds"))
 
 
 ################################################################################
