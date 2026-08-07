@@ -20,6 +20,45 @@ get_initial_taxi_data <- function(data_path) {
   return(tDF)
 }
 
+get_initial_taxi_data_aws <- function() {
+  
+  # TEST MODE: Automatically triggered by shinytest2
+  if (isTRUE(getOption("shiny.testmode"))) {
+    log_info(".... loading TEST data !")
+    return(readRDS("tests/testdata/mock_taxi_trips.rds"))
+  }
+  
+  # PROD MODE
+  
+  bucket_name <- Sys.getenv("TAXI_S3_BUCKET")
+  object_key <- Sys.getenv("TAXI_S3_OBJECT") 
+  
+  if (bucket_name == "" || object_key == "") {
+    log_error("S3 Bucket or Object Key missing from environment variables.")
+    stop("Missing required AWS configuration.")
+  }
+  
+  # Create the specific URI format Arrow requires
+  s3_uri <- paste0("s3://", bucket_name, "/", object_key)
+  log_info("READING DATA FROM AWS S3: ", s3_uri)
+  
+  tDF <- tryCatch({
+    # Arrow natively connects to S3 using the keys in your .Renviron
+    arrow::open_dataset(s3_uri)
+  }, error = function(e) {
+    log_error("Failed to fetch dataset from AWS S3: ", e$message)
+    return(NULL)
+  })
+  
+  if (is.null(tDF)) {
+    return(NULL)
+  }
+  
+  log_info(".... successfully mapped S3 dataset via Arrow")
+  
+  return(tDF)
+}
+
 
 
 
