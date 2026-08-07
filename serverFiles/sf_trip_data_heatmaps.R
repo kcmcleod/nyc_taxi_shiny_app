@@ -77,3 +77,10 @@ output$po_heatmap <- renderPlotly({
     input$di_end_date,
     input$ri_heatmap_period
   )
+
+
+################################################################################
+# EXPORT FOR TESTING
+exportTestValues(
+  exported_heatmap_data = rv_main_heatmap_data()
+)

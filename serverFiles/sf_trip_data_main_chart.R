@@ -128,5 +128,5 @@ output$po_tripVolumesOverTime <- renderPlotly({
 ################################################################################
 # EXPORT FOR TESTING
 exportTestValues(
-  exported_filtered_rows = nrow(rv_main_table_filtered_data())
+  exported_main_table_data = rv_main_table_filtered_data()
 )
