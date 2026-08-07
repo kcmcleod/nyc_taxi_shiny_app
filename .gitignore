@@ -11,3 +11,4 @@ dev_data_folder
 # creating code for AI
 *_shiny_app_code_bundle.txt
 shared_app_cache
+.Renviron
