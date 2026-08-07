@@ -3,21 +3,21 @@
     "po_tripVolumesOverTime": {
       "x": {
         "visdat": {
-          "4293212be54e": [
+          "282d5eb5b1ac": [
             "function () ",
             "plotlyVisDat"
           ]
         },
-        "cur_data": "4293212be54e",
+        "cur_data": "282d5eb5b1ac",
         "attrs": {
-          "4293212be54e": {
+          "282d5eb5b1ac": {
             "x": {
 
             },
             "y": {
 
             },
-            "mode": "line",
+            "mode": "lines",
             "alpha_stroke": 1,
             "sizes": [
               10,
@@ -88,7 +88,7 @@
               5,
               1
             ],
-            "mode": "line",
+            "mode": "lines",
             "type": "scatter",
             "marker": {
               "color": "rgba(31,119,180,1)",

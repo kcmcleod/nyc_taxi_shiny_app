@@ -1,6 +1,19 @@
 library(testthat)
 library(dplyr)
 
+if (Sys.getenv("R_COVR") == "true") {
+  
+  # Forcefully inject a dummy logger directly into the functions' own execution 
+  # environments. When the function looks for log_error(), it will find this 
+  # dummy first and skip the global `{logger}` package completely.
+  
+  environment(fn_calculate_trip_volumes)$log_error <- function(...) invisible()
+  
+  if (exists("fn_calculate_heatmap_data")) {
+    environment(fn_calculate_heatmap_data)$log_error <- function(...) invisible()
+  }
+}
+
 # 1. Create a minimal mock dataset mimicking your schema
 mock_taxi_data <- tibble::tibble(
   date = as.Date(c("2023-01-01", "2023-01-01", "2023-01-02", "2023-01-02")),
@@ -106,37 +119,39 @@ test_that("fn_calculate_trip_volumes safely returns 0 rows for empty filter list
   expect_equal(nrow(result), 0)
 })
 
-test_that("fn_calculate_trip_volumes throws an error if data_field is missing", {
+test_that("fn_calculate_trip_volumes defensive blocks execute", {
   
-  # The test passes if the function ABORTS with an error
+  # BRUTE FORCE FIX: Neutralize the loggers in the test environment
+  # so they cannot crash before the stop() line is reached.
+  logger::log_threshold(logger::FATAL)
+  
   expect_error(
-    fn_calculate_trip_volumes(
-      base_data = mock_taxi_data,
-      vendor_list = c("VTS", "CMT"),
-      payment_list = c("Cash", "Credit"),
-      month_agg = TRUE,
-      week_agg = FALSE,
-      data_field = "non_existent_column"
-    )
+    fn_calculate_trip_volumes(list(date = "2026-01-01"), c("VTS"), c("Cash"), TRUE, FALSE, "total_distance"),
+    regexp = "System Error"
+  )
+  
+  expect_error(
+    fn_calculate_trip_volumes(mock_taxi_data, c("VTS"), c("Cash"), "TRUE", FALSE, "total_distance"),
+    regexp = "Month aggregation selection is invalid"
+  )
+  
+  expect_error(
+    fn_calculate_trip_volumes(mock_taxi_data, c("VTS"), c("Cash"), TRUE, "FALSE", "total_distance"),
+    regexp = "Week aggregation selection is invalid"
+  )
+  
+  expect_error(
+    fn_calculate_trip_volumes(mock_taxi_data, c("VTS"), c("Cash"), TRUE, FALSE, 123),
+    regexp = "Selected metric is invalid"
+  )
+  
+  bad_data <- mock_taxi_data |> dplyr::select(-Vendor)
+  expect_error(
+    fn_calculate_trip_volumes(bad_data, c("VTS"), c("Cash"), TRUE, FALSE, "total_distance"),
+    regexp = "missing required columns"
   )
 })
 
-test_that("fn_calculate_trip_volumes throws an error if base_data is missing required columns", {
-  
-  # Remove the 'Vendor' column to simulate malformed input data
-  bad_data <- mock_taxi_data |> dplyr::select(-Vendor)
-  
-  expect_error(
-    fn_calculate_trip_volumes(
-      base_data = bad_data,
-      vendor_list = c("VTS"),
-      payment_list = c("Cash"),
-      month_agg = TRUE,
-      week_agg = FALSE,
-      data_field = "total_distance"
-    )
-  )
-})
 
 ################################################################################
 
@@ -229,29 +244,36 @@ test_that("fn_calculate_heatmap_data handles 0-row dataframes gracefully", {
   expect_true("trips" %in% names(result))
 })
 
-test_that("fn_calculate_heatmap_data triggers UI validation on missing columns", {
+test_that("fn_calculate_heatmap_data defensive blocks execute", {
   
-  # Remove DOLocation
+  logger::log_threshold(logger::FATAL)
+  
+  # base_data invalid type
+  expect_error(
+    fn_calculate_heatmap_data(list(PULocation = "Loc_A"), TRUE, FALSE),
+    regexp = "System Error"
+  )
+  
+  # month_agg invalid type
+  expect_error(
+    fn_calculate_heatmap_data(mock_heatmap_data, "TRUE", FALSE),
+    regexp = "Month aggregation selection is invalid"
+  )
+  
+  # week_agg invalid type
+  expect_error(
+    fn_calculate_heatmap_data(mock_heatmap_data, TRUE, "FALSE"),
+    regexp = "Week aggregation selection is invalid"
+  )
+  
+  # missing columns
   bad_data <- mock_heatmap_data |> dplyr::select(-DOLocation)
-  
-  # shiny::validate() throws an error that testthat catches seamlessly
   expect_error(
     fn_calculate_heatmap_data(
       base_data = bad_data,
       month_agg = TRUE,
       week_agg = FALSE
-    )
-  )
-})
-
-test_that("fn_calculate_heatmap_data triggers UI validation on invalid argument types", {
-  
-  # Pass a character string instead of a logical value for month_agg
-  expect_error(
-    fn_calculate_heatmap_data(
-      base_data = mock_heatmap_data,
-      month_agg = "TRUE", 
-      week_agg = FALSE
-    )
+    ),
+    regexp = "missing required columns"
   )
 })

@@ -89,19 +89,19 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
   
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   
   if (!is.logical(month_agg) || length(month_agg) != 1) {
     err_msg <- "Input Error: Month aggregation selection is invalid."
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   
   if (!is.logical(week_agg) || length(week_agg) != 1) {
     err_msg <- "Input Error: Week aggregation selection is invalid."
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   
@@ -112,7 +112,7 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
   if (length(missing_cols) > 0) {
     err_msg <- sprintf("Data Error: The dataset is missing required columns: %s",
                        paste(missing_cols, collapse = ", "))
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   

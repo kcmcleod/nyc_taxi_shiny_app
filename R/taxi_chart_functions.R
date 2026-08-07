@@ -100,19 +100,19 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation", y
   
   if (!inherits(base_data, "data.frame")) {
     err_msg <- "System Error: The underlying data source must be collected into memory before plotting."
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   
   if (! is.character(title) || length(title) != 1) {
     err_msg <- "System Error: Invalid chart title."
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   
   if (missing(config) || is.null(config$colours)) {
     err_msg <- "System Error: Dashboard configuration (colours) is missing."
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   
@@ -120,7 +120,7 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation", y
       !is.character(y_col) || length(y_col) != 1 || 
       !is.character(z_col) || length(z_col) != 1) {
     err_msg <- "System Error: Column names for the heatmap axes must be valid text strings."
-    logger::log_error(err_msg)
+    log_error(err_msg)
     stop(err_msg)
   }
   
@@ -130,7 +130,7 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation", y
   if (length(missing_cols) > 0) {
     err_msg <- sprintf("Data Error: The heatmap dataset is missing required columns: %s", 
                        paste(missing_cols, collapse = ", "))
-    logger::log_error(err_msg) 
+    log_error(err_msg) 
     stop(err_msg)
   }
   

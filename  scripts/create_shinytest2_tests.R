@@ -1,5 +1,7 @@
 library(shinytest2)
 
+offline_data_prep <-TRUE
+
 ################################################################################
 # SETUP
 
@@ -48,5 +50,5 @@ cov_results <- covr::file_coverage(
   test_files = unit_tests 
 )
 
-
 covr::report(cov_results)
+covr::zero_coverage(cov_results)

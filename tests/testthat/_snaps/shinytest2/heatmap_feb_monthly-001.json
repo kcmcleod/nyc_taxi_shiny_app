@@ -33,7 +33,7 @@
       "Myle Technologies Inc"
     ],
     "plotly_afterplot-A": "\"po_heatmap\"",
-    "plotly_relayout-A": "{\"width\":1065,\"height\":450}",
+    "plotly_relayout-A": "{\"width\":1065,\"height\":600}",
     "rb_journeys_or_passengers": "Journey Count",
     "ri_heatmap_period": "Monthly",
     "sidebarCollapsed": false,
@@ -386,7 +386,7 @@
             "y": [
               1
             ],
-            "name": "efa1704f266698924d994e72e60d9949",
+            "name": "6668e4d3b6fe76c2584290d99da51e24",
             "type": "scatter",
             "mode": "markers",
             "opacity": 0,
@@ -1604,7 +1604,7 @@
                 "bordercolor": null,
                 "borderwidth": 0,
                 "thickness": 23.039999999999996,
-                "title": "Total Trips",
+                "title": "Number of journeys",
                 "titlefont": {
                   "color": "rgba(0,0,0,1)",
                   "family": "",
@@ -1737,7 +1737,7 @@
               "xanchor": "center",
               "yanchor": "top",
               "annotationType": "axis",
-              "yshift": -62.831050228310502
+              "yshift": -62.831050228310531
             },
             {
               "text": "Dropoff Borough",
@@ -1798,7 +1798,7 @@
             {
               "text": "2026 month:04",
               "x": 0.24571917808219179,
-              "y": 0.47031963470319632,
+              "y": 0.47625570776255705,
               "showarrow": false,
               "ax": 0,
               "ay": 0,
@@ -1816,7 +1816,7 @@
             {
               "text": "2026 month:05",
               "x": 0.75428082191780821,
-              "y": 0.47031963470319632,
+              "y": 0.47625570776255705,
               "showarrow": false,
               "ax": 0,
               "ay": 0,
@@ -1835,7 +1835,7 @@
           "yaxis": {
             "domain": [
               0,
-              0.47031963470319632
+              0.47625570776255705
             ],
             "automargin": true,
             "type": "linear",
@@ -1951,7 +1951,7 @@
               "x1": 0.49143835616438358,
               "y0": 0,
               "y1": 23.37899543378996,
-              "yanchor": 0.47031963470319632,
+              "yanchor": 0.47625570776255705,
               "ysizemode": "pixel"
             },
             {
@@ -1971,7 +1971,7 @@
               "x1": 1,
               "y0": 0,
               "y1": 23.37899543378996,
-              "yanchor": 0.47031963470319632,
+              "yanchor": 0.47625570776255705,
               "ysizemode": "pixel"
             }
           ],
@@ -2140,7 +2140,7 @@
             "showgrid": true,
             "domain": [
               0,
-              0.47031963470319632
+              0.47625570776255705
             ],
             "gridcolor": "rgba(235,235,235,1)",
             "gridwidth": 0.66417600664176002,
@@ -2160,7 +2160,7 @@
               "size": 11.68949771689498
             },
             "title": {
-              "text": "Total Trips",
+              "text": "Number of journeys",
               "font": {
                 "color": "rgba(0,0,0,1)",
                 "family": "",
@@ -2169,6 +2169,7 @@
             }
           },
           "hovermode": "closest",
+          "height": 600,
           "barmode": "relative"
         },
         "config": {
@@ -2181,7 +2182,7 @@
         },
         "source": "A",
         "attrs": {
-          "cd4ddd0066": {
+          "28a469758137": {
             "x": {
 
             },
@@ -2194,9 +2195,9 @@
             "type": "heatmap"
           }
         },
-        "cur_data": "cd4ddd0066",
+        "cur_data": "28a469758137",
         "visdat": {
-          "cd4ddd0066": [
+          "28a469758137": [
             "function (y) ",
             "x"
           ]
@@ -2317,14 +2318,14 @@
     "po_tripVolumesOverTime": {
       "x": {
         "visdat": {
-          "dc775021c79": [
+          "1f9145e5391d": [
             "function () ",
             "plotlyVisDat"
           ]
         },
-        "cur_data": "dc775021c79",
+        "cur_data": "1f9145e5391d",
         "attrs": {
-          "dc775021c79": {
+          "1f9145e5391d": {
             "x": {
 
             },

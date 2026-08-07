@@ -1,9 +1,10 @@
 library(shinytest2)
 library(testthat)
 
-testthat::local_edition(3)
+# testthat::local_edition(3)
 
 test_that("sf_trip_data - main chart", {
+  testthat::local_edition(3)
   
   app <- AppDriver$new()
   
@@ -27,6 +28,8 @@ test_that("sf_trip_data - main chart", {
 
 
 test_that("sf_trip_data - heatmap chart", {
+  
+  testthat::local_edition(3)
   
   app <- AppDriver$new()
   
