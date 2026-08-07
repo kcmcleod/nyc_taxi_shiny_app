@@ -79,7 +79,7 @@ rv_main_table_filtered_data <- reactive({
   data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance", 
                        "total_distance", "total_number_trips")
   
-  data <- fn_calculate_trip_volumes(base_data, vendor_list, payment_list, 
+  data <- fn_calculate_trip_volumes(base_data, vendor_list, payment_list,
                                     month_agg, week_agg, data_field)
   
   return(data)
@@ -97,7 +97,16 @@ output$po_tripVolumesOverTime <- renderPlotly({
     need(length(input$pi_level) == 1, "Please select exactly one time period.")
   )
   
-  base_data <- rv_main_table_filtered_data()
+  base_data <-  tryCatch({
+    rv_main_table_filtered_data()
+  }, error = function(e) {
+    toastr_error(e$message)
+    return(NULL)
+  })
+  
+  validate(
+    need(! is.null(base_data), "Chart unavailable due to data error")
+  )
   
   validate(
     need(nrow(base_data) > 0, "No data for that query")
@@ -107,12 +116,21 @@ output$po_tripVolumesOverTime <- renderPlotly({
                         "Distance in miles", "Total number of trips"  
   )
   
-  chart <- fn_generate_main_line_chart(base_data, input$pi_level, "date", 
-                                       "total_value", "Yellow Taxi journeys", 
-                                       y_lab_title, config)
+  chart <- tryCatch({
+    fn_generate_main_line_chart(base_data, input$pi_level, "date", 
+                                "total_value", "Yellow Taxi journeys", 
+                                y_lab_title, config)
+  }, error = function(e) {
+    toastr_error(e$message)
+    return(NULL)
+  })
+  
+  validate(
+    need(! is.null(chart), "Chart unavailable due to data error"),
+  )
   
   return(chart)
- 
+  
 }) |>
   bindCache(
     yellow_data_version(),
