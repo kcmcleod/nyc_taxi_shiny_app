@@ -110,7 +110,7 @@ config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr
 # no need to load data if only doing local data processing
 if(! exists("offline_data_prep")) {
   # Load the pre-computed metadata 
-  app_metadata <- get_initial_taxi_metadata(data_path = dataPath)
+  app_metadata <- get_initial_taxi_metadata(data_path = paste0(getwd(), "/app_data/"))
   
   # save aws bill if running locally
   if(Sys.getenv("DEPLOY_ENV") == "DEVELOPER") {

@@ -53,7 +53,7 @@ if (dir.exists(partition_dir)) {
   processed_months_df <- arrow::open_dataset(partition_dir) |> 
     dplyr::select(Year, Month) |> 
     dplyr::distinct() |> 
-    dplyr::collect()
+    dplyr::collect() 
   
   processed_months <- sprintf("%04d-%02d", processed_months_df$Year, processed_months_df$Month)
   processed_months <- sort(processed_months)
@@ -251,7 +251,7 @@ yellow_taxi_meta_data <- list("Vendor" = Vendors,
                               "max_date" = date_ranges$max_date[1],
                               "Location" = locations)
 
-saveRDS(yellow_taxi_meta_data, file = paste0(dataPath, format(Sys.Date(), "%Y%m%d"), "_yellow_metadata.rds"))
+saveRDS(yellow_taxi_meta_data, file = paste0(paste0(getwd(), "/app_data/"), format(Sys.Date(), "%Y%m%d"), "_yellow_metadata.rds"))
 
 
 ################################################################################
