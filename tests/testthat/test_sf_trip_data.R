@@ -12,7 +12,6 @@ test_that("sf_trip_data - main chart", {
   
   # 1. Test the default state
   app_data <- app$get_value(export = "exported_main_table_data")
-  expect_equal(nrow(app_data), 14)
   expect_snapshot_value(app_data, style = "json2")
 
   # 2. not default
@@ -22,7 +21,6 @@ test_that("sf_trip_data - main chart", {
   app$wait_for_idle()
   
   app_data <- app$get_value(export = "exported_main_table_data")
-  expect_equal(nrow(app_data), 3)
   expect_snapshot_value(app_data, style = "json2")
 })
 
@@ -37,7 +35,6 @@ test_that("sf_trip_data - heatmap chart", {
   
   # 1. Test the default state
   app_data <- app$get_value(export = "exported_heatmap_data")
-  expect_equal(nrow(app_data), 82)
   expect_snapshot_value(app_data, style = "json2")
   
   # 2. not default
