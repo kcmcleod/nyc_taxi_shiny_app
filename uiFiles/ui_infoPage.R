@@ -1,10 +1,8 @@
-tabItem(
-  tabName = "info_page",
-  box(
-    width = 12,
-    title = "App Info",
-    status = "info",
-    solidHeader = TRUE,
+nav_panel(
+  title = "Info Page",
+  icon = icon("list-alt"),
+  card(
+    card_header("App Info"),
     tags$p(tags$b("APP NAME:"), textOutput("ui_text_appName", inline = TRUE)),
     tags$p(tags$b("APP VERSION:"), textOutput("ui_text_appVersion", inline = TRUE)),
     tags$p(tags$b("DATA LOCATION:"), textOutput("ui_text_dataPath", inline = TRUE)),

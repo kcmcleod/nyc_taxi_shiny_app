@@ -6,28 +6,29 @@ source("global.R")
 
 server <- function(input, output, session) {
   listOfServerFiles <- listOfFiles(serverFilesPath)
-  
-  for(file in listOfServerFiles) {
+
+  for (file in listOfServerFiles) {
     source(file, local = TRUE)
   }
-  
+
   # Show the warning modal 60 seconds before timeout
   observeEvent(input$idle_warning, {
     showModal(
       modalDialog(
         title = "Session Timeout Warning",
-        "Your session will expire in 60 seconds due to inactivity. Move your mouse or click anywhere to stay connected.",
+        "Your session will expire in 60 seconds due to inactivity.
+        Move your mouse or click anywhere to stay connected.",
         footer = modalButton("I'm still here!"),
         easyClose = TRUE
       )
     )
   })
-  
+
   # Close the modal automatically if the user moves their mouse
   observeEvent(input$idle_active, {
     removeModal()
   })
-  
+
   # 3. Kill the session if the final timer hits
   observeEvent(input$idle_timeout, {
     removeModal()
@@ -36,26 +37,27 @@ server <- function(input, output, session) {
   })
 }
 
-source(paste0(uiFilesPath, "sidebar.R"))
-source(paste0(uiFilesPath, "header.R"))
-source(paste0(uiFilesPath, "body.R"))
+app_theme <- bs_theme(
+  version = 5,
+  bg = config$colours$theme$body_bg,
+  fg = "#212529", # Standard dark grey text for high contrast
+  primary = config$colours$theme$primary_accent,
+  secondary = config$colours$theme$secondary_accent
+)
 
-ui <- bootstrapPage(
-  use_idle_timer(timeout_minutes = 15),                    
-  useShinyjs(),
-  tagList(
-    tags$head(
-      # tags$script(type = "text/javascript", src = "sidebar.js")
-    ),
-    # use tags$footer() to have message at top of screen
-    # includeCSS(paste0(getwd(), "/www/style.css")),
-    dashboardPage(
-      title = appTitle,
-      sidebar = sidebar,
-      header = header,
-      body = body
-    ),
-    #add_busy_gif(),
+ui <- page_navbar(
+  title = appTitle,
+  theme = app_theme,
+  id = "main_nav",
+
+  # Source your individual pages as nav_panels
+  source(paste0(uiFilesPath, "ui_trip_data.R"), local = TRUE)$value,
+  source(paste0(uiFilesPath, "ui_infoPage.R"), local = TRUE)$value,
+
+  # Global header components (invisible scripts and modals)
+  header = tagList(
+    use_idle_timer(timeout_minutes = 15),
+    useShinyjs(),
     disconnectMessage(
       text = "Your session has timed out due to inactivity.",
       refresh = "Reconnect to NYC Taxi Data",
@@ -71,4 +73,3 @@ ui <- bootstrapPage(
 shinyApp(ui = ui, server = server, onStart = function() {
   logger::log_info("starting app... ")
 })
-
