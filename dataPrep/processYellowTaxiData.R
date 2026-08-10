@@ -209,16 +209,13 @@ combinedDF <- combinedDF |>
 # Define the folder path instead of a file path
 partition_dir <- paste0(dataPath, "yellow_aggregation_partitioned")
 
-# ensure we dont keep create folders
-if (dir.exists(partition_dir)) {
-  unlink(partition_dir, recursive = TRUE)
-}
-
 # Write the partitioned dataset
 write_dataset(
   dataset = combinedDF, 
   path = partition_dir, 
-  format = "parquet"
+  format = "parquet",
+  # Dec data is split between Dec and Jan file so to handle this we create 2 files
+  basename_template = paste0("run_", format(Sys.time(), "%Y%m%d_%H%M%S"), "-{i}.parquet")
 )
 
 log_info("Partitioned data successfully written to: ", partition_dir)
