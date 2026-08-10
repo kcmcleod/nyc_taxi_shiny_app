@@ -1,8 +1,7 @@
-
 #' Calculate Trip Volumes
 #'
-#' @description Filters and aggregates NYC taxi data based on user selections for 
-#' vendor, payment type, and temporal aggregation. It leverages Arrow for lazy 
+#' @description Filters and aggregates NYC taxi data based on user selections for
+#' vendor, payment type, and temporal aggregation. It leverages Arrow for lazy
 #' evaluation on disk before pulling the grouped data into memory to calculate the final sum.
 #'
 #' @param base_data An Arrow dataset or standard data frame containing the raw taxi data.
@@ -13,69 +12,69 @@
 #' @param data_field A character string of the metric to aggregate (e.g., "total_distance" or "total_number_trips").
 #'
 #' @return A tibble with two columns: `date` and `total_value`, containing the aggregated totals.
-#' 
+#'
 #' @export
-fn_calculate_trip_volumes <- function(base_data, vendor_list, payment_list, 
+fn_calculate_trip_volumes <- function(base_data, vendor_list, payment_list,
                                       month_agg, week_agg, data_field) {
-  
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.logical(month_agg) || length(month_agg) != 1) {
     err_msg <- "Input Error: Month aggregation selection is invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.logical(week_agg) || length(week_agg) != 1) {
     err_msg <- "Input Error: Week aggregation selection is invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.character(data_field) || length(data_field) != 1) {
     err_msg <- "Input Error: Selected metric is invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   # check cols
-  required_cols <- c("date", "Vendor", "payment_type",
-                     "full_month_aggregation", "full_week_aggregation", data_field)
+  required_cols <- c(
+    "date", "Vendor", "payment_type",
+    "full_month_aggregation", "full_week_aggregation", data_field
+  )
   missing_cols <- setdiff(required_cols, names(base_data))
-  
+
   if (length(missing_cols) > 0) {
-    err_msg <- sprintf("Data Error: The dataset is missing required columns: %s",
-                       paste(missing_cols, collapse = ", "))
-    
+    err_msg <- sprintf(
+      "Data Error: The dataset is missing required columns: %s",
+      paste(missing_cols, collapse = ", ")
+    )
+
     log_error(err_msg)
     stop(err_msg)
   }
-  
-  base_data |> 
+
+  base_data |>
     filter(
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg,
       Vendor %in% vendor_list,
       payment_type %in% payment_list
-    ) |> 
+    ) |>
     select(date, all_of(data_field)) |>
-    group_by(date) |> 
-    collect()  |> 
-    summarise(total_value = sum(.data[[data_field]], na.rm = TRUE), .groups = 'drop') 
+    group_by(date) |>
+    collect() |>
+    summarise(total_value = sum(.data[[data_field]], na.rm = TRUE), .groups = "drop")
 }
-
-
-
 
 
 #' Calculate Heatmap Data
 #'
-#' @description Filters NYC taxi data based on temporal aggregation settings, 
-#' pulls the filtered data into memory, formats date columns if required, 
+#' @description Filters NYC taxi data based on temporal aggregation settings,
+#' pulls the filtered data into memory, formats date columns if required,
 #' and aggregates trip counts by pickup and dropoff locations.
 #'
 #' @param base_data An Arrow dataset or standard data frame containing the raw taxi data.
@@ -86,60 +85,60 @@ fn_calculate_trip_volumes <- function(base_data, vendor_list, payment_list,
 #'
 #' @export
 fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
-  
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.logical(month_agg) || length(month_agg) != 1) {
     err_msg <- "Input Error: Month aggregation selection is invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.logical(week_agg) || length(week_agg) != 1) {
     err_msg <- "Input Error: Week aggregation selection is invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
-  # cols  
+
+  # cols
   required_cols <- c("date", "full_month_aggregation", "full_week_aggregation", "PULocation", "DOLocation")
   missing_cols <- setdiff(required_cols, names(base_data))
-  
+
   if (length(missing_cols) > 0) {
-    err_msg <- sprintf("Data Error: The dataset is missing required columns: %s",
-                       paste(missing_cols, collapse = ", "))
+    err_msg <- sprintf(
+      "Data Error: The dataset is missing required columns: %s",
+      paste(missing_cols, collapse = ", ")
+    )
     log_error(err_msg)
     stop(err_msg)
   }
-  
-  filtered_data <- base_data |> 
+
+  filtered_data <- base_data |>
     dplyr::filter(
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg
-    ) |> 
+    ) |>
+    dplyr::select(date, PULocation, DOLocation, total_number_trips) |>
     dplyr::collect()
-  
+
   grouping_cols <- c("PULocation", "DOLocation")
-  
-  if(month_agg) {
-    tDF <- filtered_data |> 
+
+  if (month_agg) {
+    tDF <- filtered_data |>
       dplyr::mutate(date_month = format(date, "%Y month:%m"))
     grouping_cols <- c(grouping_cols, "date_month")
-    
-  } else if(week_agg) {
-    tDF <- filtered_data |> 
+  } else if (week_agg) {
+    tDF <- filtered_data |>
       dplyr::mutate(date_week = format(date, "%G week:%V"))
     grouping_cols <- c(grouping_cols, "date_week")
-    
   } else {
     tDF <- filtered_data
   }
-  
-  tDF |> 
+
+  tDF |>
     dplyr::group_by(dplyr::across(dplyr::all_of(grouping_cols))) |>
-    dplyr::summarise(trips = dplyr::n(), .groups = 'drop')
+    dplyr::summarise(trips = dplyr::n(), .groups = "drop")
 }
