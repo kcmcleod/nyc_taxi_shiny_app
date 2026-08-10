@@ -62,7 +62,7 @@ test_that("fn_generate_main_line_chart generates a valid plotly object", {
   )
 
   # Force Plotly to compile the lazy object into its final list structure
-  built_fig <- plotly::plotly_build(raw_fig)
+  built_fig <- suppressWarnings(plotly::plotly_build(raw_fig))
 
   # Assertions
   expect_s3_class(raw_fig, "plotly")

@@ -166,7 +166,8 @@ mock_heatmap_data <- tibble::tibble(
   full_month_aggregation = c(TRUE, TRUE, FALSE, TRUE),
   full_week_aggregation = c(FALSE, FALSE, TRUE, FALSE),
   PULocation = c("Loc_A", "Loc_A", "Loc_B", "Loc_A"),
-  DOLocation = c("Loc_X", "Loc_X", "Loc_Y", "Loc_Z")
+  DOLocation = c("Loc_X", "Loc_X", "Loc_Y", "Loc_Z"),
+  total_number_trips = 100
 )
 
 # --- STANDARD BEHAVIOUR TESTS ---

@@ -44,12 +44,19 @@ test_that("get_initial_taxi_data successfully loads a parquet file from disk
   withr::local_options(shiny.testmode = FALSE)
 
   temp_dir <- withr::local_tempdir()
-  dummy_file <- file.path(temp_dir, "yellow_tripdata_2023-01.parquet")
 
+  # 1. Create the specific directory the function is looking for
+  partition_dir <- file.path(temp_dir, "yellow_aggregation_partitioned")
+  dir.create(partition_dir)
+
+  # 2. Write the dummy parquet file INSIDE that new directory
+  dummy_file <- file.path(partition_dir, "dummy_data.parquet")
   df <- data.frame(col1 = 1:5)
   arrow::write_parquet(df, dummy_file)
 
+  # 3. Run the function pointing to the root temp_dir
   result <- get_initial_taxi_data(temp_dir)
+
   expect_true(inherits(result, "Dataset") || inherits(result, "ArrowObject") ||
     inherits(result, "data.frame"))
 })
