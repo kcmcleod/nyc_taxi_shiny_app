@@ -31,6 +31,33 @@ jobs:
 
       - name: Restore renv environment
         uses: r-lib/actions/setup-renv@v2
+        
+      - name: Install lintr and styler
+        run: |
+          install.packages(c("lintr", "styler"))
+        shell: Rscript {0}
+
+      - name: Enforce Code Formatting (styler)
+        run: |
+          # 1. Run styler across the codebase
+          Rscript -e 'styler::style_dir()'
+          
+          # 2. Check if styler changed any files. 
+          # If git diff detects changes, the code wasn't formatted before pushing!
+          git diff --exit-code || {
+            echo "::error::Code is not formatted correctly! Please run styler::style_dir() locally on your Mac and push the changes."
+            exit 1
+          }
+
+      - name: Run Static Code Analysis (lintr)
+        run: |
+          Rscript -e '
+            lints <- lintr::lint_dir()
+            print(lints)
+            if (length(lints) > 0) {
+              stop("Linting errors found! Please fix the errors listed above.")
+            }
+          '
 
       - name: Run testthat and shinytest2
         run: |

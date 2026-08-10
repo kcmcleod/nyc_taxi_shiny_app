@@ -1,0 +1,17 @@
+linters: linters_with_defaults(
+  # Increase line length to 120 (default is 80, which is too short for Shiny UI)
+  line_length_linter(120),
+  
+  # Disable strict naming rules to allow both combinedDF and mock_taxi_data
+  object_name_linter = NULL,
+  
+  # Allow commented-out code blocks
+  commented_code_linter = NULL,
+  
+  # Allow dots in file names (e.g., sf_trip_data.R)
+  object_length_linter = NULL
+)
+exclusions: list(
+  "renv",
+  "www/idle_time_out.js"
+)
