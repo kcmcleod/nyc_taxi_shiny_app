@@ -1,13 +1,12 @@
 library(shinytest2)
 
-offline_data_prep <-TRUE
+offline_data_prep <- TRUE
 
 ################################################################################
 # SETUP
 
 # Sets up the necessary infrastructure and 'tests/testthat/' folder
 use_shinytest2()
-
 
 
 ################################################################################
@@ -18,9 +17,7 @@ record_test()
 
 # if snaps get really large, eg MBs, switch from app$expect_values() to app$get_value()
 # plotly_data <- app$get_value(output = "po_tripVolumesOverTime")
-# expect_true(length(plotly_data$x$data) > 0) 
-
-
+# expect_true(length(plotly_data$x$data) > 0)
 
 
 ################################################################################
@@ -28,11 +25,9 @@ record_test()
 test_app()
 
 
-
 ################################################################################
 # UPDATE SNAPS
 testthat::snapshot_accept()
-
 
 
 ################################################################################
@@ -46,8 +41,8 @@ unit_tests <- grep("shinytest2|setup", app_tests, value = TRUE, invert = TRUE)
 core_sources <- grep("_disable", app_sources, value = TRUE, invert = TRUE)
 
 cov_results <- covr::file_coverage(
-  source_files = core_sources, 
-  test_files = unit_tests 
+  source_files = core_sources,
+  test_files = unit_tests
 )
 
 covr::report(cov_results)

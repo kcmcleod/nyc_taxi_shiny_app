@@ -1,19 +1,19 @@
 # script to set up GitHub tokens
 
-if (! requireNamespace("usethis", quietly = TRUE)) {
+if (!requireNamespace("usethis", quietly = TRUE)) {
   install.packages("usethis")
 } else {
   print("The package is installed.")
 }
 
-if (! requireNamespace("gitcreds", quietly = TRUE)) {
+if (!requireNamespace("gitcreds", quietly = TRUE)) {
   install.packages("gitcreds")
 } else {
   print("The package is installed.")
 }
 usethis::use_github()
 
-readline(prompt = "Now go and fill in the browser form. 
+readline(prompt = "Now go and fill in the browser form.
          Once done, press [Enter] to continue...")
 print("Script resuming...")
 

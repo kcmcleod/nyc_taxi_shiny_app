@@ -1,6 +1,3 @@
-
-
-
 output$ui_text_appName <- renderText({
   appTitle
 })
@@ -16,8 +13,6 @@ output$ui_text_dataPath <- renderText({
 output$ui_text_liveApp <- renderText({
   isLiveVersion
 })
-
-
 
 
 output$ui_text_renv <- renderText({

@@ -18,21 +18,21 @@ if (length(branches_to_check) == 0) {
 } else {
   cat("\nFound the following local branches:\n")
   print(branches_to_check)
-  
+
   # Pause and ask the user if they want to proceed
   proceed <- menu(
-    c("Yes", "No"), 
+    c("Yes", "No"),
     title = "\nWould you like to review and delete any of these branches?"
   )
-  
+
   if (proceed == 1) {
     # Loop through each branch and ask for instructions
     for (branch in branches_to_check) {
       action <- menu(
-        c("Keep", "Delete (Safe)", "Force Delete"), 
+        c("Keep", "Delete (Safe)", "Force Delete"),
         title = paste0("\nWhat would you like to do with branch '", branch, "'?")
       )
-      
+
       if (action == 2) {
         # Safe delete: Git will block this if the branch is unmerged
         system(paste("git branch -d", branch))

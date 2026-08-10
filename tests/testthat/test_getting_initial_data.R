@@ -34,28 +34,30 @@ if (!file.exists("tests/testdata/yellow_metadata.rds")) {
 
 test_that("get_initial_taxi_data loads mock data when shiny.testmode is TRUE", {
   withr::local_options(shiny.testmode = TRUE)
-  
+
   result <- get_initial_taxi_data("dummy_path")
   expect_false(is.null(result))
 })
 
-test_that("get_initial_taxi_data successfully loads a parquet file from disk when testmode is FALSE", {
+test_that("get_initial_taxi_data successfully loads a parquet file from disk
+          when testmode is FALSE", {
   withr::local_options(shiny.testmode = FALSE)
-  
+
   temp_dir <- withr::local_tempdir()
   dummy_file <- file.path(temp_dir, "yellow_tripdata_2023-01.parquet")
-  
+
   df <- data.frame(col1 = 1:5)
   arrow::write_parquet(df, dummy_file)
-  
+
   result <- get_initial_taxi_data(temp_dir)
-  expect_true(inherits(result, "Dataset") || inherits(result, "ArrowObject") || inherits(result, "data.frame"))
+  expect_true(inherits(result, "Dataset") || inherits(result, "ArrowObject") ||
+    inherits(result, "data.frame"))
 })
 
 test_that("get_initial_taxi_data returns NULL when no file is found in directory", {
   withr::local_options(shiny.testmode = FALSE)
   empty_dir <- withr::local_tempdir()
-  
+
   result <- get_initial_taxi_data(empty_dir)
   expect_null(result)
 })
@@ -67,7 +69,7 @@ test_that("get_initial_taxi_data returns NULL when no file is found in directory
 
 test_that("get_initial_taxi_data_aws loads mock data when shiny.testmode is TRUE", {
   withr::local_options(shiny.testmode = TRUE)
-  
+
   result <- get_initial_taxi_data_aws()
   expect_false(is.null(result))
 })
@@ -75,7 +77,7 @@ test_that("get_initial_taxi_data_aws loads mock data when shiny.testmode is TRUE
 test_that("get_initial_taxi_data_aws stops if AWS environment variables are missing", {
   withr::local_options(shiny.testmode = FALSE)
   withr::local_envvar(TAXI_S3_BUCKET = "", TAXI_S3_OBJECT = "")
-  
+
   expect_error(
     get_initial_taxi_data_aws(),
     regexp = "Missing required AWS configuration"
@@ -85,7 +87,7 @@ test_that("get_initial_taxi_data_aws stops if AWS environment variables are miss
 test_that("get_initial_taxi_data_aws catches S3 connection errors gracefully", {
   withr::local_options(shiny.testmode = FALSE)
   withr::local_envvar(TAXI_S3_BUCKET = "fake-bucket-12345", TAXI_S3_OBJECT = "fake-object.parquet")
-  
+
   result <- get_initial_taxi_data_aws()
   expect_null(result)
 })
@@ -97,20 +99,20 @@ test_that("get_initial_taxi_data_aws catches S3 connection errors gracefully", {
 
 test_that("get_initial_taxi_metadata loads mock metadata when shiny.testmode is TRUE", {
   withr::local_options(shiny.testmode = TRUE)
-  
+
   result <- get_initial_taxi_metadata("dummy_path")
   expect_false(is.null(result))
 })
 
 test_that("get_initial_taxi_metadata successfully loads metadata rds file from disk", {
   withr::local_options(shiny.testmode = FALSE)
-  
+
   temp_dir <- withr::local_tempdir()
   dummy_metadata_file <- file.path(temp_dir, "yellow_metadata_2023.rds")
-  
+
   dummy_meta <- list(version = "1.0", zones = c("A", "B"))
   saveRDS(dummy_meta, dummy_metadata_file)
-  
+
   result <- get_initial_taxi_metadata(temp_dir)
   expect_equal(result$version, "1.0")
 })
@@ -118,7 +120,7 @@ test_that("get_initial_taxi_metadata successfully loads metadata rds file from d
 test_that("get_initial_taxi_metadata returns NULL when no metadata file is found", {
   withr::local_options(shiny.testmode = FALSE)
   empty_dir <- withr::local_tempdir()
-  
+
   result <- get_initial_taxi_metadata(empty_dir)
   expect_null(result)
 })
