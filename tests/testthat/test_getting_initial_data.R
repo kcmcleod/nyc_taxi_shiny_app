@@ -11,7 +11,7 @@ if (Sys.getenv("R_COVR") == "true") {
   environment(get_initial_taxi_metadata)$log_error <- function(...) invisible()
 }
 
-logger::log_threshold(logger::FATAL)
+log_threshold(FATAL)
 
 # --- SETUP: Ensure test data directory and files exist for testmode ---
 # Because testthat runs inside tests/testthat/, we create the directory structure here if missing
