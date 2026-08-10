@@ -1,5 +1,6 @@
 library(testthat)
 library(dplyr)
+library(logger)
 
 # Prevent logger from crashing the covr sandbox
 if (Sys.getenv("R_COVR") == "true") {

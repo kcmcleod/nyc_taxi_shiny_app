@@ -2,6 +2,7 @@ library(testthat)
 library(plotly)
 library(ggplot2)
 library(dplyr)
+library(logger)
 
 # 1. THE SAFE FIX: Inject dummy function for un-prefixed log_error calls in covr
 if (!exists("log_error", mode = "function")) {
