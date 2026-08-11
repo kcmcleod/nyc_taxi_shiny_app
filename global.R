@@ -21,7 +21,12 @@ suppressPackageStartupMessages(library("scales"))
 
 ################################################################################
 # PATHS
+# Dynamically locate project root whether running from root, tests/, or dataPrep/
 codePath <- getwd()
+while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePath)) {
+  codePath <- dirname(codePath)
+}
+
 uiFilesPath <- paste0(codePath, "/uiFiles/")
 serverFilesPath <- paste0(codePath, "/serverFiles/")
 dataPath <- paste0(Sys.getenv("HOME"), "/data/shiny_data/")
