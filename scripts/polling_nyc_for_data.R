@@ -1,3 +1,5 @@
+offline_data_prep <- TRUE
+
 source(paste0(getwd(), "/global.R"))
 library(httr)
 
