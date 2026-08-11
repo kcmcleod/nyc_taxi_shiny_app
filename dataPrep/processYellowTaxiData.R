@@ -22,27 +22,6 @@ log_info("STARTING TO PROCESS YELLOW DATA")
 
 log_info("Checking existing partitioned master directory for already processed months...")
 
-# all_master_files <- sort(
-#   list.files(dataPath,
-#              pattern = "_yellow_aggregation\\.parquet",
-#              full.names = TRUE),
-#   decreasing = TRUE)
-#
-# latest_master_file <- all_master_files[1]
-#
-# processed_months <- character(0)
-# existing_master_df <- NULL
-#
-# if (!is.na(latest_master_file) && file.exists(latest_master_file)) {
-#   log_info(".. found existing master file: ", latest_master_file)
-#   existing_master_df <- read_parquet(latest_master_file)
-#
-#   processed_months <- unique(format(existing_master_df$date, "%Y-%m"))
-#   processed_months <- sort(processed_months)
-#   log_info(".. already processed months: ", paste0(processed_months, collapse = ", "))
-# }
-
-
 partition_dir <- paste0(dataPath, "yellow_aggregation_partitioned")
 processed_months <- character(0)
 
@@ -91,16 +70,6 @@ if (length(new_files) == 0) {
 
 log_info("Found ", length(new_files), " files to process...")
 
-# latest_master_file <- sort(
-#   list.files(dataPath,
-#              pattern = "_yellow_aggregation.parquet",
-#              full.names = TRUE),
-#   decreasing = TRUE)[1]
-#
-# if (!is.na(latest_master_file)) {
-#   existing_master_df <- read_parquet(latest_master_file)
-# }
-
 
 ################################################################################
 # LOOP THRU DATA FILES
@@ -146,58 +115,14 @@ rate_lookups <- read_csv(paste0(dataPath, "src/rate_code_lookup.csv"), col_types
 payment_lookups <- read_csv(paste0(dataPath, "src/payment_type_lookup.csv"), col_types = c("ic"))
 vendor_lookups <- read_csv(paste0(dataPath, "src/vendor_lookup.csv"), col_types = c("ic"))
 
-combinedDF <- fn_perform_lookup(combinedDF, rate_lookups, "RatecodeID", "RatecodeID", "Rate", "rate") |>
-  fn_perform_lookup(zone_lookups, c("PULocationID" = "LocationID"), "PULocationID", "PULocation", "PU",
-    post_process_fn = function(df) rename(df, PULocation = Borough)
-  ) |>
-  fn_perform_lookup(zone_lookups, c("DOLocationID" = "LocationID"), "DOLocationID", "DOLocation", "DO",
-    post_process_fn = function(df) rename(df, DOLocation = Borough)
-  ) |>
-  fn_perform_lookup(payment_lookups, "payment_type", "payment_type", "payment_type", "payment",
-    post_process_fn = function(df) mutate(df, payment_type = payment_class)
-  ) |>
-  select(-c(payment_class)) |>
-  fn_perform_lookup(vendor_lookups, "VendorID", "VendorID", "Vendor", "vendor")
-
-# checks on joins
-all_names <- names(combinedDF)
-expected_names <- c("PULocation", "DOLocation", "Rate", "Vendor")
-
-join_results <- sapply(expected_names, function(field) fn_test_lookup_join(all_names, field))
-
-if (class(combinedDF$payment_type) != "character") {
-  log_error(".... payement join not complete")
-  join_results <- c(join_results, FALSE)
-}
-
-if (any(!join_results)) {
-  log_error("STOPPING DUE TO FAILED JOINS!")
-  stop()
-}
-
-
-################################################################################
-# GETTING EXISTING PROCESSED DATA
-#
-# log_info("Extending OG data...")
-# if (!is.null(existing_master_df)) {
-#
-#   # drop any extra cols
-#   combinedDF <- select(combinedDF, any_of(names(existing_master_df)))
-#
-#   combinedDF <- as_tibble(rbindlist(list(existing_master_df, combinedDF), fill = TRUE)) |>
-#     arrange(across(all_of(sort_cols)))
-#   log_info("... merged with existing master. Total rows now: ", nrow(combinedDF))
-# }
+combinedDF <- fn_perform_joins(
+  combinedDF, zone_lookups, rate_lookups,
+  payment_lookups, vendor_lookups
+)
 
 
 ################################################################################
 # WRITE NEW ASSET
-
-# log_info("Writing new complete data asset...")
-
-# write_parquet(combinedDF,
-#               sink = paste0(dataPath, format(Sys.Date(), "%Y%m%d"), "_yellow_aggregation.parquet"))
 
 log_info("Writing new partitioned data asset...")
 
