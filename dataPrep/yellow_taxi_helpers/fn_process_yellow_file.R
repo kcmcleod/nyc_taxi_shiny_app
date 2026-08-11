@@ -1,14 +1,13 @@
 fn_process_yellow_file <- function(fullFileName) {
   currentDate <- str_match(fullFileName, pattern = "\\d{4}-\\d{2}")[1]
 
-  if (is.null(currentDate) || is.na(fullFileName)) {
-    logg_error(".... cannot read date from: ", fullFileName)
+  if (is.na(currentDate) || is.na(fullFileName)) {
+    log_error(".... cannot read date from: ", fullFileName)
     return(NULL)
   }
 
   tDF <- read_parquet(fullFileName) |>
     select(-c(store_and_fwd_flag))
-
 
   # clean up
   tDF_clean <- filter(

@@ -29,7 +29,10 @@ fn_validate_columns <- function(df, expected_cols, df_name) {
 
   # Rule 2: log but ignore extra cols
   if (length(extra_cols) > 0) {
-    log_warn("...... ", df_name, " has extra column(s) (ignoring): ", extra_cols)
+    log_warn(
+      "...... ", df_name, " has extra column(s) (ignoring): ",
+      paste0(extra_cols, collapse = ", ")
+    )
   }
 
   return(is_valid)
