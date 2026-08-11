@@ -30,19 +30,26 @@ test_that("End-to-End ETL pipeline (aggregations + lookups) matches frozen golde
   combinedDF <- arrange(combinedDF, across(all_of(sort_cols)))
 
   # Step B: Perform lookup enrichment joins against live CSV lookup tables
-  zone_lookups <- read_csv(file.path(dataPath, "src/taxi_zone_lookup.csv"), show_col_types = FALSE) |>
+  lookup_dir <- testthat::test_path("..", "testdata", "lookups")
+
+  # Ensure CI skips gracefully if someone clones without test fixtures
+  skip_if_not(
+    dir.exists(lookup_dir),
+    "Lookup CSV fixtures not found in tests/testdata/lookups/."
+  )
+
+  zone_lookups <- read_csv(file.path(lookup_dir, "taxi_zone_lookup.csv"),
+    show_col_types = FALSE
+  ) |>
     select(LocationID, Borough)
-  rate_lookups <- read_csv(file.path(dataPath, "src/rate_code_lookup.csv"),
-    col_types = "ic",
-    show_col_types = FALSE
+  rate_lookups <- read_csv(file.path(lookup_dir, "rate_code_lookup.csv"),
+    col_types = "ic", show_col_types = FALSE
   )
-  payment_lookups <- read_csv(file.path(dataPath, "src/payment_type_lookup.csv"),
-    col_types = "ic",
-    show_col_types = FALSE
+  payment_lookups <- read_csv(file.path(lookup_dir, "payment_type_lookup.csv"),
+    col_types = "ic", show_col_types = FALSE
   )
-  vendor_lookups <- read_csv(file.path(dataPath, "src/vendor_lookup.csv"),
-    col_types = "ic",
-    show_col_types = FALSE
+  vendor_lookups <- read_csv(file.path(lookup_dir, "vendor_lookup.csv"),
+    col_types = "ic", show_col_types = FALSE
   )
 
   new_output <- fn_perform_lookup(
