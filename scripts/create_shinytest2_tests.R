@@ -34,6 +34,8 @@ testthat::snapshot_accept()
 # COVERAGE
 
 app_sources <- list.files("R", pattern = "\\.[Rr]$", full.names = TRUE)
+dp_sources <- list.files("dataPrep/yellow_taxi_helpers", pattern = "\\.[Rr]$", full.names = TRUE)
+app_sources <- c(app_sources, dp_sources)
 app_tests <- list.files("tests/testthat", pattern = "\\.[Rr]$", full.names = TRUE)
 
 # filter out shinytest2 etc
