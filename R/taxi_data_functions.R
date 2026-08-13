@@ -66,8 +66,12 @@ fn_calculate_trip_volumes <- function(base_data, vendor_list, payment_list,
     ) |>
     select(date, all_of(data_field)) |>
     group_by(date) |>
+    dplyr::summarise(
+      total_value = sum(!!sym(data_field), na.rm = TRUE),
+      .groups = "drop"
+    ) |>
     collect() |>
-    summarise(total_value = sum(.data[[data_field]], na.rm = TRUE), .groups = "drop")
+    arrange(date)
 }
 
 
@@ -121,7 +125,8 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg
     ) |>
-    dplyr::select(date, PULocation, DOLocation, total_number_trips) |>
+    dplyr::group_by(date, PULocation, DOLocation) |>
+    dplyr::summarise(trips = sum(total_number_trips, na.rm = TRUE), .groups = "drop") |>
     dplyr::collect()
 
   grouping_cols <- c("PULocation", "DOLocation")
@@ -140,5 +145,5 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
 
   tDF |>
     dplyr::group_by(dplyr::across(dplyr::all_of(grouping_cols))) |>
-    dplyr::summarise(trips = dplyr::n(), .groups = "drop")
+    dplyr::summarise(trips = sum(trips, na.rm = TRUE), .groups = "drop")
 }
