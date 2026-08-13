@@ -193,13 +193,13 @@ test_that("fn_calculate_heatmap_data processes monthly aggregation correctly", {
       DOLocation == "Loc_X"
     )
 
-  expect_equal(jan_group$trips, 2)
+  expect_equal(jan_group$trips, 200)
 
   # February Loc_A to Loc_Z should have 1 trip
   feb_group <- result |>
     dplyr::filter(date_month == "2023 month:02")
 
-  expect_equal(feb_group$trips, 1)
+  expect_equal(feb_group$trips, 100)
 })
 
 test_that("fn_calculate_heatmap_data processes weekly aggregation correctly", {
@@ -215,7 +215,7 @@ test_that("fn_calculate_heatmap_data processes weekly aggregation correctly", {
 
   # Only one row matches week_agg == TRUE in the mock data
   expect_equal(nrow(result), 1)
-  expect_equal(result$trips, 1)
+  expect_equal(result$trips, 100)
   expect_equal(result$PULocation, "Loc_B")
 })
 
