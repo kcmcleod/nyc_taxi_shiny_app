@@ -11,6 +11,9 @@ server <- function(input, output, session) {
     source(file, local = TRUE)
   }
 
+  # Load modules
+  mod_info_page_server("info_page")
+
   # Show the warning modal 60 seconds before timeout
   observeEvent(input$idle_warning, {
     showModal(
@@ -52,7 +55,10 @@ ui <- page_navbar(
 
   # Source your individual pages as nav_panels
   source(paste0(uiFilesPath, "ui_trip_data.R"), local = TRUE)$value,
-  source(paste0(uiFilesPath, "ui_infoPage.R"), local = TRUE)$value,
+
+  # Modules
+  mod_info_page_ui("info_page"),
+
 
   # Global header components (invisible scripts and modals)
   header = tagList(
