@@ -1,7 +1,12 @@
 offline_data_prep <- TRUE
 
-# 2. Source global.R to initialise paths (dataPath, codePath, config) and libraries
-global_path <- testthat::test_path("../../global.R")
+codePath <- getwd()
+while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePath)) {
+  codePath <- dirname(codePath)
+}
+
+# 2. Source global.R to attach {tidyverse}, {arrow}, etc.
+global_path <- file.path(codePath, "global.R")
 if (file.exists(global_path)) {
   source(global_path, local = FALSE)
 }

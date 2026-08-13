@@ -82,6 +82,8 @@ jobs:
           # 2. Filter out non-function source files
           core_sources <- grep("_disable", all_sources, value = TRUE, invert = TRUE)
           
+          source("tests/testthat/setup.R")
+          
           # 3. Run coverage across both R/ and dataPrep/ helpers
           cov_results  <- covr::file_coverage(
             source_files = core_sources, 
