@@ -33,6 +33,10 @@ fn_process_yellow_file <- function(fullFileName) {
     tDF_clean$cbd_congestion_fee <- 0.00
   }
 
+  if (!"Airport_fee" %in% names(tDF_clean)) {
+    tDF_clean$Airport_fee <- 0.00
+  }
+
   # aggregations setup
   expected_cols <- c(
     "full_month_aggregation", "full_week_aggregation", "date", "VendorID", "payment_type",
