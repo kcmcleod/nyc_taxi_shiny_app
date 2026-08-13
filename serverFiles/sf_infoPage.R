@@ -20,5 +20,9 @@ output$ui_text_renv <- renderText({
 })
 
 output$ui_text_cache <- renderText({
+  if (Sys.getenv("DEPLOY_ENV") == "DEVELOPER") {
+    return("In memory cache")
+  }
+
   cachePath
 })
