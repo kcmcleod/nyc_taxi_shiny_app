@@ -167,9 +167,6 @@ date_ranges <- arrow::open_dataset(partition_dir) |>
   ) |>
   collect()
 
-# min_taxi_date <- min(combinedDF$date, na.rm = TRUE)
-# max_taxi_date <- max(combinedDF$date, na.rm = TRUE)
-
 yellow_taxi_meta_data <- list(
   "Vendor" = Vendors,
   "payment_type" = payment_types,
@@ -185,26 +182,8 @@ saveRDS(yellow_taxi_meta_data, file = paste0(
 
 
 ################################################################################
-# CLEAN UP OLD BACKUPS (> 90 DAYS)
-# cutoff_date <- Sys.time() - as.difftime(90, units = "days")
-#
-# if(! exists("all_master_files")) {
-#   all_master_files <- list.files(path = dataPath,
-#                                  pattern = "_yellow_aggregation\\.parquet$",
-#                                  full.names = TRUE)
-# }
-#
-# old_files <- all_master_files[file.info(all_master_files)$mtime < cutoff_date]
-#
-# if (length(old_files) > 0) {
-#   file.remove(old_files)
-#   log_info("Cleaned up ", length(old_files), " old aggregation files (>90 days old).")
-# }
-
-
-################################################################################
 # BYE TIME!
-remove(combinedDF) # , existing_master_df)
+remove(combinedDF)
 gc()
 
 total_time <- Sys.time() - start_time

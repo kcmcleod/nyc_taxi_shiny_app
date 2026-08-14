@@ -16,8 +16,9 @@ test_that("sf_trip_data - main chart", {
 
   # 2. not default
   app$set_inputs(
-    `yt_parent-yt_main-pi_level` = "Month", pi_vendor = "Myle Technologies Inc",
-    `yt_parent-yt_main-pi_pay_type` = "Flex Fare trip"
+    "yt_parent-yt_main-pi_level" = "Month",
+    "yt_parent-yt_main-pi_vendor" = "Myle Technologies Inc",
+    "yt_parent-yt_main-pi_pay_type" = "Flex Fare trip"
   )
 
   app$wait_for_idle()
@@ -39,7 +40,10 @@ test_that("sf_trip_data - heatmap chart", {
   expect_snapshot_value(app_data, style = "json2")
 
   # 2. not default
-  app$set_inputs(ri_heatmap_period = "Combined", di_start_date = "2026-01-01")
+  app$set_inputs(
+    "yt_parent-yt_heat-ri_heatmap_period" = "Combined",
+    "yt_parent-di_start_date" = "2026-01-01"
+  )
 
   app$wait_for_idle()
 

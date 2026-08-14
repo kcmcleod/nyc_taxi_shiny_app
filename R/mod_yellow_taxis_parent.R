@@ -82,8 +82,11 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
 
       tmpDF <- yellow_taxi_data() |>
         filter(
-          (!full_month_aggregation & !full_week_aggregation &
-            date >= user_start_date & date <= user_end_date) |
+          # allows dates with a missing value
+          is.na(date) |
+
+            (!full_month_aggregation & !full_week_aggregation &
+              date >= user_start_date & date <= user_end_date) |
 
             # Monthly Data: Snap the user's start date to the 1st of the month
             # due to the data prep using the 1st of the month as the date

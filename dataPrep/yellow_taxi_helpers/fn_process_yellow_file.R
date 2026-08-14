@@ -10,14 +10,26 @@ fn_process_yellow_file <- function(fullFileName) {
     select(-c(store_and_fwd_flag))
 
   # clean up
-  tDF_clean <- filter(
-    tDF, tpep_pickup_datetime >= ymd(paste0(currentDate, "-01")),
-    tpep_dropoff_datetime < ymd(paste0(currentDate, "-01")) %m+% months(1)
+  valid_start <- ymd(paste0(currentDate, "-01"))
+  valid_end <- ymd(paste0(currentDate, "-01")) %m+% months(1)
+
+  tDF_clean <- mutate(
+    tDF,
+    tpep_pickup_datetime = if_else(
+      tpep_pickup_datetime < valid_start | tpep_pickup_datetime >= valid_end,
+      NA_POSIXct_,
+      tpep_pickup_datetime
+    ),
+    tpep_dropoff_datetime = if_else(
+      tpep_dropoff_datetime < valid_start | tpep_dropoff_datetime >= valid_end,
+      NA_POSIXct_,
+      tpep_dropoff_datetime
+    )
   )
 
-  count_removed_rows <- nrow(tDF) - nrow(tDF_clean)
-  log_info(".... number of rows removed due to wrong dates: ", count_removed_rows)
-  remove(count_removed_rows, tDF)
+  count_mutated_rows <- sum(is.na(tDF_clean$tpep_pickup_datetime))
+  log_info(".... number of rows with wrong dates: ", count_mutated_rows)
+  remove(count_mutated_rows, tDF)
 
   # trip dates
   tDF_clean$trip_start_date <- lubridate::as_date(tDF_clean$tpep_pickup_datetime)
@@ -27,6 +39,7 @@ fn_process_yellow_file <- function(fullFileName) {
   tDF_clean$trip_start_week <- format(tDF_clean$trip_start_week, "%Y-%m-%d")
   tDF_clean$trip_start_month <- format.Date(tDF_clean$trip_start_date, format = "%Y-%m")
   tDF_clean$trip_start_year <- format.Date(tDF_clean$trip_start_date, format = "%Y")
+  tDF_clean$reporting_month <- valid_start
 
   # cbd_congestion_fee is missing on older data
   if (!"cbd_congestion_fee" %in% names(tDF_clean)) {
