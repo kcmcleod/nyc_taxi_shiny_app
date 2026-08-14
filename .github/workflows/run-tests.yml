@@ -112,7 +112,7 @@ jobs:
           
           # 5. Export to Cobertura XML for Codecov
           covr::to_cobertura(cov_results, filename = "cobertura.xml")
-          covr::report(cov_results)
+          print(cov_results)
         shell: Rscript {0}
         env:
           R_COVR: "true"
