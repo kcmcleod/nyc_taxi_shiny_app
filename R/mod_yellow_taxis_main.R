@@ -136,8 +136,9 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
           Vendor %in% input$pi_vendor,
           payment_type %in% input$pi_pay_type
         ) |>
-        pull(!!sym(data_field)) |>
-        sum(na.rm = TRUE)
+        summarise(total = sum(!!sym(data_field), na.rm = TRUE)) |>
+        collect() |>
+        pull(total)
 
       # Format with commas for clean UI presentation
       scales::comma(na_val)
@@ -220,7 +221,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
     ############################################################################
     # EXPORT FOR TESTING
     exportTestValues(
-      exported_main_table_data = rv_main_chart_filtered_data()
+      exported_main_chart_data = rv_main_chart_filtered_data()
     )
   })
 }
