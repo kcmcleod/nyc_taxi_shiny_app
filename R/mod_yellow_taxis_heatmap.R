@@ -75,13 +75,14 @@ mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
 
       # Isolate the NAs from the daily tier to prevent triple-counting
       na_val <- filtered_data() |>
-        dplyr::filter(
+        filter(
           is.na(date),
           full_month_aggregation == FALSE,
           full_week_aggregation == FALSE
         ) |>
-        dplyr::pull(total_number_trips) |>
-        sum(na.rm = TRUE)
+        summarise(total = sum(total_number_trips, na.rm = TRUE)) |>
+        collect() |>
+        pull(total)
 
       # Format with commas
       scales::comma(na_val)
