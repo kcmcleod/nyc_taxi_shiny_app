@@ -87,7 +87,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
 
     ################################################################################
     # DATA
-    rv_main_table_filtered_data <- reactive({
+    rv_main_chart_filtered_data <- reactive({
       req(filtered_data())
 
       base_data <- filtered_data()
@@ -167,7 +167,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
 
       base_data <- tryCatch(
         {
-          rv_main_table_filtered_data()
+          rv_main_chart_filtered_data()
         },
         error = function(e) {
           toastr_error(e$message)
@@ -220,7 +220,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
     ############################################################################
     # EXPORT FOR TESTING
     exportTestValues(
-      exported_main_table_data = rv_main_table_filtered_data()
+      exported_main_table_data = rv_main_chart_filtered_data()
     )
   })
 }
