@@ -34,7 +34,7 @@ jobs:
         
       - name: Install lintr and styler
         run: |
-          install.packages(c("lintr", "styler"))
+          install.packages(c("lintr", "styler", "roxygen2"))
         shell: Rscript {0}
 
       - name: Enforce Code Formatting (styler)
