@@ -175,15 +175,15 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     c(1, config$colours$icons$taxi)
   )
 
-  # 4. Helper function to generate a strict matrix for Plotly rendering
   create_heatmap_trace <- function(df, show_legend = FALSE) {
     df_wide <- df |>
       dplyr::select(dplyr::all_of(c(x_col, y_col, z_col))) |>
       tidyr::pivot_wider(
         names_from = dplyr::all_of(x_col),
         values_from = dplyr::all_of(z_col),
-        names_expand = TRUE, # Forces missing X factors to become NA columns
-        id_expand = TRUE # Forces missing Y factors to become NA rows
+        names_expand = TRUE,
+        id_expand = TRUE,
+        values_fn = sum
       )
 
     y_labels <- df_wide[[y_col]]
@@ -217,7 +217,18 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     facets <- sort(unique(plot_data[[split_variable]]))
     n_facets <- length(facets)
     n_rows <- ceiling(n_facets / 3)
-    calc_height <- max(400, n_rows * 300)
+
+    # Define exactly how many pixels we want everything to take up
+    plot_height_px <- 250
+    gap_px <- 170 # Guaranteed space for 90-deg labels + the next title
+    layout_top <- 100
+    layout_bottom <- 80
+
+    # 1. Total height scales perfectly with the number of rows
+    calc_height <- (n_rows * plot_height_px) + ((n_rows - 1) * gap_px) + layout_top + layout_bottom
+
+    # The exact fraction one gap represents
+    gap_frac <- gap_px / calc_height
 
     plot_list <- lapply(seq_along(facets), function(i) {
       f <- facets[i]
@@ -238,18 +249,24 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
       return(p)
     })
 
+    # Apply the perfectly calculated gap fraction
+    # Plotly's subplot margin adds top + bottom to create the vertical gap
     fig <- plotly::subplot(plot_list,
       nrows = n_rows, shareX = FALSE, shareY = TRUE,
-      titleX = FALSE, titleY = FALSE, margin = c(0.02, 0.02, 0.05, 0.08)
+      titleX = FALSE, titleY = FALSE,
+      margin = c(0.02, 0.02, gap_frac / 2, gap_frac / 2)
     )
+
     layout_args <- list(
       p = fig,
       title = list(
         text = "Pickup vs Dropoff Borough",
-        y = 0.98,
-        yanchor = "top"
+        yref = "container", # Pin to the absolute HTML widget frame
+        y = 1, # 100% to the top
+        yanchor = "top",
+        pad = list(t = 20) # Add 20 pixels of breathing room from the top edge
       ),
-      margin = list(t = 100)
+      margin = list(t = layout_top, b = layout_bottom)
     )
 
     # force 90 deg on every x axis

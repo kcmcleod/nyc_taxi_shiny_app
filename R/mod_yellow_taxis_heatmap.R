@@ -17,6 +17,25 @@ mod_yellow_taxis_heatmap_ui <- function(id, config) {
         inline = TRUE
       )
     ),
+    conditionalPanel(
+      condition = "input.ri_heatmap_period != 'Combined'",
+      ns = ns,
+      tags$div(
+        class = "alert alert-secondary d-flex align-items-center mb-3",
+        role = "alert",
+        icon("circle-info",
+          class = "fa-2x me-3",
+          style = paste0("color: ", config$colours$theme$secondary_accent)
+        ),
+        tags$div(
+          tags$strong("Total Journeys with Unknown Dates: "),
+          tags$span(textOutput(ns("vo_missing_dates"), inline = TRUE), class = "fw-bold"),
+          tags$br(),
+          tags$small("These volumes are excluded from the faceted heatmaps
+                     below due to meter date corruption.")
+        )
+      )
+    ),
     card(
       style = "overflow-y: auto; max-height: 70vh; overflow-x: hidden;",
       withSpinner(plotlyOutput(ns("po_heatmap"), height = "auto"),
@@ -45,6 +64,27 @@ mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
       data <- fn_calculate_heatmap_data(base_data, month_agg, week_agg)
 
       return(data)
+    })
+
+
+    ############################################################################
+    # KPI VALUE BOXES
+
+    output$vo_missing_dates <- renderText({
+      req(filtered_data())
+
+      # Isolate the NAs from the daily tier to prevent triple-counting
+      na_val <- filtered_data() |>
+        dplyr::filter(
+          is.na(date),
+          full_month_aggregation == FALSE,
+          full_week_aggregation == FALSE
+        ) |>
+        dplyr::pull(total_number_trips) |>
+        sum(na.rm = TRUE)
+
+      # Format with commas
+      scales::comma(na_val)
     })
 
 

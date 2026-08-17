@@ -97,8 +97,9 @@ test_that("fn_generate_heatmap_chart handles dynamic faceting and height calcula
   expect_s3_class(fig, "plotly")
 
   # Because n_rows is ceiling(2 facets / 3) = 1,
-  # height should resolve to max(400, 1 * 300) = 400
-  expect_equal(fig$height, 400)
+  # height should resolve to
+  # (1 row * 250px height) + (0 gaps) + (100px top margin) + (80px bottom margin)
+  expect_equal(fig$height, 430)
 })
 
 
@@ -219,5 +220,5 @@ test_that("fn_generate_heatmap_chart handles weekly faceting correctly", {
 
   # Assertions
   expect_s3_class(fig, "plotly")
-  expect_equal(fig$height, 400)
+  expect_equal(fig$height, 430)
 })
