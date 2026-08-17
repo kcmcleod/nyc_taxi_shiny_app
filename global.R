@@ -6,7 +6,7 @@ suppressPackageStartupMessages(library("shinyjs"))
 
 suppressPackageStartupMessages(library("bslib"))
 suppressPackageStartupMessages(library("shinydisconnect"))
-
+suppressPackageStartupMessages(library("DT"))
 suppressPackageStartupMessages(library("plotly"))
 suppressPackageStartupMessages(library("logger"))
 suppressPackageStartupMessages(library("arrow"))

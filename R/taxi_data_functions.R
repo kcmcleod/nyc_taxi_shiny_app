@@ -66,7 +66,7 @@ fn_calculate_trip_volumes <- function(base_data, vendor_list, payment_list,
     ) |>
     select(date, all_of(data_field)) |>
     group_by(date) |>
-    dplyr::summarise(
+    summarise(
       total_value = sum(!!sym(data_field), na.rm = TRUE),
       .groups = "drop"
     ) |>
@@ -121,29 +121,76 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
   }
 
   filtered_data <- base_data |>
-    dplyr::filter(
+    filter(
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg
     ) |>
-    dplyr::group_by(date, PULocation, DOLocation) |>
-    dplyr::summarise(trips = sum(total_number_trips, na.rm = TRUE), .groups = "drop") |>
-    dplyr::collect()
+    group_by(date, PULocation, DOLocation) |>
+    summarise(trips = sum(total_number_trips, na.rm = TRUE), .groups = "drop") |>
+    collect()
 
   grouping_cols <- c("PULocation", "DOLocation")
 
   if (month_agg) {
     tDF <- filtered_data |>
-      dplyr::mutate(date_month = format(date, "%Y month:%m"))
+      mutate(date_month = format(date, "%Y month:%m"))
     grouping_cols <- c(grouping_cols, "date_month")
   } else if (week_agg) {
     tDF <- filtered_data |>
-      dplyr::mutate(date_week = format(date, "%G week:%V"))
+      mutate(date_week = format(date, "%G week:%V"))
     grouping_cols <- c(grouping_cols, "date_week")
   } else {
     tDF <- filtered_data
   }
 
   tDF |>
-    dplyr::group_by(dplyr::across(dplyr::all_of(grouping_cols))) |>
-    dplyr::summarise(trips = sum(trips, na.rm = TRUE), .groups = "drop")
+    group_by(across(all_of(grouping_cols))) |>
+    summarise(trips = sum(trips, na.rm = TRUE), .groups = "drop")
+}
+
+
+fn_calculate_table_data <- function(base_data) {
+  if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
+    err_msg <- "System Error: The underlying data source is disconnected or invalid."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  main_data <- base_data |>
+    filter(full_month_aggregation == TRUE, full_week_aggregation == FALSE) |>
+    group_by(date) |>
+    summarise(
+      # not DRY cos arrow doesnt support across or anonymous
+      total_number_trips = sum(total_number_trips, na.rm = TRUE),
+      total_distance = sum(total_distance, na.rm = TRUE),
+      total_passenger_count = sum(total_passenger_count, na.rm = TRUE),
+      total_charges = sum(total_charges, na.rm = TRUE),
+      total_fare = sum(total_fare, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    collect() |>
+    arrange(date) |>
+    mutate(date = format(date, "%b %Y"))
+
+  # totals
+  metrics <- c(
+    "total_number_trips", "total_distance",
+    "total_passenger_count", "total_charges", "total_fare"
+  )
+
+  totals <- main_data |>
+    dplyr::summarise(
+      dplyr::across(all_of(metrics), \(x) sum(x, na.rm = TRUE))
+    ) |>
+    dplyr::mutate(date = "TOTALS")
+
+
+  renamed_metrics <- c(
+    "Date", "Trip Count", "Total Distance (miles)",
+    "Passenger Count", "Total Charge", "Total Fare"
+  )
+  presentation_names <- setNames(c("date", metrics), renamed_metrics)
+
+  final_data <- dplyr::bind_rows(main_data, totals) |>
+    rename(all_of(presentation_names))
 }

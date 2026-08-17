@@ -138,9 +138,9 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     stop(err_msg)
   }
 
-  # --- CHART LOGIC ---
+  # CHART
 
-  # 1. Lock factor levels globally so axes align perfectly across facets even if sparse
+  # Lock factor levels globally so axes align perfectly across facets even if sparse
   all_x <- sort(unique(as.character(base_data[[x_col]])))
   all_y <- sort(unique(as.character(base_data[[y_col]])))
 
@@ -150,7 +150,7 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
       !!y_col := factor(.data[[y_col]], levels = all_y)
     )
 
-  # 2. Determine if faceting is required
+  # Determine if faceting is required
   if ("date_week" %in% names(plot_data)) {
     split_variable <- "date_week"
   } else if ("date_month" %in% names(plot_data)) {
@@ -168,7 +168,7 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     calc_height <- max(400, n_rows * 300)
   }
 
-  # 3. Define the Plotly native colourscale
+  # Define the Plotly native colourscale
   custom_colours <- list(
     c(0, config$colours$theme$body_bg),
     c(0.5, config$colours$theme$primary_accent),
@@ -202,7 +202,7 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     )
   }
 
-  # 5. Render Chart
+  # Render Chart
   if (is.null(split_variable)) {
     # Standard single chart
     fig <- create_heatmap_trace(plot_data, show_legend = TRUE) |>
@@ -225,7 +225,8 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     layout_bottom <- 80
 
     # 1. Total height scales perfectly with the number of rows
-    calc_height <- (n_rows * plot_height_px) + ((n_rows - 1) * gap_px) + layout_top + layout_bottom
+    calc_height <- (n_rows * plot_height_px) + ((n_rows - 1) * gap_px) +
+      layout_top + layout_bottom
 
     # The exact fraction one gap represents
     gap_frac <- gap_px / calc_height
@@ -279,4 +280,97 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
 
     return(fig)
   }
+}
+
+
+#' Generate Yellow Taxi Data Table
+#'
+#' @description
+#' Validates and formats aggregated yellow taxi data, generating an interactive
+#' `{DT}` datatable. It automatically pins the "TOTALS" summary row to the HTML
+#' table footer (`<tfoot>`), preventing it from being affected by user sorting
+#' or pagination.
+#'
+#' @param base_data A `data.frame` or `tibble` containing the aggregated taxi data.
+#'   Must include a summary row where the `Date` column equals `"TOTALS"`.
+#'   Requires the following strict column names: `"Date"`, `"Trip Count"`,
+#'   `"Total Distance (miles)"`, `"Passenger Count"`, `"Total Charge"`,
+#'   and `"Total Fare"`.
+#'
+#' @return A `datatables` HTML widget ready for UI rendering.
+#'
+#' @examples
+#' \dontrun{
+#' my_table <- fn_generate_yellow_taxi_table(final_data)
+#' }
+fn_generate_yellow_taxi_table <- function(base_data) {
+  if (!is.data.frame(base_data)) {
+    err_msg <- "Input data must be a data.frame or tibble."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  if (nrow(base_data) == 0) {
+    err_msg <- "Input data is empty."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  req_cols <- c(
+    "Date", "Trip Count", "Total Distance (miles)",
+    "Passenger Count", "Total Charge", "Total Fare"
+  )
+  missing_cols <- setdiff(req_cols, names(base_data))
+
+  if (length(missing_cols) > 0) {
+    err_msg <- (paste("Missing required columns:", paste(missing_cols, collapse = ", ")))
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  if (!"TOTALS" %in% base_data$Date) {
+    err_msg <- "Input data must contain a summary row where Date is 'TOTALS'."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  # BUILD CHART
+
+  # totals will go into footer
+  df_data <- base_data[base_data$Date != "TOTALS", ]
+  df_totals <- base_data[base_data$Date == "TOTALS", ]
+
+  footer_vals <- c(
+    "TOTALS",
+    scales::comma(df_totals[["Trip Count"]]),
+    scales::comma(df_totals[["Total Distance (miles)"]], accuracy = 0.01),
+    scales::comma(df_totals[["Passenger Count"]]),
+    scales::dollar(df_totals[["Total Charge"]]),
+    scales::dollar(df_totals[["Total Fare"]])
+  )
+
+  # Create HTML container with footer
+  sketch <- htmltools::withTags(table(
+    tableHeader(names(df_data)),
+    tableFooter(footer_vals)
+  ))
+
+  # only show pagination when more than 20 rows
+  domString <- "t"
+  maxLength <- 20
+  if (nrow(df_data) > maxLength) {
+    domString <- paste0(domString, "p")
+  }
+
+  dt_options <- list(
+    pageLength = maxLength, lengthMenu = c(5, 10, 15, 20),
+    dom = domString
+  )
+
+  table <- DT::datatable(df_data, rownames = FALSE, options = dt_options, container = sketch) |>
+    DT::formatRound(columns = c("Trip Count", "Passenger Count"), digits = 0) |>
+    DT::formatRound(columns = "Total Distance (miles)", digits = 2) |>
+    DT::formatCurrency(columns = c("Total Charge", "Total Fare"), currency = "$")
+
+  return(table)
 }

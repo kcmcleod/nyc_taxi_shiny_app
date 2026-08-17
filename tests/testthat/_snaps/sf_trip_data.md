@@ -165,3 +165,113 @@
       ]
     }
 
+# sf_trip_data - table
+
+    {
+      "type": "list",
+      "attributes": {
+        "names": {
+          "type": "character",
+          "attributes": {},
+          "value": ["Date", "Trip Count", "Total Distance (miles)", "Passenger Count", "Total Charge", "Total Fare"]
+        },
+        "row.names": {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3, 4]
+        },
+        "class": {
+          "type": "character",
+          "attributes": {},
+          "value": ["tbl_df", "tbl", "data.frame"]
+        }
+      },
+      "value": [
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["Mar 2026", "Apr 2026", "May 2026", "TOTALS"]
+        },
+        {
+          "type": "integer",
+          "attributes": {},
+          "value": [120, 78, 42, 240]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [296.28, 385.52, 263.6, 945.4]
+        },
+        {
+          "type": "integer",
+          "attributes": {},
+          "value": [128, 84, 43, 255]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [2449.32, 2565.44, 1496.9, 6511.66]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1599.54, 1796.17, 1092.04, 4487.75]
+        }
+      ]
+    }
+
+---
+
+    {
+      "type": "list",
+      "attributes": {
+        "names": {
+          "type": "character",
+          "attributes": {},
+          "value": ["Date", "Trip Count", "Total Distance (miles)", "Passenger Count", "Total Charge", "Total Fare"]
+        },
+        "row.names": {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3, 4, 5, 6]
+        },
+        "class": {
+          "type": "character",
+          "attributes": {},
+          "value": ["tbl_df", "tbl", "data.frame"]
+        }
+      },
+      "value": [
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "TOTALS"]
+        },
+        {
+          "type": "integer",
+          "attributes": {},
+          "value": [48, 44, 120, 78, 42, 332]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [467.36, 211.01, 296.28, 385.52, 263.6, 1623.77]
+        },
+        {
+          "type": "integer",
+          "attributes": {},
+          "value": [60, 23, 128, 84, 43, 338]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [2368.28, 1759.8, 2449.32, 2565.44, 1496.9, 10639.74]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1975.32, 1273.73, 1599.54, 1796.17, 1092.04, 7736.8]
+        }
+      ]
+    }
+
