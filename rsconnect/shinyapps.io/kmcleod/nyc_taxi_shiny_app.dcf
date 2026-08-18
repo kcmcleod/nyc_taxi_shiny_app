@@ -1,0 +1,13 @@
+name: nyc_taxi_shiny_app
+title: nyc_taxi_shiny_app
+username: kmcleod
+account: kmcleod
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17717897
+bundleId: 12427240
+url: https://kmcleod.shinyapps.io/nyc_taxi_shiny_app/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: dev_data_folder|app_data/20260814_yellow_metadata.rds|data-raw|dataPrep|scripts|tests|.lintr|.github|.git|R/.DS_Store
