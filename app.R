@@ -59,7 +59,7 @@ ui <- page_navbar(
   id = "main_nav",
 
   # Load Modules
-  mod_yellow_taxis_parent_ui("yt_parent", config),
+  mod_yellow_taxis_parent_ui("yt_parent", config, app_metadata),
   mod_info_page_ui("info_page"),
 
   # Global header components (invisible scripts and modals)

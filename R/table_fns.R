@@ -1,12 +1,44 @@
-fn_calculate_table_data <- function(base_data) {
+fn_calculate_table_data <- function(base_data, week_agg, month_agg,
+                                    pu_locations, do_locations) {
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
     log_error(err_msg)
     stop(err_msg)
   }
 
+  if (!is.logical(month_agg) || length(month_agg) != 1) {
+    err_msg <- "Input Error: Month aggregation selection is invalid."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  if (!is.logical(week_agg) || length(week_agg) != 1) {
+    err_msg <- "Input Error: Week aggregation selection is invalid."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  if (!length(pu_locations) > 0 || !is.character(pu_locations)) {
+    err_msg <- "Input Error: Invalid choice for pick up location."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  if (!length(do_locations) > 0 || !is.character(do_locations)) {
+    err_msg <- "Input Error: Invalid choice for drop off location."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  date_format_string <- ifelse(month_agg == TRUE, "%b %Y", "%d %b %Y")
+
   main_data <- base_data |>
-    filter(full_month_aggregation == TRUE, full_week_aggregation == FALSE) |>
+    filter(
+      full_month_aggregation == month_agg,
+      full_week_aggregation == week_agg,
+      PULocation %in% pu_locations,
+      DOLocation %in% do_locations
+    ) |>
     group_by(date) |>
     summarise(
       # not DRY cos arrow doesnt support across or anonymous
@@ -19,7 +51,10 @@ fn_calculate_table_data <- function(base_data) {
     ) |>
     collect() |>
     arrange(date) |>
-    mutate(date = format(date, "%b %Y"))
+    mutate(
+      date = format(date, date_format_string),
+      date = if_else(is.na(date), "Unknown", date)
+    )
 
   # totals
   metrics <- c(
@@ -32,7 +67,6 @@ fn_calculate_table_data <- function(base_data) {
       dplyr::across(all_of(metrics), \(x) sum(x, na.rm = TRUE))
     ) |>
     dplyr::mutate(date = "TOTALS")
-
 
   renamed_metrics <- c(
     "Date", "Trip Count", "Total Distance (miles)",
@@ -102,8 +136,8 @@ fn_generate_yellow_taxi_table <- function(base_data) {
   # BUILD CHART
 
   # totals will go into footer
-  df_data <- base_data[base_data$Date != "TOTALS", ]
-  df_totals <- base_data[base_data$Date == "TOTALS", ]
+  df_data <- base_data[!base_data$Date %in% "TOTALS", ]
+  df_totals <- base_data[base_data$Date %in% "TOTALS", ]
 
   footer_vals <- c(
     "TOTALS",
@@ -122,9 +156,9 @@ fn_generate_yellow_taxi_table <- function(base_data) {
 
   # only show pagination when more than 20 rows
   domString <- "t"
-  maxLength <- 20
+  maxLength <- 10
   if (nrow(df_data) > maxLength) {
-    domString <- paste0(domString, "p")
+    domString <- paste0("p", domString)
   }
 
   dt_options <- list(

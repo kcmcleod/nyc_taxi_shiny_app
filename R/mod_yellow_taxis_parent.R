@@ -3,7 +3,7 @@
 ################################################################################
 
 #' Module UI
-mod_yellow_taxis_parent_ui <- function(id, config) {
+mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
   ns <- NS(id)
 
   nav_panel(
@@ -17,8 +17,22 @@ mod_yellow_taxis_parent_ui <- function(id, config) {
       tags$p("Controls the date range for all the charts/tables in this page"),
       layout_columns(
         col_widths = breakpoints(sm = 12, md = 6),
-        disabled(dateInput(ns("di_start_date"), label = "Start Date", width = "100%")),
-        disabled(dateInput(ns("di_end_date"), label = "End Date", width = "100%"))
+        disabled(dateInput(
+          ns("di_start_date"),
+          label = "Start Date",
+          width = "100%",
+          min = app_metadata$min_date,
+          max = app_metadata$max_date,
+          value = floor_date(app_metadata$max_date %m-% weeks(13), unit = "month")
+        )),
+        disabled(dateInput(
+          ns("di_end_date"),
+          label = "End Date",
+          width = "100%",
+          min = app_metadata$min_date,
+          max = app_metadata$max_date,
+          value = app_metadata$max_date
+        ))
       )
     ),
     navset_card_tab(
@@ -35,7 +49,7 @@ mod_yellow_taxis_parent_ui <- function(id, config) {
       ),
       nav_panel(
         title = "TABLES",
-        mod_yellow_taxis_table_ui(ns("yt_table"), config)
+        mod_yellow_taxis_table_ui(ns("yt_table"), config, app_metadata)
       )
     )
   )
@@ -46,20 +60,7 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
                                            data_version) {
   moduleServer(id, function(input, output, session) {
     observeEvent(yellow_taxi_data(), {
-      # dates
-      min_date <- app_metadata$min_date
-      max_date <- app_metadata$max_date
-      initial_window_date <- floor_date(max_date %m-% weeks(13), unit = "month")
-
-      updateDateInput(
-        session = session, "di_start_date", min = min_date,
-        max = max_date, value = initial_window_date
-      )
-      updateDateInput(
-        session = session, "di_end_date", min = min_date,
-        max = max_date, value = max_date
-      )
-
+      # not sure this is needed...
       enable("di_start_date")
       enable("di_end_date")
     })
