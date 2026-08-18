@@ -6,12 +6,12 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["date", "total_value"]
+          "value": ["date", "payment_type", "total_value"]
         },
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70]
         },
         "class": {
           "type": "character",
@@ -29,12 +29,17 @@
               "value": ["Date"]
             }
           },
-          "value": [20513, 20520, 20527, 20534, 20541, 20548, 20555, 20562, 20569, 20576, 20583, 20590, 20597, 20604]
+          "value": [20513, 20513, 20513, 20513, 20513, 20520, 20520, 20520, 20520, 20520, 20527, 20527, 20527, 20527, 20527, 20534, 20534, 20534, 20534, 20534, 20541, 20541, 20541, 20541, 20541, 20548, 20548, 20548, 20548, 20548, 20555, 20555, 20555, 20555, 20555, 20562, 20562, 20562, 20562, 20562, 20569, 20569, 20569, 20569, 20569, 20576, 20576, 20576, 20576, 20576, 20583, 20583, 20583, 20583, 20583, 20590, 20590, 20590, 20590, 20590, 20597, 20597, 20597, 20597, 20597, 20604, 20604, 20604, 20604, 20604]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge"]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [25, 168, 80, 24, 44, 425, 85, 35, 72, 36, 59, 66, 502, 39]
+          "value": [7, 6, 4, 4, 4, 10, 103, 36, 4, 15, 7, 59, 3, 3, 8, 3, 3, 4, 9, 5, 23, 3, 8, 3, 7, 377, 3, 4, 38, 3, 50, 15, 9, 8, 3, 3, 12, 6, 6, 8, 8, 54, 3, 3, 4, 11, 12, 5, 4, 4, 19, 8, 9, 19, 4, 46, 4, 7, 5, 4, 3, 487, 4, 5, 3, 4, 26, 4, 2, 3]
         }
       ]
     }
@@ -47,7 +52,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["date", "total_value"]
+          "value": ["date", "payment_type", "total_value"]
         },
         "row.names": {
           "type": "integer",
@@ -71,6 +76,11 @@
             }
           },
           "value": [20513, 20544, 20574]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["Flex Fare trip", "Flex Fare trip", "Flex Fare trip"]
         },
         {
           "type": "integer",

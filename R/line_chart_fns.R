@@ -9,13 +9,16 @@
 #' @param payment_list A character vector of payment types to include in the filter.
 #' @param month_agg Logical. If `TRUE`, filters for data pre-aggregated at the monthly level.
 #' @param week_agg Logical. If `TRUE`, filters for data pre-aggregated at the weekly level.
-#' @param data_field A character string of the metric to aggregate (e.g., "total_distance" or "total_number_trips").
+#' @param data_field A character string of the metric to aggregate (e.g.,
+#' "total_distance" or "total_number_trips").
+#' @param split_by A character string of the metric to create lines for
+#' (e.g., "Payment Type", "Vendor", "Total").
 #'
 #' @return A tibble with two columns: `date` and `total_value`, containing the aggregated totals.
 #'
 #' @export
 fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
-                                         month_agg, week_agg, data_field) {
+                                         month_agg, week_agg, data_field, split_by) {
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
     log_error(err_msg)
@@ -40,6 +43,13 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
     stop(err_msg)
   }
 
+  if (!is.character(split_by) || length(split_by) != 1 ||
+    !split_by %in% c("Payment Type", "Vendor", "Total")) {
+    err_msg <- "Input Error: Selected line type is invalid."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
   # check cols
   required_cols <- c(
     "date", "Vendor", "payment_type",
@@ -57,6 +67,12 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
     stop(err_msg)
   }
 
+  if (split_by == "Total") {
+    split_col <- ""
+  } else {
+    split_col <- ifelse(split_by == "Vendor", "Vendor", "payment_type")
+  }
+
   base_data |>
     filter(
       full_month_aggregation == month_agg,
@@ -64,8 +80,8 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
       Vendor %in% vendor_list,
       payment_type %in% payment_list
     ) |>
-    select(date, all_of(data_field)) |>
-    group_by(date) |>
+    select(date, !!sym(split_col), all_of(data_field)) |>
+    group_by(date, !!sym(split_col)) |>
     summarise(
       total_value = sum(!!sym(data_field), na.rm = TRUE),
       .groups = "drop"
@@ -94,7 +110,7 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
 #'
 #' @return A plotly htmlwidget object ready to be rendered in a Shiny UI.
 fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
-                                        title, y_lab_title, config) {
+                                        title, y_lab_title, split_by, config) {
   if (!inherits(base_data, "data.frame")) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
     log_error(err_msg)
@@ -119,6 +135,12 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
     stop(err_msg)
   }
 
+  if (!is.character(split_by) || length(split_by) != 1 ||
+    !split_by %in% c("Payment Type", "Vendor", "Total")) {
+    err_msg <- "Input Error: Selected line type is invalid."
+    log_error(err_msg)
+    stop(err_msg)
+  }
 
   # check cols
   required_cols <- c(x_col, y_col)
@@ -141,10 +163,23 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
     "%d %b %Y"
   )
 
-  fig <- plot_ly(base_data,
-    x = ~ get(x_col), y = ~ get(y_col), type = "scattergl",
-    mode = "lines"
-  ) |>
+  if (split_by == "Total") {
+    fig <- plot_ly(base_data,
+      x = ~ get(x_col), y = ~ get(y_col), type = "scattergl", mode = "lines",
+      line = list(color = config$colours$theme$primary_accent)
+    )
+  } else {
+    colour_col <- ifelse(split_by == "Vendor", "Vendor", "payment_type")
+
+    fig <- plot_ly(base_data,
+      x = ~ get(x_col), y = ~ get(y_col),
+      color = as.formula(paste0("~`", colour_col, "`")),
+      type = "scattergl",
+      mode = "lines"
+    )
+  }
+
+  fig |>
     layout(
       title = title,
       xaxis = list(

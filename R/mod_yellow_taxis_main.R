@@ -11,9 +11,9 @@ mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
       fill = FALSE,
       card_header("Options"),
       layout_columns(
-        col_widths = breakpoints(sm = 12, md = 6, xl = 3),
+        col_widths = breakpoints(sm = 12, md = 6, xl = c(2, 3, 3, 2, 2)),
         pickerInput(ns("pi_level"),
-          label = "Granularity:", multiple = FALSE,
+          label = "Granularity:", multiple = FALSE, width = "100%",
           choices = config$ui_values$pi_level, selected = "Week",
           options = pickerOptions(container = "body")
         ),
@@ -21,6 +21,7 @@ mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
           label = "Vendors:", multiple = TRUE,
           choices = app_metadata$Vendor,
           selected = app_metadata$Vendor,
+          width = "100%",
           options = pickerOptions(
             `actions-box` = TRUE,
             container = "body"
@@ -30,10 +31,15 @@ mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
           label = "Payment:", multiple = TRUE,
           choices = app_metadata$payment_type,
           selected = app_metadata$payment_type,
+          width = "100%",
           options = pickerOptions(
             `actions-box` = TRUE,
             container = "body"
           )
+        ),
+        radioButtons(ns("rb_split_by"),
+          label = "Lines:",
+          choices = c("Payment Type", "Vendor", "Total")
         ),
         radioButtons(ns("rb_journeys_or_passengers"),
           label = "Y axis:",
@@ -57,7 +63,10 @@ mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
       )
     ),
     card(
-      withSpinner(plotlyOutput(ns("po_tripVolumesOverTime")),
+      full_screen = TRUE, # Keeps the expand icon in the bottom right corner
+      style = "min-height: 550px;", # Forces the card to stop squashing itself
+      withSpinner(
+        plotlyOutput(ns("po_tripVolumesOverTime"), height = "500px"), # Explicit height
         type = 2,
         color.background = config$colours$icons$taxi,
         color = config$colours$theme$primary_accent, size = 0.5
@@ -73,7 +82,10 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
     ################################################################################
     # DATA
     rv_main_chart_filtered_data <- reactive({
-      req(filtered_data())
+      req(
+        filtered_data(), input$pi_vendor, input$pi_pay_type,
+        input$pi_level, input$rb_split_by
+      )
 
       base_data <- filtered_data()
       vendor_list <- input$pi_vendor
@@ -84,10 +96,11 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
       data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance",
         "total_distance", "total_number_trips"
       )
+      split_by <- input$rb_split_by
 
       data <- fn_calculate_line_chart_data(
         base_data, vendor_list, payment_list,
-        month_agg, week_agg, data_field
+        month_agg, week_agg, data_field, split_by
       )
 
       return(data)
@@ -178,7 +191,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
           fn_generate_main_line_chart(
             base_data, input$pi_level, "date",
             "total_value", "Yellow Taxi journeys",
-            y_lab_title, config
+            y_lab_title, input$rb_split_by, config
           )
         },
         error = function(e) {
@@ -200,7 +213,8 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
         input$pi_vendor,
         input$pi_pay_type,
         input$rb_journeys_or_passengers,
-        input$pi_level
+        input$pi_level,
+        input$rb_split_by
       )
 
     ############################################################################

@@ -47,7 +47,8 @@ test_that("fn_calculate_line_chart_data correctly filters and sums data", {
     payment_list = c("Cash", "Credit"),
     month_agg = TRUE,
     week_agg = FALSE,
-    data_field = "total_distance"
+    data_field = "total_distance",
+    split_by = "Total"
   )
 
   # Assertions
@@ -70,7 +71,8 @@ test_that("fn_calculate_line_chart_data handles strict filtering correctly", {
     payment_list = c("Cash"),
     month_agg = TRUE,
     week_agg = FALSE,
-    data_field = "total_number_trips"
+    data_field = "total_number_trips",
+    split_by = "Total"
   )
 
   # Assertions
@@ -88,7 +90,8 @@ test_that("fn_calculate_line_chart_data returns empty dataframe when no match is
     payment_list = c("Cash"),
     month_agg = TRUE,
     week_agg = FALSE,
-    data_field = "total_distance"
+    data_field = "total_distance",
+    split_by = "Total"
   )
 
   # Assertions
@@ -105,7 +108,8 @@ test_that("fn_calculate_line_chart_data handles 0-row dataframes gracefully", {
     payment_list = c("Cash"),
     month_agg = TRUE,
     week_agg = FALSE,
-    data_field = "total_distance"
+    data_field = "total_distance",
+    split_by = "Total"
   )
 
   # It should not crash; it should return a 0-row dataframe with the correct column names
@@ -122,7 +126,8 @@ test_that("fn_calculate_line_chart_data safely returns 0 rows for empty filter l
     payment_list = c("Cash"),
     month_agg = TRUE,
     week_agg = FALSE,
-    data_field = "total_distance"
+    data_field = "total_distance",
+    split_by = "Total"
   )
 
   expect_equal(nrow(result), 0)
@@ -132,7 +137,7 @@ test_that("fn_calculate_line_chart_data defensive blocks execute", {
   expect_error(
     fn_calculate_line_chart_data(
       list(date = "2026-01-01"), c("VTS"), c("Cash"),
-      TRUE, FALSE, "total_distance"
+      TRUE, FALSE, "total_distance", "Total"
     ),
     regexp = "System Error"
   )
@@ -140,7 +145,7 @@ test_that("fn_calculate_line_chart_data defensive blocks execute", {
   expect_error(
     fn_calculate_line_chart_data(
       mock_taxi_data, c("VTS"), c("Cash"), "TRUE",
-      FALSE, "total_distance"
+      FALSE, "total_distance", "Total"
     ),
     regexp = "Month aggregation selection is invalid"
   )
@@ -148,13 +153,16 @@ test_that("fn_calculate_line_chart_data defensive blocks execute", {
   expect_error(
     fn_calculate_line_chart_data(
       mock_taxi_data, c("VTS"), c("Cash"), TRUE,
-      "FALSE", "total_distance"
+      "FALSE", "total_distance", "Total"
     ),
     regexp = "Week aggregation selection is invalid"
   )
 
   expect_error(
-    fn_calculate_line_chart_data(mock_taxi_data, c("VTS"), c("Cash"), TRUE, FALSE, 123),
+    fn_calculate_line_chart_data(
+      mock_taxi_data, c("VTS"), c("Cash"), TRUE,
+      FALSE, 123, "Total"
+    ),
     regexp = "Selected metric is invalid"
   )
 
@@ -162,9 +170,22 @@ test_that("fn_calculate_line_chart_data defensive blocks execute", {
   expect_error(
     fn_calculate_line_chart_data(
       bad_data, c("VTS"), c("Cash"), TRUE, FALSE,
-      "total_distance"
+      "total_distance", "Total"
     ),
     regexp = "missing required columns"
+  )
+
+  expect_error(
+    fn_calculate_line_chart_data(
+      base_data = mock_taxi_data,
+      vendor_list = character(0),
+      payment_list = c("Cash"),
+      month_agg = TRUE,
+      week_agg = FALSE,
+      data_field = "total_distance",
+      split_by = "banana"
+    ),
+    regexp = "line type is invalid"
   )
 })
 
@@ -181,6 +202,7 @@ test_that("fn_generate_main_line_chart generates a valid plotly object", {
     y_col = "total_volume",
     title = "Test Chart",
     y_lab_title = "Volume",
+    split_by = "Total",
     config = mock_config
   )
 
@@ -203,7 +225,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       bad_data, "Month", "journey_date", "total_volume",
-      "Test Chart", "Volume", mock_config
+      "Test Chart", "Volume", "Total", mock_config
     ),
     regexp = "System Error: The underlying data source"
   )
@@ -212,7 +234,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       mock_chart_data, "Month", "journey_date",
-      "total_volume", 12345, "Volume", mock_config
+      "total_volume", 12345, "Volume", "Total", mock_config
     ),
     regexp = "System Error: Please supply a valid title for the chart$"
   )
@@ -221,7 +243,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       mock_chart_data, "Month", "journey_date",
-      "total_volume", "Test Chart", NULL, mock_config
+      "total_volume", "Test Chart", NULL, "Total", mock_config
     ),
     regexp = "System Error: Please supply a valid title for the chart's y-axis"
   )
@@ -230,7 +252,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       mock_chart_data, "Year", "journey_date",
-      "total_volume", "Test Chart", "Volume", mock_config
+      "total_volume", "Test Chart", "Volume", "Total", mock_config
     ),
     regexp = "System Error: Selected granularity is not permitted"
   )
@@ -239,8 +261,22 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       mock_chart_data, "Month", "journey_date",
-      "non_existent_column", "Test Chart", "Volume", mock_config
+      "non_existent_column", "Test Chart", "Volume", "Total", mock_config
     ),
     regexp = "Data Error: The dataset is missing required columns"
+  )
+
+  expect_error(
+    fn_generate_main_line_chart(
+      base_data = mock_chart_data,
+      granularity = "Month",
+      x_col = "journey_date",
+      y_col = "total_volume",
+      title = "Test Chart",
+      y_lab_title = "Volume",
+      split_by = "banana",
+      config = mock_config
+    ),
+    regexp = "line type is invalid"
   )
 })
