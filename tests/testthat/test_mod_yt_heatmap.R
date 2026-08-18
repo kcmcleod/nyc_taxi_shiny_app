@@ -1,38 +1,49 @@
+################################################################################
+### FILE: tests/testthat/test-mod_heatmap.R
+################################################################################
+
 library(testthat)
 library(shiny)
 library(dplyr)
 
-
-mock_main_data <- tibble::tibble(
+# ==============================================================================
+# 1. MOCK DATA
+# ==============================================================================
+# We need distinct rows for each temporal aggregation tier to prove the UI switches
+mock_heatmap_module_data <- tibble::tibble(
   date = as.Date(c(
-    "2023-01-01", # Normal daily row
-    "2023-01-08", # Normal weekly row
-    NA, # Missing date row (VTS/Cash)
-    NA # Missing date row (CMT/Credit)
+    "2023-01-01", # Row 1: Monthly Aggregation
+    "2023-01-08", # Row 2: Weekly Aggregation
+    "2023-01-02", # Row 3: Daily (Combined) Data
+    NA, # Row 4: Missing Date (Daily Tier)
+    NA # Row 5: Missing Date (Daily Tier)
   )),
-  Vendor = c("VTS", "CMT", "VTS", "CMT"),
-  payment_type = c("Cash", "Credit", "Cash", "Credit"),
-  full_month_aggregation = c(FALSE, FALSE, FALSE, FALSE),
-  full_week_aggregation = c(FALSE, TRUE, FALSE, FALSE),
-  total_distance = c(10, 20, 5, 15),
-  total_number_trips = c(2, 4, 1, 3)
+  full_month_aggregation = c(TRUE, FALSE, FALSE, FALSE, FALSE),
+  full_week_aggregation = c(FALSE, TRUE, FALSE, FALSE, FALSE),
+  PULocation = c("Loc_A", "Loc_A", "Loc_B", "Loc_A", "Loc_C"),
+  DOLocation = c("Loc_X", "Loc_Y", "Loc_Z", "Loc_X", "Loc_Z"),
+  total_number_trips = c(10, 20, 30, 5, 15)
 )
 
+# The heatmap module doesn't heavily use app_metadata for filtering,
+# but it is passed down the server tree, so we supply a basic mock.
 mock_metadata <- list(
-  Vendor = c("VTS", "CMT"),
-  payment_type = c("Cash", "Credit")
+  Location = c("Loc_A", "Loc_B", "Loc_C")
 )
 
+# ==============================================================================
+# 2. TESTS
+# ==============================================================================
 
-test_that("mod_yellow_taxis_main_server processes inputs and KPIs correctly", {
-  # Mock the reactive dependencies
-  mock_filtered_data <- reactiveVal(mock_main_data)
+test_that("mod_yellow_taxis_heatmap_server processes inputs and KPIs correctly", {
+  # Mock the reactive dependencies passed from the parent
+  mock_filtered_data <- reactiveVal(mock_heatmap_module_data)
   mock_data_version <- reactiveVal(1)
   mock_start_date <- as.Date("2023-01-01")
   mock_end_date <- as.Date("2023-01-31")
 
   testServer(
-    app = mod_yellow_taxis_main_server,
+    app = mod_yellow_taxis_heatmap_server,
     args = list(
       filtered_data = mock_filtered_data,
       app_metadata  = mock_metadata,
@@ -41,56 +52,57 @@ test_that("mod_yellow_taxis_main_server processes inputs and KPIs correctly", {
       end_date      = mock_end_date
     ),
     expr = {
-      session$setInputs(
-        pi_level = "Week",
-        pi_vendor = c("CMT"),
-        pi_pay_type = c("Credit"),
-        rb_journeys_or_passengers = "Journey Count"
-      )
+      # ------------------------------------------------------------------------
+      # Test A: Monthly Aggregation Filter
+      # ------------------------------------------------------------------------
+      session$setInputs(ri_heatmap_period = "Monthly")
 
-      # Access the internal reactive
-      chart_data <- rv_main_chart_filtered_data()
+      heatmap_data_monthly <- rv_main_heatmap_data()
 
-      # Verify it pulled the weekly CMT/Credit row
-      expect_s3_class(chart_data, "data.frame")
-      expect_equal(nrow(chart_data), 1)
-      expect_equal(chart_data$total_value[1], 4) # 4 trips
+      # Should only grab Row 1 (full_month_aggregation == TRUE)
+      expect_s3_class(heatmap_data_monthly, "data.frame")
+      expect_equal(nrow(heatmap_data_monthly), 1)
+      expect_equal(heatmap_data_monthly$trips[1], 10)
+      expect_true("date_month" %in% names(heatmap_data_monthly))
 
 
-      # We select VTS and Cash. The mock data has 1 NA row for this combo with 1 trip.
-      session$setInputs(
-        pi_level = "Day",
-        pi_vendor = c("VTS"),
-        pi_pay_type = c("Cash"),
-        rb_journeys_or_passengers = "Journey Count" # Note: Your UI config uses "Journey Count"
-      )
+      # ------------------------------------------------------------------------
+      # Test B: Weekly Aggregation Filter
+      # ------------------------------------------------------------------------
+      session$setInputs(ri_heatmap_period = "Weekly")
 
-      # Test the KPI Title renders correctly
-      expect_equal(output$vo_kpi_title, "Total Journeys with Unknown Dates")
+      heatmap_data_weekly <- rv_main_heatmap_data()
 
-      # Test the missing dates math sums the trips (should be "1")
-      expect_equal(output$vo_missing_dates, "1")
+      # Should only grab Row 2 (full_week_aggregation == TRUE)
+      expect_equal(nrow(heatmap_data_weekly), 1)
+      expect_equal(heatmap_data_weekly$trips[1], 20)
+      expect_true("date_week" %in% names(heatmap_data_weekly))
 
 
-      # Now we toggle the Y-axis to distance for the exact same filters
-      session$setInputs(
-        rb_journeys_or_passengers = "Total Distance"
-      )
+      # ------------------------------------------------------------------------
+      # Test C: Combined (Daily) Filter
+      # ------------------------------------------------------------------------
+      session$setInputs(ri_heatmap_period = "Combined")
 
-      # Test the KPI Title switches correctly
-      expect_equal(output$vo_kpi_title, "Total Distance with Unknown Dates (miles)")
+      heatmap_data_combined <- rv_main_heatmap_data()
 
-      # Test the missing dates math switches to sum distance (should be "5")
-      expect_equal(output$vo_missing_dates, "5")
+      # Should grab Rows 3, 4, and 5 (all daily/unaggregated rows, including NAs)
+      # Because there are 3 distinct PU/DO combinations (B-Z, A-X, C-Z), we expect 3 rows
+      expect_equal(nrow(heatmap_data_combined), 3)
+      # Verify the sum of trips across the combined rows (30 + 5 + 15 = 50)
+      expect_equal(sum(heatmap_data_combined$trips), 50)
+      # Date columns should be completely absent in the "Combined" view
+      expect_false("date_month" %in% names(heatmap_data_combined))
+      expect_false("date_week" %in% names(heatmap_data_combined))
 
 
-      session$setInputs(
-        pi_vendor = c("VTS", "CMT"),
-        pi_pay_type = c("Cash", "Credit")
-      )
+      # ------------------------------------------------------------------------
+      # Test D: Missing Dates KPI Math
+      # ------------------------------------------------------------------------
+      # Our missing dates logic sums trips where `is.na(date)` is TRUE on the daily tier.
+      # In the mock data, Row 4 (5 trips) and Row 5 (15 trips) = 20 total missing.
 
-      # Now both NA rows should be summed.
-      # Distance: 5 (VTS) + 15 (CMT) = 20
+      # The UI element formats it using scales::comma, so we check for the string "20"
       expect_equal(output$vo_missing_dates, "20")
     }
   )
