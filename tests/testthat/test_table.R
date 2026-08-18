@@ -18,7 +18,9 @@ mock_raw_table_data <- tibble::tibble(
   total_distance = c(5.5, 4.5, 10.0, 20.0),
   total_passenger_count = c(1, 2, 3, 4),
   total_charges = c(15.0, 25.0, 50.0, 100.0),
-  total_fare = c(10.0, 20.0, 40.0, 80.0)
+  total_fare = c(10.0, 20.0, 40.0, 80.0),
+  PULocation = c("EWR", "EWR", "EWR", "EWR"),
+  DOLocation = c("EWR", "EWR", "EWR", "EWR")
 )
 
 
@@ -48,13 +50,21 @@ make_mock_taxi_data <- function(n_monthly_rows = 5) {
   return(rbind(df, totals))
 }
 
+week_agg <- FALSE
+month_agg <- TRUE
+pu_locations <- app_metadata$Location
+do_locations <- app_metadata$Location
+
 
 # ==============================================================================
 # DATA CALCULATION TESTS: fn_calculate_table_data
 # ==============================================================================
 
 test_that("fn_calculate_table_data aggregates, formats dates, and appends TOTALS row", {
-  result <- fn_calculate_table_data(mock_raw_table_data)
+  result <- fn_calculate_table_data(
+    mock_raw_table_data, week_agg, month_agg,
+    pu_locations, do_locations
+  )
 
   # 1. Verify Structure & Column Names
   expect_s3_class(result, "data.frame")
@@ -91,7 +101,10 @@ test_that("fn_calculate_table_data handles empty filtered sets gracefully", {
   empty_data <- mock_raw_table_data |>
     dplyr::mutate(full_month_aggregation = FALSE)
 
-  result <- fn_calculate_table_data(empty_data)
+  result <- fn_calculate_table_data(
+    empty_data, week_agg, month_agg,
+    pu_locations, do_locations
+  )
 
   # Should successfully return a 1-row dataframe (just the TOTALS row of zeroes)
   expect_s3_class(result, "data.frame")
@@ -104,8 +117,61 @@ test_that("fn_calculate_table_data defensive blocks execute", {
   bad_data <- list(date = "2026-01-01", total_number_trips = 10)
 
   expect_error(
-    fn_calculate_table_data(bad_data),
+    fn_calculate_table_data(
+      bad_data, week_agg, month_agg,
+      pu_locations, do_locations
+    ),
     regexp = "System Error: The underlying data source is disconnected or invalid."
+  )
+
+  # Invalid Granularity
+  expect_error(
+    fn_calculate_table_data(
+      mock_raw_table_data, "week_agg", month_agg,
+      pu_locations, do_locations
+    ),
+    regexp = "Input Error: Week aggregation selection is invalid."
+  )
+
+  expect_error(
+    fn_calculate_table_data(
+      mock_raw_table_data, week_agg, "month_agg",
+      pu_locations, do_locations
+    ),
+    regexp = "Input Error: Month aggregation selection is invalid."
+  )
+
+  # Locations
+  expect_error(
+    fn_calculate_table_data(
+      mock_raw_table_data, week_agg, month_agg,
+      c(), do_locations
+    ),
+    regexp = "Input Error: Invalid choice for pick up location."
+  )
+
+  expect_error(
+    fn_calculate_table_data(
+      mock_raw_table_data, week_agg, month_agg,
+      c(1, 2, 3), do_locations
+    ),
+    regexp = "Input Error: Invalid choice for pick up location."
+  )
+
+  expect_error(
+    fn_calculate_table_data(
+      mock_raw_table_data, week_agg, month_agg,
+      pu_locations, c()
+    ),
+    regexp = "Input Error: Invalid choice for drop off location."
+  )
+
+  expect_error(
+    fn_calculate_table_data(
+      mock_raw_table_data, week_agg, month_agg,
+      pu_locations, c(1, 2, 3)
+    ),
+    regexp = "Input Error: Invalid choice for drop off location."
   )
 })
 
@@ -114,9 +180,9 @@ test_that("fn_calculate_table_data defensive blocks execute", {
 # UI RENDERING & DEFENSIVE TESTS
 # ==============================================================================
 
-test_that("fn_generate_yellow_taxi_table generates successfully and hides pagination for <= 20 rows", {
+test_that("fn_generate_yellow_taxi_table generates successfully and hides pagination for < 9 rows", {
   # 10 data rows + 1 totals row = 11 rows total
-  mock_data <- make_mock_taxi_data(10)
+  mock_data <- make_mock_taxi_data(3)
 
   expect_silent(
     res_table <- fn_generate_yellow_taxi_table(mock_data)
@@ -137,7 +203,7 @@ test_that("fn_generate_yellow_taxi_table enables pagination DOM string for > 20 
   res_table <- fn_generate_yellow_taxi_table(mock_data)
 
   # Verify DOM string is "tp" (Table + Pagination)
-  expect_equal(res_table$x$options$dom, "tp")
+  expect_equal(res_table$x$options$dom, "pt")
 })
 
 test_that("fn_generate_yellow_taxi_table defensive blocks execute", {
