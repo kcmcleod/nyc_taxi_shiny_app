@@ -17,22 +17,22 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
       tags$p("Controls the date range for all the charts/tables in this page"),
       layout_columns(
         col_widths = breakpoints(sm = 12, md = 6),
-        disabled(dateInput(
+        dateInput(
           ns("di_start_date"),
           label = "Start Date",
           width = "100%",
           min = app_metadata$min_date,
           max = app_metadata$max_date,
           value = floor_date(app_metadata$max_date %m-% weeks(13), unit = "month")
-        )),
-        disabled(dateInput(
+        ),
+        dateInput(
           ns("di_end_date"),
           label = "End Date",
           width = "100%",
           min = app_metadata$min_date,
           max = app_metadata$max_date,
           value = app_metadata$max_date
-        ))
+        )
       )
     ),
     navset_card_tab(
@@ -41,7 +41,7 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
       nav_panel(
         title = "Volumes",
         icon = icon("list-alt"),
-        mod_yellow_taxis_main_ui(ns("yt_main"), config)
+        mod_yellow_taxis_main_ui(ns("yt_main"), config, app_metadata)
       ),
       nav_panel(
         title = "JOURNEY PICKUP + DROP OFF",
@@ -59,12 +59,6 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
 mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
                                            data_version) {
   moduleServer(id, function(input, output, session) {
-    observeEvent(yellow_taxi_data(), {
-      # not sure this is needed...
-      enable("di_start_date")
-      enable("di_end_date")
-    })
-
     ############################################################################
     # TOP LEVEL DATA PROCESSING
     rv_main_date_filtered_date <- reactive({

@@ -3,7 +3,7 @@
 ################################################################################
 
 #' Main tab for Taxi UI
-mod_yellow_taxis_main_ui <- function(id, config) {
+mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
   ns <- NS(id)
 
   tagList(
@@ -17,20 +17,24 @@ mod_yellow_taxis_main_ui <- function(id, config) {
           choices = config$ui_values$pi_level, selected = "Week",
           options = pickerOptions(container = "body")
         ),
-        disabled(pickerInput(ns("pi_vendor"),
-          label = "Vendors:", multiple = TRUE, choices = c(),
+        pickerInput(ns("pi_vendor"),
+          label = "Vendors:", multiple = TRUE,
+          choices = app_metadata$Vendor,
+          selected = app_metadata$Vendor,
           options = pickerOptions(
             `actions-box` = TRUE,
             container = "body"
           )
-        )),
-        disabled(pickerInput(ns("pi_pay_type"),
-          label = "Payment:", multiple = TRUE, choices = c(),
+        ),
+        pickerInput(ns("pi_pay_type"),
+          label = "Payment:", multiple = TRUE,
+          choices = app_metadata$payment_type,
+          selected = app_metadata$payment_type,
           options = pickerOptions(
             `actions-box` = TRUE,
             container = "body"
           )
-        )),
+        ),
         radioButtons(ns("rb_journeys_or_passengers"),
           label = "Y axis:",
           choices = config$ui_values$metric_type
@@ -66,25 +70,6 @@ mod_yellow_taxis_main_ui <- function(id, config) {
 mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
                                          data_version, start_date, end_date) {
   moduleServer(id, function(input, output, session) {
-    observe({
-      # filters
-      vendor_values <- app_metadata$Vendor
-      payment_types <- app_metadata$payment_type
-
-      updatePickerInput(
-        session = session, "pi_vendor", choices = vendor_values,
-        selected = vendor_values
-      )
-      updatePickerInput(
-        session = session, "pi_pay_type", choices = payment_types,
-        selected = payment_types
-      )
-
-      enable("pi_vendor")
-      enable("pi_pay_type")
-    })
-
-
     ################################################################################
     # DATA
     rv_main_chart_filtered_data <- reactive({
