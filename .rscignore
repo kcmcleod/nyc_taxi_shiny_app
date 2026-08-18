@@ -1,0 +1,11 @@
+# Ignore local development data and scripts
+data-raw/
+scripts/
+tests/
+shared_app_cache/
+
+# Ignore local environment and Git files
+.git/
+.github/
+.Rproj.user/
+.Rhistory
