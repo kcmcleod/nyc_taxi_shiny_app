@@ -52,8 +52,8 @@ make_mock_taxi_data <- function(n_monthly_rows = 5) {
 
 week_agg <- FALSE
 month_agg <- TRUE
-pu_locations <- app_metadata$Location
-do_locations <- app_metadata$Location
+pu_locations <- c("EWR", "Manhattan", "Queens")
+do_locations <- c("EWR", "Manhattan", "Queens")
 
 
 # ==============================================================================
