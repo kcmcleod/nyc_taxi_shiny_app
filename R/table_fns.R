@@ -156,13 +156,13 @@ fn_generate_yellow_taxi_table <- function(base_data) {
 
   # only show pagination when more than 20 rows
   domString <- "t"
-  maxLength <- 10
+  maxLength <- 8
   if (nrow(df_data) > maxLength) {
     domString <- paste0("p", domString)
   }
 
   dt_options <- list(
-    pageLength = maxLength, lengthMenu = c(5, 10, 15, 20),
+    pageLength = maxLength,
     dom = domString
   )
 
