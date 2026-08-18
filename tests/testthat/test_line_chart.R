@@ -10,7 +10,7 @@ library(plotly)
 # MOCK DATA & CONFIGURATION
 # ==============================================================================
 
-# 1. RAW DATA (Used for testing fn_calculate_trip_volumes)
+# 1. RAW DATA (Used for testing fn_calculate_line_chart_data)
 mock_taxi_data <- tibble::tibble(
   date = as.Date(c("2023-01-01", "2023-01-01", "2023-01-02", "2023-01-02")),
   Vendor = c("VTS", "CMT", "VTS", "CMT"),
@@ -39,9 +39,9 @@ mock_config <- list(
 # DATA CALCULATION TESTS
 # ==============================================================================
 
-test_that("fn_calculate_trip_volumes correctly filters and sums data", {
+test_that("fn_calculate_line_chart_data correctly filters and sums data", {
   # Action: Run the function with standard inputs
-  result <- fn_calculate_trip_volumes(
+  result <- fn_calculate_line_chart_data(
     base_data = mock_taxi_data,
     vendor_list = c("VTS", "CMT"),
     payment_list = c("Cash", "Credit"),
@@ -62,9 +62,9 @@ test_that("fn_calculate_trip_volumes correctly filters and sums data", {
   expect_equal(result$total_value[result$date == as.Date("2023-01-02")], 0)
 })
 
-test_that("fn_calculate_trip_volumes handles strict filtering correctly", {
+test_that("fn_calculate_line_chart_data handles strict filtering correctly", {
   # Action: Filter for only 'Cash' and 'VTS'
-  result <- fn_calculate_trip_volumes(
+  result <- fn_calculate_line_chart_data(
     base_data = mock_taxi_data,
     vendor_list = c("VTS"),
     payment_list = c("Cash"),
@@ -80,9 +80,9 @@ test_that("fn_calculate_trip_volumes handles strict filtering correctly", {
   expect_equal(result$total_value[result$date == as.Date("2023-01-02")], 1)
 })
 
-test_that("fn_calculate_trip_volumes returns empty dataframe when no match is found", {
+test_that("fn_calculate_line_chart_data returns empty dataframe when no match is found", {
   # Action: Filter for a vendor that doesn't exist
-  result <- fn_calculate_trip_volumes(
+  result <- fn_calculate_line_chart_data(
     base_data = mock_taxi_data,
     vendor_list = c("NonExistentVendor"),
     payment_list = c("Cash"),
@@ -95,11 +95,11 @@ test_that("fn_calculate_trip_volumes returns empty dataframe when no match is fo
   expect_equal(nrow(result), 0)
 })
 
-test_that("fn_calculate_trip_volumes handles 0-row dataframes gracefully", {
+test_that("fn_calculate_line_chart_data handles 0-row dataframes gracefully", {
   # Create an intentionally empty dataframe with the correct schema
   empty_data <- mock_taxi_data |> dplyr::filter(Vendor == "ImpossibleMatch")
 
-  result <- fn_calculate_trip_volumes(
+  result <- fn_calculate_line_chart_data(
     base_data = empty_data,
     vendor_list = c("VTS"),
     payment_list = c("Cash"),
@@ -114,9 +114,9 @@ test_that("fn_calculate_trip_volumes handles 0-row dataframes gracefully", {
   expect_equal(names(result), c("date", "total_value"))
 })
 
-test_that("fn_calculate_trip_volumes safely returns 0 rows for empty filter lists", {
+test_that("fn_calculate_line_chart_data safely returns 0 rows for empty filter lists", {
   # Action: Pass an empty character vector for vendors
-  result <- fn_calculate_trip_volumes(
+  result <- fn_calculate_line_chart_data(
     base_data = mock_taxi_data,
     vendor_list = character(0),
     payment_list = c("Cash"),
@@ -128,9 +128,9 @@ test_that("fn_calculate_trip_volumes safely returns 0 rows for empty filter list
   expect_equal(nrow(result), 0)
 })
 
-test_that("fn_calculate_trip_volumes defensive blocks execute", {
+test_that("fn_calculate_line_chart_data defensive blocks execute", {
   expect_error(
-    fn_calculate_trip_volumes(
+    fn_calculate_line_chart_data(
       list(date = "2026-01-01"), c("VTS"), c("Cash"),
       TRUE, FALSE, "total_distance"
     ),
@@ -138,7 +138,7 @@ test_that("fn_calculate_trip_volumes defensive blocks execute", {
   )
 
   expect_error(
-    fn_calculate_trip_volumes(
+    fn_calculate_line_chart_data(
       mock_taxi_data, c("VTS"), c("Cash"), "TRUE",
       FALSE, "total_distance"
     ),
@@ -146,7 +146,7 @@ test_that("fn_calculate_trip_volumes defensive blocks execute", {
   )
 
   expect_error(
-    fn_calculate_trip_volumes(
+    fn_calculate_line_chart_data(
       mock_taxi_data, c("VTS"), c("Cash"), TRUE,
       "FALSE", "total_distance"
     ),
@@ -154,13 +154,13 @@ test_that("fn_calculate_trip_volumes defensive blocks execute", {
   )
 
   expect_error(
-    fn_calculate_trip_volumes(mock_taxi_data, c("VTS"), c("Cash"), TRUE, FALSE, 123),
+    fn_calculate_line_chart_data(mock_taxi_data, c("VTS"), c("Cash"), TRUE, FALSE, 123),
     regexp = "Selected metric is invalid"
   )
 
   bad_data <- mock_taxi_data |> dplyr::select(-Vendor)
   expect_error(
-    fn_calculate_trip_volumes(
+    fn_calculate_line_chart_data(
       bad_data, c("VTS"), c("Cash"), TRUE, FALSE,
       "total_distance"
     ),

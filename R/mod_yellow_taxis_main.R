@@ -100,7 +100,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
         "total_distance", "total_number_trips"
       )
 
-      data <- fn_calculate_trip_volumes(
+      data <- fn_calculate_line_chart_data(
         base_data, vendor_list, payment_list,
         month_agg, week_agg, data_field
       )
