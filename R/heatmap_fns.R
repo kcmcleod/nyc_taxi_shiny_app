@@ -17,23 +17,23 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.logical(month_agg) || length(month_agg) != 1) {
     err_msg <- "Input Error: Month aggregation selection is invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.logical(week_agg) || length(week_agg) != 1) {
     err_msg <- "Input Error: Week aggregation selection is invalid."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   # cols
   required_cols <- c("date", "full_month_aggregation", "full_week_aggregation", "PULocation", "DOLocation")
   missing_cols <- setdiff(required_cols, names(base_data))
-  
+
   if (length(missing_cols) > 0) {
     err_msg <- sprintf(
       "Data Error: The dataset is missing required columns: %s",
@@ -42,7 +42,7 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   filtered_data <- base_data |>
     filter(
       full_month_aggregation == month_agg,
@@ -51,9 +51,9 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
     group_by(date, PULocation, DOLocation) |>
     summarise(trips = sum(total_number_trips, na.rm = TRUE), .groups = "drop") |>
     collect()
-  
+
   grouping_cols <- c("PULocation", "DOLocation")
-  
+
   if (month_agg) {
     tDF <- filtered_data |>
       mutate(date_month = format(date, "%Y month:%m"))
@@ -65,7 +65,7 @@ fn_calculate_heatmap_data <- function(base_data, month_agg, week_agg) {
   } else {
     tDF <- filtered_data
   }
-  
+
   tDF |>
     group_by(across(all_of(grouping_cols))) |>
     summarise(trips = sum(trips, na.rm = TRUE), .groups = "drop")
@@ -95,29 +95,29 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.character(title) || length(title) != 1) {
     err_msg <- "System Error: Invalid chart title."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (missing(config) || is.null(config$colours)) {
     err_msg <- "System Error: Dashboard configuration (colours) is missing."
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   if (!is.character(x_col) || length(x_col) != 1 ||
-      !is.character(y_col) || length(y_col) != 1 ||
-      !is.character(z_col) || length(z_col) != 1) {
+    !is.character(y_col) || length(y_col) != 1 ||
+    !is.character(z_col) || length(z_col) != 1) {
     err_msg <- "System Error: Column names for the heatmap axes must be valid text strings."
     log_error(err_msg)
     stop(err_msg)
   }
   required_cols <- c(x_col, y_col, z_col)
   missing_cols <- setdiff(required_cols, names(base_data))
-  
+
   if (length(missing_cols) > 0) {
     err_msg <- sprintf(
       "Data Error: The heatmap dataset is missing required columns: %s",
@@ -126,19 +126,19 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     log_error(err_msg)
     stop(err_msg)
   }
-  
+
   # CHART
-  
+
   # Lock factor levels globally so axes align perfectly across facets even if sparse
   all_x <- sort(unique(as.character(base_data[[x_col]])))
   all_y <- sort(unique(as.character(base_data[[y_col]])))
-  
+
   plot_data <- base_data |>
     dplyr::mutate(
       !!x_col := factor(.data[[x_col]], levels = all_x),
       !!y_col := factor(.data[[y_col]], levels = all_y)
     )
-  
+
   # Determine if faceting is required
   if ("date_week" %in% names(plot_data)) {
     split_variable <- "date_week"
@@ -147,7 +147,7 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
   } else {
     split_variable <- NULL
   }
-  
+
   if (is.null(split_variable)) {
     calc_height <- 400
   } else {
@@ -156,14 +156,14 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     n_rows <- ceiling(n_facets / 3)
     calc_height <- max(400, n_rows * 300)
   }
-  
+
   # Define the Plotly native colourscale
   custom_colours <- list(
     c(0, config$colours$theme$body_bg),
     c(0.5, config$colours$theme$primary_accent),
     c(1, config$colours$icons$taxi)
   )
-  
+
   create_heatmap_trace <- function(df, show_legend = FALSE) {
     df_wide <- df |>
       dplyr::select(dplyr::all_of(c(x_col, y_col, z_col))) |>
@@ -174,11 +174,11 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
         id_expand = TRUE,
         values_fn = sum
       )
-    
+
     y_labels <- df_wide[[y_col]]
     z_matrix <- as.matrix(df_wide[, -1])
     x_labels <- colnames(z_matrix)
-    
+
     plotly::plot_ly(
       x = x_labels,
       y = y_labels,
@@ -190,7 +190,7 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
       showscale = show_legend
     )
   }
-  
+
   # Render Chart
   if (is.null(split_variable)) {
     # Standard single chart
@@ -206,24 +206,24 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     facets <- sort(unique(plot_data[[split_variable]]))
     n_facets <- length(facets)
     n_rows <- ceiling(n_facets / 3)
-    
+
     # Define exactly how many pixels we want everything to take up
     plot_height_px <- 250
     gap_px <- 170 # Guaranteed space for 90-deg labels + the next title
     layout_top <- 100
     layout_bottom <- 80
-    
+
     # 1. Total height scales perfectly with the number of rows
     calc_height <- (n_rows * plot_height_px) + ((n_rows - 1) * gap_px) +
       layout_top + layout_bottom
-    
+
     # The exact fraction one gap represents
     gap_frac <- gap_px / calc_height
-    
+
     plot_list <- lapply(seq_along(facets), function(i) {
       f <- facets[i]
       df_subset <- plot_data[plot_data[[split_variable]] == f, ]
-      
+
       # Show the legend only on the first iteration to prevent duplicates
       p <- create_heatmap_trace(df_subset, show_legend = (i == 1)) |>
         plotly::layout(
@@ -238,15 +238,15 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
         )
       return(p)
     })
-    
+
     # Apply the perfectly calculated gap fraction
     # Plotly's subplot margin adds top + bottom to create the vertical gap
     fig <- plotly::subplot(plot_list,
-                           nrows = n_rows, shareX = FALSE, shareY = TRUE,
-                           titleX = FALSE, titleY = FALSE,
-                           margin = c(0.02, 0.02, gap_frac / 2, gap_frac / 2)
+      nrows = n_rows, shareX = FALSE, shareY = TRUE,
+      titleX = FALSE, titleY = FALSE,
+      margin = c(0.02, 0.02, gap_frac / 2, gap_frac / 2)
     )
-    
+
     layout_args <- list(
       p = fig,
       title = list(
@@ -258,15 +258,15 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
       ),
       margin = list(t = layout_top, b = layout_bottom)
     )
-    
+
     # force 90 deg on every x axis
     for (i in 1:n_facets) {
       axis_name <- paste0("xaxis", if (i == 1) "" else i)
       layout_args[[axis_name]] <- list(tickangle = 90, showticklabels = TRUE)
     }
-    
+
     fig <- do.call(plotly::layout, layout_args)
-    
+
     return(fig)
   }
 }
