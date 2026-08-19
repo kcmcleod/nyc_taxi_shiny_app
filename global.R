@@ -29,8 +29,8 @@ while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePat
 
 uiFilesPath <- paste0(codePath, "/uiFiles/")
 serverFilesPath <- paste0(codePath, "/serverFiles/")
-dataPath <- paste0(Sys.getenv("HOME"), "/data/shiny_data/")
-cachePath <- paste0(dataPath, "shared_app_cache")
+dataPath <- paste0(codePath, "/data/")
+cachePath <- paste0(codePath, "/shared_app_cache/")
 
 
 ################################################################################
@@ -84,7 +84,7 @@ if (isLiveVersion) {
   folder <- "build"
 }
 
-dataPath <- paste0(dataPath, folder, "/", appTitle, "/")
+# dataPath <- paste0(dataPath, folder, "/", appTitle, "/")
 if (!dir.exists(dataPath)) {
   dir.create(dataPath, recursive = TRUE)
 }
