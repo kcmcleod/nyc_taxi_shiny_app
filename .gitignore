@@ -12,3 +12,4 @@ dev_data_folder
 *_shiny_app_code_bundle.txt
 shared_app_cache
 .Renviron
+data

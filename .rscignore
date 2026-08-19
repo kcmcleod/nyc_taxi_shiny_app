@@ -18,6 +18,7 @@ tests/
 # 4. R Environment Clutter
 # We ignore the massive local library, but KEEP renv.lock so the server can build it
 renv/
+renv.lock
 .Rproj.user/
 .lintr
 
