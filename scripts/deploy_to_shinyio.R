@@ -1,7 +1,5 @@
 file.rename("renv.lock", "renv_hidden.lock")
 
-rsconnect::deployApp()
-
 rsconnect::deployApp(
   appFiles = c(
     "app.R",
