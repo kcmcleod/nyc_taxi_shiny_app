@@ -127,13 +127,29 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     stop(err_msg)
   }
 
+  ##############################################################################
   # CHART
 
-  # Lock factor levels globally so axes align perfectly across facets even if sparse
-  all_x <- sort(unique(as.character(base_data[[x_col]])))
-  all_y <- sort(unique(as.character(base_data[[y_col]])))
-
+  # treat NAs as 'Missing'
   plot_data <- base_data |>
+    mutate(
+      !!x_col := dplyr::case_when(
+        is.na(.data[[x_col]]) ~ "Unknown",
+        .data[[x_col]] %in% c("N/A", "NA") ~ "Unknown",
+        TRUE ~ as.character(.data[[x_col]])
+      ),
+      !!y_col := dplyr::case_when(
+        is.na(.data[[y_col]]) ~ "Unknown",
+        .data[[y_col]] %in% c("N/A", "NA") ~ "Unknown",
+        TRUE ~ as.character(.data[[y_col]])
+      )
+    )
+
+  # Lock factor levels globally so axes align perfectly across facets
+  all_x <- sort(unique(plot_data[[x_col]]))
+  all_y <- sort(unique(plot_data[[y_col]]))
+
+  plot_data <- plot_data |>
     dplyr::mutate(
       !!x_col := factor(.data[[x_col]], levels = all_x),
       !!y_col := factor(.data[[y_col]], levels = all_y)
@@ -159,9 +175,9 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
 
   # Define the Plotly native colourscale
   custom_colours <- list(
-    c(0, config$colours$theme$body_bg),
-    c(0.5, config$colours$theme$primary_accent),
-    c(1, config$colours$icons$taxi)
+    c(0, unname(config$colours$theme$body_bg)),
+    c(0.5, unname(config$colours$theme$primary_accent)),
+    c(1, unname(config$colours$icons$taxi))
   )
 
   create_heatmap_trace <- function(df, show_legend = FALSE) {
@@ -172,7 +188,8 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
         values_from = dplyr::all_of(z_col),
         names_expand = TRUE,
         id_expand = TRUE,
-        values_fn = sum
+        values_fn = sum,
+        values_fill = 0 # Forces empty squares to be 0
       )
 
     y_labels <- df_wide[[y_col]]
@@ -221,8 +238,11 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
     gap_frac <- gap_px / calc_height
 
     plot_list <- lapply(seq_along(facets), function(i) {
-      f <- facets[i]
-      df_subset <- plot_data[plot_data[[split_variable]] == f, ]
+      # Strip hidden names to prevent the jsonlite / Plotly crash
+      f <- unname(facets[i])
+
+      # Use which() to perfectly drop NAs and avoid phantom rows
+      df_subset <- plot_data[which(plot_data[[split_variable]] == f), ]
 
       # Show the legend only on the first iteration to prevent duplicates
       p <- create_heatmap_trace(df_subset, show_legend = (i == 1)) |>
