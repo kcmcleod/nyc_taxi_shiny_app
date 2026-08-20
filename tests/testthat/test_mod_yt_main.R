@@ -31,8 +31,8 @@ test_that("mod_yellow_taxis_main_server processes inputs, splits, and KPIs corre
   # Mock the reactive dependencies
   mock_filtered_data <- reactiveVal(mock_main_data)
   mock_data_version <- reactiveVal(1)
-  mock_start_date <- as.Date("2023-01-01")
-  mock_end_date <- as.Date("2023-01-31")
+  mock_start_date <- reactiveVal(as.Date("2023-01-01"))
+  mock_end_date <- reactiveVal(as.Date("2023-01-31"))
 
   testServer(
     app = mod_yellow_taxis_main_server,

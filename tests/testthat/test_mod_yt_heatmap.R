@@ -39,8 +39,8 @@ test_that("mod_yellow_taxis_heatmap_server processes inputs and KPIs correctly",
   # Mock the reactive dependencies passed from the parent
   mock_filtered_data <- reactiveVal(mock_heatmap_module_data)
   mock_data_version <- reactiveVal(1)
-  mock_start_date <- as.Date("2023-01-01")
-  mock_end_date <- as.Date("2023-01-31")
+  mock_start_date <- reactiveVal(as.Date("2023-01-01"))
+  mock_end_date <- reactiveVal(as.Date("2023-01-31"))
 
   testServer(
     app = mod_yellow_taxis_heatmap_server,

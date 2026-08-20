@@ -20,8 +20,8 @@ test_that("mod_yellow_taxis_table_server processes reactive inputs correctly", {
   # 1. Mock the reactive dependencies passed from the parent module
   mock_filtered_data <- reactiveVal(mock_raw_table_data)
   mock_data_version <- reactiveVal(12345)
-  mock_start_date <- as.Date("2023-01-01")
-  mock_end_date <- as.Date("2023-03-31")
+  mock_start_date <- reactiveVal(as.Date("2023-01-01"))
+  mock_end_date <- reactiveVal(as.Date("2023-03-31"))
 
   # 2. Spin up the isolated module server environment
   testServer(
