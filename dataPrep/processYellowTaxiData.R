@@ -76,11 +76,22 @@ log_info("Found ", length(new_files), " files to process...")
 combinedDF <- NULL
 expected_cols <- NULL
 
+new_files <- new_files[1:10]
+
 for (file in new_files) {
   log_info("Processing file: ", file)
   tmp <- fn_process_yellow_file(file)
 
   if (!is.null(tmp) && is_tibble(tmp)) {
+    # use for partitioning later
+    file_month_str <- str_match(file, pattern = "\\d{4}-\\d{2}")[1]
+
+    tmp <- tmp |>
+      mutate(
+        Year = as.integer(substr(file_month_str, 1, 4)),
+        Month = as.integer(substr(file_month_str, 6, 7))
+      )
+
     if (is.null(combinedDF)) {
       combinedDF <- tmp
       expected_cols <- names(tmp)
@@ -126,12 +137,8 @@ combinedDF <- fn_perform_joins(
 
 log_info("Writing new partitioned data asset...")
 
-# Create partition columns from your existing 'date' column
+# Create partition columns from the og file name
 combinedDF <- combinedDF |>
-  mutate(
-    Year = lubridate::year(date),
-    Month = lubridate::month(date)
-  ) |>
   group_by(Year, Month)
 
 # Define the folder path instead of a file path
@@ -189,5 +196,6 @@ gc()
 total_time <- Sys.time() - start_time
 pretty_duration <- pretty_ms(as.numeric(total_time, units = "secs") * 1000)
 log_info("Finished! This took: ", pretty_duration)
+message("Data written to: ", partition_dir)
 message("Log: ", str_replace_all(string = log_name, pattern = " ", replacement = "\\\\ "))
 message("GOOD BYE!")
