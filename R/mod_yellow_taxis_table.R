@@ -73,8 +73,8 @@ mod_yellow_taxis_table_server <- function(id, filtered_data, app_metadata,
     }) |>
       bindCache(
         data_version(),
-        start_date,
-        end_date,
+        start_date(),
+        end_date(),
         input$pi_level,
         input$pi_do_locations,
         input$pi_pu_locations

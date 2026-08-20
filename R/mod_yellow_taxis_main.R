@@ -138,6 +138,11 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
         collect() |>
         pull(total)
 
+      # Catch Arrow's empty vector behaviour
+      if (length(na_val) == 0 || is.na(na_val)) {
+        na_val <- 0
+      }
+
       # Format with commas for clean UI presentation
       scales::comma(na_val)
     })
@@ -208,8 +213,8 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
     }) |>
       bindCache(
         data_version(),
-        start_date,
-        end_date,
+        start_date(),
+        end_date(),
         input$pi_vendor,
         input$pi_pay_type,
         input$rb_journeys_or_passengers,

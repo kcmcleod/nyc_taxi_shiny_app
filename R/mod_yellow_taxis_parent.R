@@ -98,22 +98,22 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
     mod_yellow_taxis_main_server(
       id = "yt_main",
       rv_main_date_filtered_date, app_metadata,
-      data_version, input$di_start_date,
-      input$di_end_date
+      data_version, reactive(input$di_start_date),
+      reactive(input$di_end_date)
     )
 
     mod_yellow_taxis_heatmap_server(
       id = "yt_heat",
       rv_main_date_filtered_date, app_metadata,
-      data_version, input$di_start_date,
-      input$di_end_date
+      data_version, reactive(input$di_start_date),
+      reactive(input$di_end_date)
     )
 
     mod_yellow_taxis_table_server(
       id = "yt_table",
       rv_main_date_filtered_date, app_metadata,
-      data_version, input$di_start_date,
-      input$di_end_date
+      data_version, reactive(input$di_start_date),
+      reactive(input$di_end_date)
     )
   })
 }

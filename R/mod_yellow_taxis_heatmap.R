@@ -130,8 +130,8 @@ mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
     }) |>
       bindCache(
         data_version(),
-        start_date,
-        end_date,
+        start_date(),
+        end_date(),
         input$ri_heatmap_period
       )
 
