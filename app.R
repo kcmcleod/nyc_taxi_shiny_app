@@ -64,6 +64,9 @@ ui <- page_navbar(
 
   # Global header components (invisible scripts and modals)
   header = tagList(
+    tags$head(
+      tags$link(rel = "icon", type = "image/svg+xml", href = "favicon.svg")
+    ),
     use_idle_timer(timeout_minutes = 15),
     useShinyjs(),
     disconnectMessage(
