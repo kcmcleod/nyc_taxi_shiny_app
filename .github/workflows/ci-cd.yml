@@ -1,4 +1,4 @@
-name: Run Shiny Tests
+name: CI - CD
 
 # This triggers the pipeline on every push to the main/master branch
 on:
@@ -123,3 +123,56 @@ jobs:
           file: ./cobertura.xml
           fail_ci_if_error: false # Prevents the whole pipeline failing if Codecov is down
           token: ${{ secrets.CODECOV_TOKEN }}
+          
+  deploy:
+    needs: test # This strict gate ensures deployment ONLY happens if all tests pass
+    runs-on: ubuntu-latest
+    
+    # Best Practice: Only deploy to production from the main branch
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Restore renv environment
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Deploy to shinyapps.io
+        env:
+          RSCONNECT_USER: ${{ secrets.RSCONNECT_USER }}
+          RSCONNECT_TOKEN: ${{ secrets.RSCONNECT_TOKEN }}
+          RSCONNECT_SECRET: ${{ secrets.RSCONNECT_SECRET }}
+        run: |
+          Rscript -e '
+            # 1. Authenticate with shinyapps.io
+            rsconnect::setAccountInfo(
+              name = Sys.getenv("RSCONNECT_USER"),
+              token = Sys.getenv("RSCONNECT_TOKEN"),
+              secret = Sys.getenv("RSCONNECT_SECRET")
+            )
+            
+            # 2. Deploy using strict appFiles to intentionally exclude renv.lock
+            rsconnect::deployApp(
+              appDir = ".",
+              appFiles = c(
+                "app.R",
+                "global.R",
+                ".Renviron",
+                ".Rprofile",
+                "config",
+                "app_data",
+                "serverFiles",
+                "R",
+                "www",
+                "data"
+              ),
+              appName = "nyc_taxi_shiny_app", 
+              forceUpdate = TRUE
+            )
+          '
