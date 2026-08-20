@@ -165,8 +165,10 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
 
   if (split_by == "Total") {
     fig <- plot_ly(base_data,
-      x = ~ get(x_col), y = ~ get(y_col), type = "scattergl", mode = "lines",
-      line = list(color = config$colours$theme$primary_accent)
+      x = ~ get(x_col), y = ~ get(y_col), type = "scattergl",
+      mode = "lines",
+      line = list(color = config$colours$theme$primary_accent),
+      name = "Total"
     )
   } else {
     colour_col <- ifelse(split_by == "Vendor", "Vendor", "payment_type")
@@ -177,11 +179,31 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
       type = "scattergl",
       mode = "lines"
     )
+
+    # Calculate the grand total on the fly for the selected dates/filters
+    total_data <- base_data |>
+      dplyr::group_by(.data[[x_col]]) |>
+      dplyr::summarise(!!y_col := sum(.data[[y_col]], na.rm = TRUE), .groups = "drop")
+
+    # Add the Total line as a hidden trace
+    fig <- fig |>
+      plotly::add_trace(
+        data = total_data,
+        x = as.formula(paste0("~", x_col)),
+        y = as.formula(paste0("~", y_col)),
+        type = "scattergl",
+        mode = "lines",
+        name = "Grand Total",
+        line = list(color = config$colours$theme$primary_accent, dash = "dash", width = 3),
+        visible = "legendonly",
+        inherit = FALSE # stops Plotly trying to apply the colour_col mapping to this line
+      )
   }
 
-  fig |>
+  fig <- fig |>
     layout(
       title = title,
+      hovermode = "x unified",
       xaxis = list(
         title = "Journey date",
         tickmode = "array",
