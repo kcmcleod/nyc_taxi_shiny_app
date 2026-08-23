@@ -76,7 +76,7 @@ mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
           fn_generate_heatmap_chart(plot_data, config,
             x_col = "PULocation", y_col = "DOLocation",
             z_col = "trips",
-            title = "Number of journeys"
+            title = "Number of journeys (Log Scale)"
           )
         },
         error = function(e) {

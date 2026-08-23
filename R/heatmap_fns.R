@@ -189,21 +189,39 @@ fn_generate_heatmap_chart <- function(base_data, config, x_col = "PULocation",
         names_expand = TRUE,
         id_expand = TRUE,
         values_fn = sum,
-        values_fill = 0 # Forces empty squares to be 0
+        values_fill = 0
       )
 
     y_labels <- df_wide[[y_col]]
     z_matrix <- as.matrix(df_wide[, -1])
     x_labels <- colnames(z_matrix)
 
+    # Apply a log10 transformation to compress the massive Manhattan outlier
+    z_log <- log10(z_matrix + 1)
+
     plotly::plot_ly(
       x = x_labels,
       y = y_labels,
-      z = z_matrix,
+      z = z_log,
+      text = z_matrix,
       type = "heatmap",
       height = calc_height,
       colorscale = custom_colours,
-      colorbar = list(title = title),
+
+      # hover tooltip shows the real numbers
+      hovertemplate = paste0(
+        "Pickup: %{x}<br>",
+        "Dropoff: %{y}<br>",
+        "Journeys: %{text:,}<extra></extra>"
+      ),
+
+      # Hardcode the legend ticks so they translate the log scale back to readable numbers
+      colorbar = list(
+        title = title,
+        tickmode = "array",
+        tickvals = c(0, 1, 2, 3, 4, 5, 6),
+        ticktext = c("0", "10", "100", "1k", "10k", "100k", "1M")
+      ),
       showscale = show_legend
     )
   }
