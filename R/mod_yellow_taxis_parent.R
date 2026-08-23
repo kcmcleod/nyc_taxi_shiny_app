@@ -53,16 +53,16 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
       id = ns("yellow_data_panel"),
       full_screen = TRUE,
       nav_panel(
-        title = "Volumes",
+        title = "TIME SERIES",
         icon = icon("list-alt"),
         mod_yellow_taxis_main_ui(ns("yt_main"), config, app_metadata)
       ),
       nav_panel(
-        title = "JOURNEY PICKUP + DROP OFF",
+        title = "ROUTE HEATMAPS",
         mod_yellow_taxis_heatmap_ui(ns("yt_heat"), config)
       ),
       nav_panel(
-        title = "TABLES",
+        title = "SUMMARY METRICS",
         mod_yellow_taxis_table_ui(ns("yt_table"), config, app_metadata)
       )
     )
