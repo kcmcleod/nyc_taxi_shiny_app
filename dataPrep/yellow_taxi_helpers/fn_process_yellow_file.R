@@ -31,6 +31,12 @@ fn_process_yellow_file <- function(fullFileName) {
   log_info(".... number of rows with wrong dates: ", count_mutated_rows)
   remove(count_mutated_rows, tDF)
 
+  tDF_clean <- dplyr::filter(
+    tDF_clean,
+    !is.na(tpep_pickup_datetime),
+    !is.na(tpep_dropoff_datetime)
+  )
+
   # trip dates
   tDF_clean$trip_start_date <- lubridate::as_date(tDF_clean$tpep_pickup_datetime)
   tDF_clean$trip_start_week <- floor_date(tDF_clean$tpep_pickup_datetime,

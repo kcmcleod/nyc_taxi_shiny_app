@@ -76,7 +76,7 @@ log_info("Found ", length(new_files), " files to process...")
 combinedDF <- NULL
 expected_cols <- NULL
 
-new_files <- new_files[1:10]
+new_files <- new_files[1:15]
 
 for (file in new_files) {
   log_info("Processing file: ", file)
