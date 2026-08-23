@@ -49,7 +49,7 @@ server <- function(input, output, session) {
 app_theme <- bs_theme(
   version = 5,
   bg = config$colours$theme$body_bg,
-  fg = "#212529", # Standard dark grey text for high contrast
+  fg = config$colours$theme$body_fg,
   primary = config$colours$theme$primary_accent,
   secondary = config$colours$theme$secondary_accent
 )
@@ -59,7 +59,7 @@ ui <- page_navbar(
   theme = app_theme,
   id = "main_nav",
   fillable = FALSE,
-  bg = config$colours$theme$primary_accent,
+  navbar_options = navbar_options(bg = config$colours$theme$primary_accent),
 
   # Load Modules
   mod_yellow_taxis_parent_ui("yt_parent", config, app_metadata),

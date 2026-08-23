@@ -4,6 +4,7 @@ colours:
     primary_accent: "#00539F"
     secondary_accent: "#6C757D"
     body_bg: "#F8F9FA"
+    body_fg: "#212529"
   disconnect:
     background: "#FFC107"
     text: "#000000"
