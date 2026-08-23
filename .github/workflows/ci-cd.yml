@@ -1,0 +1,178 @@
+name: CI - CD
+
+# This triggers the pipeline on every push to the main/master branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    # Passes the default GitHub token to avoid API rate limits during setup
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true # Uses pre-compiled binaries to speed up installation
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev
+
+      - name: Restore renv environment
+        uses: r-lib/actions/setup-renv@v2
+        
+      - name: Install lintr and styler
+        run: |
+          install.packages(c("lintr", "styler", "roxygen2"))
+        shell: Rscript {0}
+
+      - name: Enforce Code Formatting (styler)
+        run: |
+          # 1. Run styler across the codebase
+          Rscript -e 'styler::style_dir()'
+          
+          # 2. Check if styler changed any files. 
+          # If git diff detects changes, the code was not formatted before pushing!
+          git diff --exit-code || {
+            echo "::error::Code is not formatted correctly! Please run styler::style_dir() locally on your Mac and push the changes."
+            exit 1
+          }
+
+      - name: Run Static Code Analysis (lintr)
+        run: |
+          Rscript -e '
+            lints <- lintr::lint_dir()
+            print(lints)
+            if (length(lints) > 0) {
+              stop("Linting errors found! Please fix the errors listed above.")
+            }
+          '
+
+      - name: Run testthat and shinytest2
+        run: |
+          # Runs all test files in your tests/testthat directory
+          testthat::test_dir("tests/testthat", stop_on_failure = TRUE)
+        shell: Rscript {0}
+        env:
+          CI: "true"
+          NOT_CRAN: "true"
+
+      - name: Calculate Code Coverage & Generate Summary Report
+        run: |
+          app_sources <- list.files("R", pattern = "\\.[Rr]$", full.names = TRUE)
+          dp_sources  <- list.files("dataPrep/yellow_taxi_helpers", pattern = "\\.[Rr]$", full.names = TRUE)
+          all_sources <- c(app_sources, dp_sources)
+          
+          app_tests   <- list.files("tests/testthat", pattern = "\\.[Rr]$", full.names = TRUE)
+          
+          # 1. Filter out shinytest2 tests and setup files
+          unit_tests   <- grep("shinytest2|setup", app_tests, value = TRUE, invert = TRUE)
+          
+          # 2. Filter out non-function source files
+          core_sources <- grep("_disable", all_sources, value = TRUE, invert = TRUE)
+          
+          source("tests/testthat/setup.R")
+          
+          # 3. Run coverage across both R/ and dataPrep/ helpers
+          cov_results  <- covr::file_coverage(
+            source_files = core_sources, 
+            test_files   = unit_tests 
+          )
+          
+          overall_pct <- covr::percent_coverage(cov_results)
+          
+          # 4. Write Markdown Report Card to GitHub Step Summary
+          step_summary_file <- Sys.getenv("GITHUB_STEP_SUMMARY")
+          if (nzchar(step_summary_file)) {
+            status_icon <- ifelse(overall_pct >= 90, "🟢", "🔴")
+            summary_lines <- c(
+              "### 📊 NYC Taxi R Shiny Coverage Report",
+              "",
+              sprintf("**Overall Pipeline Coverage:** `%.2f%%` %s", overall_pct, status_icon),
+              "",
+              "| Module Layer | Included in CI |",
+              "| :--- | :---: |",
+              "| **Core App Functions (`R/`)** | ✅ |",
+              "| **ETL Helpers (`dataPrep/yellow_taxi_helpers/`)** | ✅ |",
+              ""
+            )
+            cat(paste(summary_lines, collapse = "\n"), file = step_summary_file, append = TRUE)
+          }
+          
+          # 5. Export to Cobertura XML for Codecov
+          covr::to_cobertura(cov_results, filename = "cobertura.xml")
+          print(cov_results)
+        shell: Rscript {0}
+        env:
+          R_COVR: "true"
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./cobertura.xml
+          fail_ci_if_error: false # Prevents the whole pipeline failing if Codecov is down
+          token: ${{ secrets.CODECOV_TOKEN }}
+          
+  deploy:
+    needs: test # This strict gate ensures deployment ONLY happens if all tests pass
+    runs-on: ubuntu-latest
+    
+    # Best Practice: Only deploy to production from the main branch
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Restore renv environment
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Deploy to shinyapps.io
+        env:
+          RSCONNECT_USER: ${{ secrets.RSCONNECT_USER }}
+          RSCONNECT_TOKEN: ${{ secrets.RSCONNECT_TOKEN }}
+          RSCONNECT_SECRET: ${{ secrets.RSCONNECT_SECRET }}
+        run: |
+          Rscript -e '
+            # 1. Authenticate with shinyapps.io
+            rsconnect::setAccountInfo(
+              name = Sys.getenv("RSCONNECT_USER"),
+              token = Sys.getenv("RSCONNECT_TOKEN"),
+              secret = Sys.getenv("RSCONNECT_SECRET")
+            )
+            
+            # 2. Deploy using strict appFiles to intentionally exclude renv.lock
+            rsconnect::deployApp(
+              appDir = ".",
+              appFiles = c(
+                "app.R",
+                "global.R",
+                ".Renviron",
+                ".Rprofile",
+                "config",
+                "app_data",
+                "serverFiles",
+                "R",
+                "www",
+                "data"
+              ),
+              appName = "nyc_taxi_shiny_app", 
+              forceUpdate = TRUE
+            )
+          '

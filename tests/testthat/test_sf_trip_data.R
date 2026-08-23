@@ -1,0 +1,81 @@
+library(shinytest2)
+library(testthat)
+
+test_that("sf_trip_data - main chart", {
+  testthat::local_edition(3)
+
+  app <- AppDriver$new()
+
+  app$wait_for_idle()
+
+  # 1. Test the default state
+  app_data <- app$get_value(export = "yt_parent-yt_main-exported_main_chart_data")
+  expect_true(!is.null(app_data))
+  expect_snapshot_value(app_data, style = "json2")
+
+  # 2. not default
+  app$set_inputs(
+    "yt_parent-yt_main-pi_level" = "Month",
+    "yt_parent-yt_main-pi_vendor" = "Myle Technologies Inc",
+    "yt_parent-yt_main-pi_pay_type" = "Flex Fare trip"
+  )
+
+  app$wait_for_idle()
+
+  app_data <- app$get_value(export = "yt_parent-yt_main-exported_main_chart_data")
+  expect_true(!is.null(app_data))
+  expect_snapshot_value(app_data, style = "json2")
+})
+
+
+test_that("sf_trip_data - heatmap chart", {
+  testthat::local_edition(3)
+
+  app <- AppDriver$new()
+
+  app$wait_for_idle()
+
+  # 1. Test the default state
+  app_data <- app$get_value(export = "yt_parent-yt_heat-exported_heatmap_data")
+  expect_true(!is.null(app_data))
+  expect_snapshot_value(app_data, style = "json2")
+
+  # 2. not default
+  app$set_inputs(
+    "yt_parent-yt_heat-ri_heatmap_period" = "Combined",
+    "yt_parent-di_start_date" = "2026-01-01"
+  )
+
+  app$wait_for_idle()
+
+  print(app$get_logs())
+  app_data <- app$get_value(export = "yt_parent-yt_heat-exported_heatmap_data")
+  expect_true(!is.null(app_data))
+  expect_snapshot_value(app_data, style = "json2")
+})
+
+
+test_that("sf_trip_data - table", {
+  testthat::local_edition(3)
+
+  app <- AppDriver$new()
+
+  app$wait_for_idle()
+
+  # 1. Test the default state
+  app_data <- app$get_value(export = "yt_parent-yt_table-exported_table_data")
+  expect_true(!is.null(app_data))
+  expect_snapshot_value(app_data, style = "json2")
+
+  # 2. not default
+  app$set_inputs(
+    "yt_parent-di_start_date" = "2026-01-01"
+  )
+
+  app$wait_for_idle()
+
+  print(app$get_logs())
+  app_data <- app$get_value(export = "yt_parent-yt_table-exported_table_data")
+  expect_true(!is.null(app_data))
+  expect_snapshot_value(app_data, style = "json2")
+})

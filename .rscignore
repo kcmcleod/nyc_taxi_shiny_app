@@ -1,0 +1,28 @@
+# ==============================================================================
+# .rscignore
+# Files and directories to EXCLUDE when deploying to Shinyapps.io
+# ==============================================================================
+
+# 1. Local Data and Caches
+.RData
+.Rhistory
+
+# 2. Local ETL & Utility Scripts
+data-raw/
+dataPrep/
+scripts/
+
+# 3. Testing Infrastructure
+tests/
+
+# 4. R Environment Clutter
+# We ignore the massive local library, but KEEP renv.lock so the server can build it
+renv/
+renv.lock
+.Rproj.user/
+.lintr
+
+# 5. Version Control
+.git/
+.github/
+.gitignore

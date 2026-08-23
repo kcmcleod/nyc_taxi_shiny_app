@@ -1,0 +1,26 @@
+---
+colours:
+  theme:
+    primary_accent: "#00539F"
+    secondary_accent: "#6C757D"
+    body_bg: "#F8F9FA"
+    body_fg: "#212529"
+  disconnect:
+    background: "#FFC107"
+    text: "#000000"
+    overlay: "#000000"
+    button: "#333333"
+  icons:
+    taxi: "#FFC107"
+ui_values:
+  pi_level:
+    - Day
+    - Week
+    - Month
+  metric_type:
+    - Journey Count
+    - Total Distance
+  heatmap_level:
+    - Combined
+    - Monthly
+    - Weekly

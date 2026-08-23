@@ -1,0 +1,19 @@
+# codecov.yml
+coverage:
+  status:
+    project:
+      default:
+        # Require the overall project coverage to be at least 85%
+        target: 85%
+        # Allow a 1% drop before failing the pipeline
+        threshold: 1%
+    patch:
+      default:
+        # Require any NEW code added in a Pull Request to be 100% tested
+        target: 100%
+
+# Tell Codecov to ignore testing files and scripts when calculating the percentage
+ignore:
+  - "tests/**/*"
+  - "scripts/**/*"
+  - "data-raw/**/*"
