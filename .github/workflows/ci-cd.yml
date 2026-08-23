@@ -3,9 +3,9 @@ name: CI - CD
 # This triggers the pipeline on every push to the main/master branch
 on:
   push:
-    branches: [ main, yellow_taxi_mvp ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, yellow_taxi_mvp ]
+    branches: [ main ]
 
 jobs:
   test:
