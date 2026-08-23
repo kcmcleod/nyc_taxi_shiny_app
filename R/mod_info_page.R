@@ -10,7 +10,7 @@ mod_info_page_ui <- function(id) {
     title = "Info Page",
     icon = icon("list-alt"),
     card(
-      card_header("App Info"),
+      card_header("App Info", class = "bg-light"),
       tags$p(tags$b("APP NAME:"), textOutput(ns("ui_text_appName"), inline = TRUE)),
       tags$p(tags$b("APP VERSION:"), textOutput(ns("ui_text_appVersion"), inline = TRUE)),
       tags$p(tags$b("DATA LOCATION:"), textOutput(ns("ui_text_dataPath"), inline = TRUE)),

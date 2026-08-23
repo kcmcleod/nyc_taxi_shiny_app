@@ -9,7 +9,7 @@ mod_yellow_taxis_heatmap_ui <- function(id, config) {
   tagList(
     card(
       fill = FALSE,
-      card_header("Options"),
+      card_header("Options", class = "bg-light"),
       radioButtons(ns("ri_heatmap_period"),
         label = "Heatmaps period:",
         choices = config$ui_values$heatmap_level,
@@ -17,27 +17,8 @@ mod_yellow_taxis_heatmap_ui <- function(id, config) {
         inline = TRUE
       )
     ),
-    conditionalPanel(
-      condition = "input.ri_heatmap_period != 'Combined'",
-      ns = ns,
-      tags$div(
-        class = "alert alert-secondary d-flex align-items-center mb-3",
-        role = "alert",
-        icon("circle-info",
-          class = "fa-2x me-3",
-          style = paste0("color: ", config$colours$theme$secondary_accent)
-        ),
-        tags$div(
-          tags$strong("Total Journeys with Unknown Dates: "),
-          tags$span(textOutput(ns("vo_missing_dates"), inline = TRUE), class = "fw-bold"),
-          tags$br(),
-          tags$small("These volumes are excluded from the faceted heatmaps
-                     below due to meter date corruption.")
-        )
-      )
-    ),
     card(
-      style = "overflow-y: auto; max-height: 70vh; overflow-x: hidden;",
+      fill = FALSE,
       withSpinner(plotlyOutput(ns("po_heatmap"), height = "auto"),
         type = 2,
         color.background = config$colours$icons$taxi,
@@ -64,28 +45,6 @@ mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
       data <- fn_calculate_heatmap_data(base_data, month_agg, week_agg)
 
       return(data)
-    })
-
-
-    ############################################################################
-    # KPI VALUE BOXES
-
-    output$vo_missing_dates <- renderText({
-      req(filtered_data())
-
-      # Isolate the NAs from the daily tier to prevent triple-counting
-      na_val <- filtered_data() |>
-        filter(
-          is.na(date),
-          full_month_aggregation == FALSE,
-          full_week_aggregation == FALSE
-        ) |>
-        summarise(total = sum(total_number_trips, na.rm = TRUE)) |>
-        collect() |>
-        pull(total)
-
-      # Format with commas
-      scales::comma(na_val)
     })
 
 

@@ -9,7 +9,7 @@ mod_yellow_taxis_table_ui <- function(id, config, app_metadata) {
   tagList(
     card(
       fill = FALSE,
-      card_header("Options"),
+      card_header("Options", class = "bg-light"),
       layout_columns(
         col_widths = breakpoints(sm = 12, md = 6, xl = 3),
         pickerInput(ns("pi_level"),
@@ -38,6 +38,7 @@ mod_yellow_taxis_table_ui <- function(id, config, app_metadata) {
       )
     ),
     card(
+      fill = FALSE,
       withSpinner(DTOutput(ns("dt_tripVolumes")),
         type = 2,
         color.background = config$colours$icons$taxi,

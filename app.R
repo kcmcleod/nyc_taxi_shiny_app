@@ -16,7 +16,8 @@ server <- function(input, output, session) {
     "yt_parent", yellow_taxi_data, app_metadata,
     yellow_data_version
   )
-  mod_info_page_server("info_page")
+
+  # mod_info_page_server("info_page")
 
 
   # Show the warning modal 60 seconds before timeout
@@ -57,10 +58,13 @@ ui <- page_navbar(
   title = appTitle,
   theme = app_theme,
   id = "main_nav",
+  fillable = FALSE,
+  bg = config$colours$theme$primary_accent,
 
   # Load Modules
   mod_yellow_taxis_parent_ui("yt_parent", config, app_metadata),
-  mod_info_page_ui("info_page"),
+
+  # mod_info_page_ui("info_page"),
 
   # Global header components (invisible scripts and modals)
   header = tagList(

@@ -9,11 +9,25 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
   nav_panel(
     title = "Yellow Taxis",
     icon = icon("taxi", style = paste0("color:", config$colours$icons$taxi)),
+    card(
+      fill = FALSE,
+      card_header(
+        "About this Dashboard",
+        class = "bg-light" # Uses the subtle shading we discussed
+      ),
+      tags$p(
+        "This application provides high-speed, interactive analytics for New York City's
+        Yellow Taxi network. Powered by an Apache Arrow and Parquet backend,
+        it rapidly queries partitioned data to visualise journey volumes,
+        financial metrics, and geographic trip patterns without the overhead of
+        a traditional database."
+      )
+    ),
 
     # Top Date Range Card
     card(
       fill = FALSE,
-      card_header("DATE RANGE"),
+      card_header("DATE RANGE", class = "bg-light"),
       tags$p("Controls the date range for all the charts/tables in this page"),
       layout_columns(
         col_widths = breakpoints(sm = 12, md = 6),

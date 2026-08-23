@@ -9,7 +9,7 @@ mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
   tagList(
     card(
       fill = FALSE,
-      card_header("Options"),
+      card_header("Options", class = "bg-light"),
       layout_columns(
         col_widths = breakpoints(sm = 12, md = 6, xl = c(2, 3, 3, 2, 2)),
         pickerInput(ns("pi_level"),
@@ -47,24 +47,10 @@ mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
         )
       )
     ),
-    conditionalPanel(
-      condition = "input.pi_level != 'Month'",
-      ns = ns,
-      tags$div(
-        class = "alert alert-secondary d-flex align-items-center mb-3", # mb-3 adds clean bottom spacing
-        role = "alert",
-        icon("circle-info", class = "fa-2x me-3", style = paste0("color: ", config$colours$theme$secondary_accent)),
-        tags$div(
-          tags$strong(textOutput(ns("vo_kpi_title"), inline = TRUE), ": "),
-          tags$span(textOutput(ns("vo_missing_dates"), inline = TRUE), class = "fw-bold"),
-          tags$br(),
-          tags$small("These volumes are excluded from the timeline below due to meter date corruption.")
-        )
-      )
-    ),
     card(
       full_screen = TRUE, # Keeps the expand icon in the bottom right corner
-      style = "min-height: 550px;", # Forces the card to stop squashing itself
+      fill = FALSE,
+      style = "min-height: 550px;",
       withSpinner(
         plotlyOutput(ns("po_tripVolumesOverTime"), height = "500px"), # Explicit height
         type = 2,
@@ -104,47 +90,6 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
       )
 
       return(data)
-    })
-
-
-    ############################################################################
-    # KPI VALUE BOXES
-
-    output$vo_kpi_title <- renderText({
-      if (input$rb_journeys_or_passengers == "Total Distance") {
-        "Total Distance with Unknown Dates (miles)"
-      } else {
-        "Total Journeys with Unknown Dates"
-      }
-    })
-
-    output$vo_missing_dates <- renderText({
-      req(filtered_data(), input$pi_vendor, input$pi_pay_type)
-
-      data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance",
-        "total_distance", "total_number_trips"
-      )
-
-      # Isolate the NAs from the daily tier only to prevent triple-counting
-      na_val <- filtered_data() |>
-        filter(
-          is.na(date),
-          full_month_aggregation == FALSE,
-          full_week_aggregation == FALSE,
-          Vendor %in% input$pi_vendor,
-          payment_type %in% input$pi_pay_type
-        ) |>
-        summarise(total = sum(!!sym(data_field), na.rm = TRUE)) |>
-        collect() |>
-        pull(total)
-
-      # Catch Arrow's empty vector behaviour
-      if (length(na_val) == 0 || is.na(na_val)) {
-        na_val <- 0
-      }
-
-      # Format with commas for clean UI presentation
-      scales::comma(na_val)
     })
 
 
