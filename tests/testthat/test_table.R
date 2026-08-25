@@ -71,7 +71,7 @@ test_that("fn_calculate_table_data aggregates, formats dates, and appends TOTALS
 
   expected_cols <- c(
     "Date", "Trip Count", "Total Distance (miles)",
-    "Passenger Count", "Total Charge", "Total Fare"
+    "Passenger Count", "Total Fare", "Total Charge"
   )
   expect_equal(names(result), expected_cols)
 
