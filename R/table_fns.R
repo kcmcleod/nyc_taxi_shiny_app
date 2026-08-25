@@ -45,8 +45,8 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
       total_number_trips = sum(total_number_trips, na.rm = TRUE),
       total_distance = sum(total_distance, na.rm = TRUE),
       total_passenger_count = sum(total_passenger_count, na.rm = TRUE),
-      total_charges = sum(total_charges, na.rm = TRUE),
       total_fare = sum(total_fare, na.rm = TRUE),
+      total_charges = sum(total_charges, na.rm = TRUE),
       .groups = "drop"
     ) |>
     collect() |>
@@ -59,7 +59,7 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
   # totals
   metrics <- c(
     "total_number_trips", "total_distance",
-    "total_passenger_count", "total_charges", "total_fare"
+    "total_passenger_count", "total_fare", "total_charges"
   )
 
   totals <- main_data |>
@@ -70,7 +70,7 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
 
   renamed_metrics <- c(
     "Date", "Trip Count", "Total Distance (miles)",
-    "Passenger Count", "Total Charge", "Total Fare"
+    "Passenger Count", "Total Fare", "Total Charge"
   )
   presentation_names <- setNames(c("date", metrics), renamed_metrics)
 
@@ -93,8 +93,8 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
 #' @param base_data A `data.frame` or `tibble` containing the aggregated taxi data.
 #'   Must include a summary row where the `Date` column equals `"TOTALS"`.
 #'   Requires the following strict column names: `"Date"`, `"Trip Count"`,
-#'   `"Total Distance (miles)"`, `"Passenger Count"`, `"Total Charge"`,
-#'   and `"Total Fare"`.
+#'   `"Total Distance (miles)"`, `"Passenger Count"`, `"Total Fare"`,
+#'   and `"Total Charge"`.
 #'
 #' @return A `datatables` HTML widget ready for UI rendering.
 #'
@@ -144,8 +144,8 @@ fn_generate_yellow_taxi_table <- function(base_data) {
     scales::comma(df_totals[["Trip Count"]]),
     scales::comma(df_totals[["Total Distance (miles)"]], accuracy = 0.01),
     scales::comma(df_totals[["Passenger Count"]]),
-    scales::dollar(df_totals[["Total Charge"]]),
-    scales::dollar(df_totals[["Total Fare"]])
+    scales::dollar(df_totals[["Total Fare"]]),
+    scales::dollar(df_totals[["Total Charge"]])
   )
 
   # Create HTML container with footer
@@ -163,7 +163,11 @@ fn_generate_yellow_taxi_table <- function(base_data) {
 
   dt_options <- list(
     pageLength = maxLength,
-    dom = domString
+    dom = domString,
+    columnDefs = list(
+      # targets = 0 targets the first column (Date)
+      list(targets = 0, orderable = FALSE)
+    )
   )
 
   table <- DT::datatable(df_data,
@@ -172,7 +176,7 @@ fn_generate_yellow_taxi_table <- function(base_data) {
   ) |>
     DT::formatRound(columns = c("Trip Count", "Passenger Count"), digits = 0) |>
     DT::formatRound(columns = "Total Distance (miles)", digits = 2) |>
-    DT::formatCurrency(columns = c("Total Charge", "Total Fare"), currency = "$")
+    DT::formatCurrency(columns = c("Total Fare", "Total Charge"), currency = "$")
 
   return(table)
 }
