@@ -13,7 +13,7 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
       fill = FALSE,
       card_header(
         "About this Dashboard",
-        class = "bg-light" # Uses the subtle shading we discussed
+        class = "bg-light"
       ),
       tags$p(
         "This application provides high-speed, interactive analytics for New York City's
