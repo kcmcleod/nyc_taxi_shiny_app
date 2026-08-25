@@ -21,6 +21,10 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
         it rapidly queries partitioned data to visualise journey volumes,
         financial metrics, and geographic trip patterns without the overhead of
         a traditional database."
+      ),
+      tags$a(
+        href = "https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page",
+        "Data from the NYC Taxi and Limousine Commission (TLC). "
       )
     ),
 
