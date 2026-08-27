@@ -1,3 +1,38 @@
+#' Calculate and format aggregated summary metrics for presentation
+#'
+#' @description
+#' Validates and aggregates the underlying Arrow dataset (or `data.frame`) based on
+#' selected time horizons and spatial filters. Computes summary totals for journey counts,
+#' distances, and financial metrics, appending a final cumulative 'TOTALS' row.
+#' Built with strict defensive programming checks to ensure safe execution before pushing
+#' the final formatted payload to the presentation layer (e.g., `DT::datatable`).
+#'
+#' @param base_data An `ArrowObject`, `Dataset`, `arrow_dplyr_query`, or `data.frame`
+#'   acting as the underlying data source.
+#' @param week_agg Logical. If `TRUE`, applies weekly aggregation logic to the date format.
+#' @param month_agg Logical. If `TRUE`, applies monthly aggregation logic (`"%b %Y"`) to the date format.
+#' @param pu_locations A character vector of selected pick-up locations for spatial filtering.
+#' @param do_locations A character vector of selected drop-off locations for spatial filtering.
+#' @param all_locations A character vector of all valid locations
+#'
+#' @return A `data.frame` containing the aggregated metrics with a chronological date sequence,
+#'   a final appended 'TOTALS' row, and human-readable presentation column names.
+#'
+#' @importFrom dplyr filter group_by summarise collect arrange mutate if_else across all_of bind_rows rename
+#' @importFrom stats setNames
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Typical usage within the Shiny server module for the summary table
+#' table_data <- fn_calculate_table_data(
+#'   base_data = arrow_dataset,
+#'   week_agg = FALSE,
+#'   month_agg = TRUE,
+#'   pu_locations = c("Manhattan", "Brooklyn"),
+#'   do_locations = c("Queens")
+#' )
+#' }
 fn_calculate_table_data <- function(base_data, week_agg, month_agg,
                                     pu_locations, do_locations) {
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
