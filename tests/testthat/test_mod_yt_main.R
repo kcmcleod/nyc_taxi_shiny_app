@@ -73,3 +73,46 @@ test_that("mod_yellow_taxis_main_server processes inputs, splits, and KPIs corre
     }
   )
 })
+
+
+test_that("mod_yellow_taxis_main_server tryCatch safely handles data failures", {
+  # 1. Create a sabotaged reactive that simulates a fatal pipeline error
+  mock_crashing_data <- reactive({
+    stop("Simulated Database Timeout")
+  })
+
+  mock_metadata <- list(
+    Vendor = c("VTS", "CMT"),
+    payment_type = c("Cash", "Credit")
+  )
+
+  testServer(
+    app = mod_yellow_taxis_main_server,
+    args = list(
+      filtered_data = mock_crashing_data,
+      app_metadata  = mock_metadata,
+      data_version  = reactiveVal(1),
+      start_date    = reactiveVal(as.Date("2023-01-01")),
+      end_date      = reactiveVal(as.Date("2023-01-31"))
+    ),
+    expr = {
+      # 2. Set required inputs to trigger the chart render
+      session$setInputs(
+        pi_level = "Day",
+        pi_vendor = "VTS",
+        pi_pay_type = "Cash",
+        rb_split_by = "Total",
+        rb_journeys_or_passengers = "Journey Count"
+      )
+
+      # 3. Evaluate the output.
+      # The tryCatch will swallow the "Simulated Database Timeout",
+      # fire the toastr message, and assign NULL to base_data.
+      # The immediate validate() block then takes over and throws a safe Shiny silent error.
+      err <- expect_error(output$po_tripVolumesOverTime)
+
+      # 4. Verify the server did not crash and correctly surfaced the validation message
+      expect_match(err$message, "Chart unavailable due to data error")
+    }
+  )
+})

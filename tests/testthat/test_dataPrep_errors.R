@@ -63,3 +63,32 @@ test_that("fn_process_yellow_file aborts on invalid filename or column validatio
   # Filename without a YYYY-MM date string
   expect_null(fn_process_yellow_file("bad_file_name_without_date.parquet"))
 })
+
+
+test_that("fn_monthly_aggregation defensive guardrails execute", {
+  # 1. Non-dataframe & empty dataframe
+  expect_null(fn_monthly_aggregation("not_a_df"))
+  expect_null(fn_monthly_aggregation(data.frame()))
+
+  # 2. Missing required financial/distance columns
+  bad_df <- data.frame(VendorID = 1)
+  expect_null(fn_monthly_aggregation(bad_df))
+
+  # 3. Valid schema but missing requested grouping column
+  # We provide all mandatory calculation columns so it passes check #1
+  valid_schema_df <- data.frame(
+    extra = 0, mta_tax = 0, tolls_amount = 0, improvement_surcharge = 0,
+    congestion_surcharge = 0, Airport_fee = 0, cbd_congestion_fee = 0,
+    trip_distance = 0, total_amount = 0, fare_amount = 0, tip_amount = 0,
+    passenger_count = 1
+  )
+
+  # We request grouping by columns that do not exist in valid_schema_df
+  # This perfectly triggers the code shown in image_e1b487.png
+  result <- fn_monthly_aggregation(
+    df = valid_schema_df,
+    grouping_values = c("VendorID", "payment_type")
+  )
+
+  expect_null(result)
+})
