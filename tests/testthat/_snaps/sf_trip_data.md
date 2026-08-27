@@ -148,7 +148,7 @@
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
         },
         "class": {
           "type": "character",
@@ -160,17 +160,17 @@
         {
           "type": "character",
           "attributes": {},
-          "value": ["Bronx", "Bronx", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "N/A", "N/A", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Unknown", "Unknown"]
+          "value": ["Bronx", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "N/A", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Unknown"]
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["Bronx", "Brooklyn", "Manhattan", "Queens", "Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island", "Bronx", "Brooklyn", "EWR", "Manhattan", "N/A", "Queens", "Unknown", "Manhattan", "N/A", "Bronx", "Brooklyn", "Manhattan", "N/A", "Queens", "Staten Island", "Unknown", "Manhattan", "Unknown"]
+          "value": ["Bronx", "Manhattan", "Queens", "Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island", "Bronx", "Brooklyn", "EWR", "Manhattan", "N/A", "Queens", "Unknown", "N/A", "Bronx", "Brooklyn", "Manhattan", "N/A", "Queens", "Staten Island", "Unknown", "Unknown"]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [12, 2, 24, 6, 3, 90, 50, 27, 1, 37, 117, 10, 4505, 7, 97, 2, 1, 4, 19, 117, 366, 11, 425, 1, 4, 3, 14]
+          "value": [10, 9, 4, 3, 58, 33, 16, 1, 26, 72, 3, 2514, 4, 59, 2, 1, 13, 68, 264, 6, 326, 1, 1, 2]
         }
       ]
     }
@@ -243,7 +243,7 @@
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
         },
         "class": {
           "type": "character",
@@ -255,32 +255,32 @@
         {
           "type": "character",
           "attributes": {},
-          "value": ["28 Dec 2025", "04 Jan 2026", "11 Jan 2026", "18 Jan 2026", "25 Jan 2026", "01 Feb 2026", "08 Feb 2026", "15 Feb 2026", "22 Feb 2026", "01 Mar 2026", "08 Mar 2026", "15 Mar 2026", "22 Mar 2026", "29 Mar 2026", "05 Apr 2026", "12 Apr 2026", "19 Apr 2026", "26 Apr 2026", "03 May 2026", "10 May 2026", "17 May 2026", "24 May 2026", "31 May 2026", "TOTALS"]
+          "value": ["28 Dec 2025", "04 Jan 2026", "11 Jan 2026", "18 Jan 2026", "25 Jan 2026", "01 Feb 2026", "08 Feb 2026", "15 Feb 2026", "22 Feb 2026", "01 Mar 2026", "08 Mar 2026", "15 Mar 2026", "22 Mar 2026", "29 Mar 2026", "TOTALS"]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [20, 154, 172, 23, 63, 68, 85, 28, 40, 25, 168, 80, 24, 44, 425, 85, 35, 72, 36, 59, 66, 502, 39, 2313]
+          "value": [20, 154, 172, 23, 63, 68, 85, 28, 40, 25, 168, 80, 24, 44, 994]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [86.1, 400.82, 294.98, 99.91, 140.35, 462.78, 160.75, 133.19, 181.37, 137.42, 371.01, 208.55, 127.8, 78.48, 486.85, 172.08, 100.57, 222.99, 127.92, 174.72, 138.68, 769.15, 323.84, 5400.31]
+          "value": [86.1, 400.82, 294.98, 99.91, 140.35, 462.78, 160.75, 133.19, 181.37, 137.42, 371.01, 208.55, 127.8, 78.48, 2883.51]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [20, 216, 162, 24, 69, 55, 104, 26, 40, 30, 191, 85, 15, 53, 463, 122, 33, 88, 40, 51, 77, 657, 43, 2664]
+          "value": [20, 216, 162, 24, 69, 55, 104, 26, 40, 30, 191, 85, 15, 53, 1090]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [374.01, 2101.33, 1582.67, 548.98, 444.09, 2289.13, 1238.97, 445.55, 912.1, 508.28, 2142.68, 1302.37, 1562.63, 436.37, 3927.06, 2210.47, 507.89, 1476.03, 692.04, 897.86, 835.73, 5655.27, 1522.71, 33614.22]
+          "value": [374.01, 2101.33, 1582.67, 548.98, 444.09, 2289.13, 1238.97, 445.55, 912.1, 508.28, 2142.68, 1302.37, 1562.63, 436.37, 15889.16]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [498.88, 3216.42, 2355.58, 698.72, 592.58, 3013.53, 1725.96, 677.53, 1148.31, 695.76, 3369.5, 1986.13, 1794.99, 661.55, 6023.81, 2786.21, 746.63, 2146.67, 994.95, 1308.93, 1244.12, 9918.88, 2066.78, 49672.42]
+          "value": [498.88, 3216.42, 2355.58, 698.72, 592.58, 3013.53, 1725.96, 677.53, 1148.31, 695.76, 3369.5, 1986.13, 1794.99, 661.55, 22435.44]
         }
       ]
     }

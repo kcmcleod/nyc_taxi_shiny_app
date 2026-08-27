@@ -73,6 +73,7 @@ ui <- page_navbar(
     ),
     use_idle_timer(timeout_minutes = 15),
     useShinyjs(),
+    useToastr(),
     disconnectMessage(
       text = "Your session has timed out due to inactivity.",
       refresh = "Reconnect to NYC Taxi Data",

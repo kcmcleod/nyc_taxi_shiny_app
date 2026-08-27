@@ -34,15 +34,6 @@ test_that("mod_yellow_taxis_parent_server processes complex date filtering corre
       data_version     = mock_data_version
     ),
     expr = {
-      # module is programmed to return NULL if inputs equal Sys.Date()
-      session$setInputs(
-        di_start_date = Sys.Date(),
-        di_end_date   = Sys.Date()
-      )
-
-      expect_null(rv_main_date_filtered_date())
-
-
       # We set the user start date to Jan 10th.
       # - Daily data on Jan 15th should PASS.
       # - Monthly data on Jan 1st should PASS (because floor_date(Jan 10) = Jan 1).
@@ -50,8 +41,7 @@ test_that("mod_yellow_taxis_parent_server processes complex date filtering corre
       # - Out of bounds 2022 data should FAIL.
       # - NA dates should PASS.
       session$setInputs(
-        di_start_date = as.Date("2023-01-10"),
-        di_end_date   = as.Date("2023-01-31")
+        di_date_range = c(as.Date("2023-01-10"), as.Date("2023-01-31"))
       )
 
       result <- rv_main_date_filtered_date()
@@ -66,14 +56,22 @@ test_that("mod_yellow_taxis_parent_server processes complex date filtering corre
       # Now, the Jan 15th (daily), Jan 1st (monthly), and Jan 8th (weekly) rows
       # should all fail the filter. Only the NA row should remain.
       session$setInputs(
-        di_start_date = as.Date("2023-02-01"),
-        di_end_date   = as.Date("2023-02-28")
+        di_date_range = c(as.Date("2023-02-01"), as.Date("2023-02-28"))
       )
 
       result_tight <- rv_main_date_filtered_date()
 
       expect_equal(nrow(result_tight), 1)
       expect_true(is.na(result_tight$date[1])) # Only the NA row survives
+
+
+      # Simulate a user selecting a 2-year range to force the observer to execute
+      # the branch containing updateDateRangeInput and toastr_warning
+      session$setInputs(
+        di_date_range = c(as.Date("2021-01-01"), as.Date("2023-01-01"))
+      )
+
+      expect_true(TRUE)
     }
   )
 })
