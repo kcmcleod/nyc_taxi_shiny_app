@@ -43,7 +43,7 @@ test_that("sf_trip_data - heatmap chart", {
   # 2. not default
   app$set_inputs(
     "yt_parent-yt_heat-ri_heatmap_period" = "Combined",
-    "yt_parent-di_start_date" = "2026-01-01"
+    "yt_parent-di_date_range" = c("2026-01-01", "2026-03-31")
   )
 
   app$wait_for_idle()
@@ -69,7 +69,7 @@ test_that("sf_trip_data - table", {
 
   # 2. not default
   app$set_inputs(
-    "yt_parent-di_start_date" = "2026-01-01"
+    "yt_parent-di_date_range" = c("2026-01-01", "2026-03-31")
   )
 
   app$wait_for_idle()

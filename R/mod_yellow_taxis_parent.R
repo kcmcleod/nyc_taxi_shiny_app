@@ -33,24 +33,15 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
       fill = FALSE,
       card_header("DATE RANGE", class = "bg-light"),
       tags$p("Controls the date range for all the charts/tables in this page"),
-      layout_columns(
-        col_widths = breakpoints(sm = 12, md = 6),
-        dateInput(
-          ns("di_start_date"),
-          label = "Start Date",
-          width = "100%",
-          min = app_metadata$min_date,
-          max = app_metadata$max_date,
-          value = floor_date(app_metadata$max_date %m-% weeks(13), unit = "month")
-        ),
-        dateInput(
-          ns("di_end_date"),
-          label = "End Date",
-          width = "100%",
-          min = app_metadata$min_date,
-          max = app_metadata$max_date,
-          value = app_metadata$max_date
-        )
+      dateRangeInput(
+        ns("di_date_range"),
+        label = NULL, # Label hidden since the card header acts as the label
+        start = floor_date(app_metadata$max_date %m-% weeks(13), unit = "month"),
+        end = app_metadata$max_date,
+        min = app_metadata$min_date,
+        max = app_metadata$max_date,
+        width = "100%",
+        separator = " to "
       )
     ),
     navset_card_tab(
@@ -78,16 +69,43 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
                                            data_version) {
   moduleServer(id, function(input, output, session) {
     ############################################################################
+    # 1-YEAR GUARDRAIL
+    observeEvent(input$di_date_range,
+      {
+        req(input$di_date_range)
+
+        start_date <- input$di_date_range[1]
+        end_date <- input$di_date_range[2]
+
+        date_diff <- as.numeric(difftime(end_date, start_date, units = "days"))
+
+        if (date_diff > 365) {
+          corrected_end <- start_date + lubridate::days(365)
+
+          updateDateRangeInput(
+            session,
+            "di_date_range",
+            end = corrected_end
+          )
+
+          toastr_warning(
+            message = "Time period limited to a maximum of 1 year to ensure optimal performance.",
+            position = "bottom-right",
+            timeOut = 5000
+          )
+        }
+      },
+      ignoreInit = TRUE
+    )
+
+
+    ############################################################################
     # TOP LEVEL DATA PROCESSING
     rv_main_date_filtered_date <- reactive({
-      req(yellow_taxi_data(), input$di_end_date, input$di_start_date)
+      req(yellow_taxi_data(), input$di_date_range)
 
-      if (input$di_start_date == Sys.Date() || input$di_end_date == Sys.Date()) {
-        return(NULL)
-      }
-
-      user_start_date <- input$di_start_date
-      user_end_date <- input$di_end_date
+      user_start_date <- input$di_date_range[1]
+      user_end_date <- input$di_date_range[2]
 
       tmpDF <- yellow_taxi_data() |>
         filter(
@@ -116,22 +134,22 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
     mod_yellow_taxis_main_server(
       id = "yt_main",
       rv_main_date_filtered_date, app_metadata,
-      data_version, reactive(input$di_start_date),
-      reactive(input$di_end_date)
+      data_version, reactive(input$di_date_range[1]),
+      reactive(input$di_date_range[2])
     )
 
     mod_yellow_taxis_heatmap_server(
       id = "yt_heat",
       rv_main_date_filtered_date, app_metadata,
-      data_version, reactive(input$di_start_date),
-      reactive(input$di_end_date)
+      data_version, reactive(input$di_date_range[1]),
+      reactive(input$di_date_range[2])
     )
 
     mod_yellow_taxis_table_server(
       id = "yt_table",
       rv_main_date_filtered_date, app_metadata,
-      data_version, reactive(input$di_start_date),
-      reactive(input$di_end_date)
+      data_version, reactive(input$di_date_range[1]),
+      reactive(input$di_date_range[2])
     )
   })
 }
