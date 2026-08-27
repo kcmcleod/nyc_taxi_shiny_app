@@ -72,14 +72,14 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
     # 1-YEAR GUARDRAIL
     observeEvent(input$di_date_range,
       {
-        req(input$di_date_range)
+        req(input$di_date_range[1], input$di_date_range[2])
 
-        start_date <- input$di_date_range[1]
-        end_date <- input$di_date_range[2]
+        start_date <- as.Date(input$di_date_range[1])
+        end_date <- as.Date(input$di_date_range[2])
 
         date_diff <- as.numeric(difftime(end_date, start_date, units = "days"))
 
-        if (date_diff > 365) {
+        if (!is.na(date_diff) && date_diff > 365) {
           corrected_end <- start_date + lubridate::days(365)
 
           updateDateRangeInput(
@@ -102,10 +102,10 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
     ############################################################################
     # TOP LEVEL DATA PROCESSING
     rv_main_date_filtered_date <- reactive({
-      req(yellow_taxi_data(), input$di_date_range)
+      req(yellow_taxi_data(), input$di_date_range[1], input$di_date_range[2])
 
-      user_start_date <- input$di_date_range[1]
-      user_end_date <- input$di_date_range[2]
+      user_start_date <- as.Date(input$di_date_range[1])
+      user_end_date <- as.Date(input$di_date_range[2])
 
       tmpDF <- yellow_taxi_data() |>
         filter(

@@ -79,3 +79,21 @@ test_that("sf_trip_data - table", {
   expect_true(!is.null(app_data))
   expect_snapshot_value(app_data, style = "json2")
 })
+
+
+test_that("sf_trip_data - 365 day guardrail snaps end date back", {
+  testthat::local_edition(3)
+
+  app <- AppDriver$new()
+  app$wait_for_idle()
+
+  app$set_inputs(
+    "yt_parent-di_date_range" = c("2025-01-01", "2026-03-01")
+  )
+  app$wait_for_idle()
+
+  updated_dates <- app$get_value(input = "yt_parent-di_date_range")
+
+  expect_equal(as.character(updated_dates[1]), "2025-01-01")
+  expect_equal(as.character(updated_dates[2]), "2026-01-01")
+})

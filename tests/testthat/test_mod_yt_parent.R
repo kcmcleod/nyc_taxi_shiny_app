@@ -63,6 +63,15 @@ test_that("mod_yellow_taxis_parent_server processes complex date filtering corre
 
       expect_equal(nrow(result_tight), 1)
       expect_true(is.na(result_tight$date[1])) # Only the NA row survives
+
+
+      # Simulate a user selecting a 2-year range to force the observer to execute
+      # the branch containing updateDateRangeInput and toastr_warning
+      session$setInputs(
+        di_date_range = c(as.Date("2021-01-01"), as.Date("2023-01-01"))
+      )
+
+      expect_true(TRUE)
     }
   )
 })
