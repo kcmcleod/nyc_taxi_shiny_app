@@ -54,7 +54,7 @@ mod_yellow_taxis_table_server <- function(id, filtered_data, app_metadata,
   moduleServer(id, function(input, output, session) {
     ################################################################################
     # DATA
-    rv_table_filtered_data <- reactive({
+    rv_table_filtered_data_raw <- reactive({
       req(filtered_data(), input$pi_level, input$pi_do_locations, input$pi_pu_locations)
 
       pu_locations <- input$pi_pu_locations
@@ -80,6 +80,8 @@ mod_yellow_taxis_table_server <- function(id, filtered_data, app_metadata,
         input$pi_do_locations,
         input$pi_pu_locations
       )
+
+    rv_table_filtered_data <- debounce(rv_table_filtered_data_raw, 800)
 
 
     ############################################################################

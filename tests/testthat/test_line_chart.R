@@ -189,6 +189,22 @@ test_that("fn_calculate_line_chart_data defensive blocks execute", {
   )
 })
 
+test_that("fn_calculate_line_chart_data executes circuit breaker on large queries", {
+  expect_error(
+    fn_calculate_line_chart_data(
+      base_data = mock_taxi_data,
+      vendor_list = c("VTS", "CMT"),
+      payment_list = c("Cash", "Credit"),
+      month_agg = TRUE,
+      week_agg = FALSE,
+      data_field = "total_distance",
+      split_by = "Total",
+      row_limit = 1 # Intentionally set limit to 1 to trip the breaker
+    ),
+    regexp = "Query too large"
+  )
+})
+
 
 # ==============================================================================
 # UI RENDERING TESTS

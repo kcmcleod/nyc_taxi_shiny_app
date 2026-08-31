@@ -67,7 +67,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
   moduleServer(id, function(input, output, session) {
     ################################################################################
     # DATA
-    rv_main_chart_filtered_data <- reactive({
+    rv_main_chart_filtered_data_raw <- reactive({
       req(
         filtered_data(), input$pi_vendor, input$pi_pay_type,
         input$pi_level, input$rb_split_by
@@ -92,6 +92,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
       return(data)
     })
 
+    rv_main_chart_filtered_data <- debounce(rv_main_chart_filtered_data_raw, 800)
 
     ############################################################################
     # CHART

@@ -13,12 +13,14 @@
 #' "total_distance" or "total_number_trips").
 #' @param split_by A character string of the metric to create lines for
 #' (e.g., "Payment Type", "Vendor", "Total").
+#' @param row_limit A numeric indicating the max number of rows that can be safely handled
 #'
 #' @return A tibble with two columns: `date` and `total_value`, containing the aggregated totals.
 #'
 #' @export
 fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
-                                         month_agg, week_agg, data_field, split_by) {
+                                         month_agg, week_agg, data_field, split_by,
+                                         row_limit = 15000000) {
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
     log_error(err_msg)
@@ -73,14 +75,29 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
     split_col <- ifelse(split_by == "Vendor", "Vendor", "payment_type")
   }
 
-  base_data |>
+  lazy_query <- base_data |>
     filter(
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg,
       Vendor %in% vendor_list,
       payment_type %in% payment_list
     ) |>
-    select(date, !!sym(split_col), all_of(data_field)) |>
+    select(date, !!sym(split_col), all_of(data_field))
+
+  # guardrail: dont want too many rows in data
+  row_count <- lazy_query |>
+    summarise(n = n()) |>
+    collect() |>
+    pull(n)
+
+  if (row_count > row_limit) {
+    message(row_count)
+    err_msg <- "Query too large. Please refine your filters to visualise the data."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  lazy_query |>
     group_by(date, !!sym(split_col)) |>
     summarise(
       total_value = sum(!!sym(data_field), na.rm = TRUE),

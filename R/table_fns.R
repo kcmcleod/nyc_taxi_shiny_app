@@ -14,6 +14,7 @@
 #' @param pu_locations A character vector of selected pick-up locations for spatial filtering.
 #' @param do_locations A character vector of selected drop-off locations for spatial filtering.
 #' @param all_locations A character vector of all valid locations
+#' @param row_limit A numeric indicating the max number of rows that can be safely handled
 #'
 #' @return A `data.frame` containing the aggregated metrics with a chronological date sequence,
 #'   a final appended 'TOTALS' row, and human-readable presentation column names.
@@ -34,7 +35,7 @@
 #' )
 #' }
 fn_calculate_table_data <- function(base_data, week_agg, month_agg,
-                                    pu_locations, do_locations) {
+                                    pu_locations, do_locations, row_limit = 15000000) {
   if (!inherits(base_data, c("data.frame", "ArrowObject", "arrow_dplyr_query", "Dataset"))) {
     err_msg <- "System Error: The underlying data source is disconnected or invalid."
     log_error(err_msg)
@@ -73,7 +74,22 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
       full_week_aggregation == week_agg,
       PULocation %in% pu_locations,
       DOLocation %in% do_locations
-    ) |>
+    )
+
+  # guardrail: dont want too many rows in data
+  row_count <- main_data |>
+    summarise(n = n()) |>
+    collect() |>
+    pull(n)
+
+  if (row_count > row_limit) {
+    message(row_count)
+    err_msg <- "Query too large. Please refine your filters to visualise the data."
+    log_error(err_msg)
+    stop(err_msg)
+  }
+
+  main_data <- main_data |>
     group_by(date) |>
     summarise(
       # not DRY cos arrow doesnt support across or anonymous
