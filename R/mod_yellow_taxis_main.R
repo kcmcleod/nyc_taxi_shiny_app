@@ -92,11 +92,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
       return(data)
     })
 
-    if (isTRUE(getOption("shiny.testmode"))) {
-      rv_main_chart_filtered_data <- rv_main_chart_filtered_data_raw
-    } else {
-      rv_main_chart_filtered_data <- debounce(rv_main_chart_filtered_data_raw, 800)
-    }
+    rv_main_chart_filtered_data <- debounce(rv_main_chart_filtered_data_raw, 800)
 
     ############################################################################
     # CHART
