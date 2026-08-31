@@ -84,7 +84,7 @@ mod_yellow_taxis_table_server <- function(id, filtered_data, app_metadata,
     if (isTRUE(getOption("shiny.testmode"))) {
       rv_table_filtered_data <- rv_table_filtered_data_raw
     } else {
-      rv_table_filtered_data <- debounce(rv_main_chart_filtered_data_raw, 800)
+      rv_table_filtered_data <- debounce(rv_main_table_filtered_data_raw, 800)
     }
 
 
