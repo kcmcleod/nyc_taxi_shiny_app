@@ -47,12 +47,12 @@ test_that("mod_yellow_taxis_table_server processes reactive inputs correctly", {
       expect_equal(calculated_data$Date[1], "Jan 2023")
 
       session$setInputs(pi_pu_locations = "Manhattan")
-
+      session$elapse(800)
       updated_data <- rv_table_filtered_data()
       expect_equal(nrow(updated_data), 1) # Only the zeroes TOTALS row should remain
 
-
       session$setInputs(pi_pu_locations = "EWR")
+      session$elapse(800)
       updated_data <- rv_table_filtered_data()
       expect_equal(nrow(updated_data), 3)
       expect_equal(pull(updated_data[3, 2]), 60)
