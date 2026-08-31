@@ -61,12 +61,13 @@ test_that("mod_yellow_taxis_main_server processes inputs, splits, and KPIs corre
 
 
       session$setInputs(rb_split_by = "Vendor")
-
+      session$elapse(800)
       chart_data_vendor <- rv_main_chart_filtered_data()
       chart_data_vendor_valid <- chart_data_vendor[!is.na(chart_data_vendor$date), ]
 
       # Jan 1st should now be split into two separate rows
       expect_equal(nrow(chart_data_vendor_valid), 2)
+      print(names(chart_data_vendor_valid))
       expect_true("Vendor" %in% names(chart_data_vendor_valid))
       expect_equal(chart_data_vendor_valid$total_value[chart_data_vendor_valid$Vendor == "VTS"], 2)
       expect_equal(chart_data_vendor_valid$total_value[chart_data_vendor_valid$Vendor == "CMT"], 3)
