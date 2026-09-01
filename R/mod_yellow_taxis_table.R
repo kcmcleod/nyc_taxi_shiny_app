@@ -48,7 +48,7 @@ mod_yellow_taxis_table_ui <- function(id, config, app_metadata) {
   )
 }
 
-#' Info Page Module Server
+#'
 mod_yellow_taxis_table_server <- function(id, filtered_data, app_metadata,
                                           data_version, start_date, end_date) {
   moduleServer(id, function(input, output, session) {
