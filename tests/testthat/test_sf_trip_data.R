@@ -19,7 +19,7 @@ test_that("sf_trip_data - main chart", {
     "yt_parent-yt_main-pi_vendor" = "Myle Technologies Inc",
     "yt_parent-yt_main-pi_pay_type" = "Flex Fare trip"
   )
-
+  Sys.sleep(1.5)
   app$wait_for_idle()
 
   app_data <- app$get_value(export = "yt_parent-yt_main-exported_main_chart_data")
@@ -45,7 +45,7 @@ test_that("sf_trip_data - heatmap chart", {
     "yt_parent-yt_heat-ri_heatmap_period" = "Combined",
     "yt_parent-di_date_range" = c("2026-01-01", "2026-03-31")
   )
-
+  Sys.sleep(1.5)
   app$wait_for_idle()
 
   print(app$get_logs())
@@ -71,7 +71,7 @@ test_that("sf_trip_data - table", {
   app$set_inputs(
     "yt_parent-di_date_range" = c("2026-01-01", "2026-03-31")
   )
-
+  Sys.sleep(1.5)
   app$wait_for_idle()
 
   print(app$get_logs())
@@ -90,6 +90,7 @@ test_that("sf_trip_data - 365 day guardrail snaps end date back", {
   app$set_inputs(
     "yt_parent-di_date_range" = c("2025-01-01", "2026-03-01")
   )
+  Sys.sleep(1.5)
   app$wait_for_idle()
 
   updated_dates <- app$get_value(input = "yt_parent-di_date_range")

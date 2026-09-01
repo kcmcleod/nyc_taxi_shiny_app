@@ -174,12 +174,20 @@ date_ranges <- arrow::open_dataset(partition_dir) |>
   ) |>
   collect()
 
+daily_volumes <- arrow::open_dataset(partition_dir) |>
+  dplyr::filter(full_month_aggregation == FALSE, full_week_aggregation == FALSE) |>
+  dplyr::group_by(date) |>
+  dplyr::summarise(total_trips = sum(total_number_trips, na.rm = TRUE)) |>
+  dplyr::collect() |>
+  dplyr::arrange(date)
+
 yellow_taxi_meta_data <- list(
   "Vendor" = Vendors,
   "payment_type" = payment_types,
   "min_date" = date_ranges$min_date[1],
   "max_date" = date_ranges$max_date[1],
-  "Location" = locations
+  "Location" = locations,
+  "daily_volumes" = daily_volumes
 )
 
 saveRDS(yellow_taxi_meta_data, file = paste0(
