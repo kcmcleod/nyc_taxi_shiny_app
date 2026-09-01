@@ -103,3 +103,51 @@ test_that("mod_yellow_taxis_availability_server handles validations and tryCatch
     }
   )
 })
+
+
+test_that("mod_yellow_taxis_availability_server safely handles chart generation failures", {
+  # 1. Locate the exact environment where the isolated shiny module was sourced
+  target_env <- environment(mod_yellow_taxis_availability_server)
+
+  # 2. Back up the original function
+  original_fn <- get("fn_generate_availability_chart", envir = target_env)
+
+  # 3. Unlock the isolated environment binding if it is locked
+  if (bindingIsLocked("fn_generate_availability_chart", target_env)) {
+    unlockBinding("fn_generate_availability_chart", target_env)
+  }
+
+  # 4. Overwrite the function with a fatal crash inside that specific environment
+  assign("fn_generate_availability_chart", function(...) stop("Simulated Plotly Crash"), envir = target_env)
+
+  # 5. Guarantee it gets cleanly restored when the test finishes
+  on.exit({
+    if (bindingIsLocked("fn_generate_availability_chart", target_env)) {
+      unlockBinding("fn_generate_availability_chart", target_env)
+    }
+    assign("fn_generate_availability_chart", original_fn, envir = target_env)
+  })
+
+  testServer(
+    app = mod_yellow_taxis_availability_server,
+    args = list(
+      app_metadata = mock_metadata,
+      config = mock_config,
+      data_version = reactiveVal(1),
+      user_start_date = reactiveVal(as.Date("2023-01-01")),
+      user_end_date = reactiveVal(as.Date("2023-01-31"))
+    ),
+    expr = {
+      session$setInputs(pi_range = "Full data range", pi_level = "Month")
+      session$elapse(800)
+
+      # 6. The rendering block will catch our "Simulated Plotly Crash",
+      #    trigger toastr_error (covering those missing lines),
+      #    return NULL, and trigger the final Shiny validate() trap.
+      expect_error(
+        output$ply_data_vols,
+        regexp = "Chart unavailable due to data error"
+      )
+    }
+  )
+})
