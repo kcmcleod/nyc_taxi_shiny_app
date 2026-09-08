@@ -59,7 +59,12 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
       nav_panel(
         title = "SUMMARY METRICS",
         mod_yellow_taxis_table_ui(ns("yt_table"), config, app_metadata)
-      )
+      ),
+      nav_panel(
+        title = "DATA AVAILABILITY",
+        icon = icon("database"),
+        mod_yellow_taxis_availability_ui(ns("yt_avail"), config)
+      ),
     )
   )
 }
@@ -148,6 +153,13 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
     mod_yellow_taxis_table_server(
       id = "yt_table",
       rv_main_date_filtered_date, app_metadata,
+      data_version, reactive(input$di_date_range[1]),
+      reactive(input$di_date_range[2])
+    )
+
+    mod_yellow_taxis_availability_server(
+      id = "yt_avail",
+      app_metadata, config,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )
