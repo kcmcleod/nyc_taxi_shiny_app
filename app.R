@@ -5,11 +5,14 @@ options(scipen = 999)
 source("global.R")
 
 server <- function(input, output, session) {
-  listOfServerFiles <- listOfFiles(serverFilesPath)
+  yellow_taxi_data <- reactiveVal(raw_taxi_data)
 
-  for (file in listOfServerFiles) {
-    source(file, local = TRUE)
-  }
+  # reports version of data to use as key for caching
+  yellow_data_version <- reactive({
+    req(app_metadata, app_metadata$min_date, app_metadata$max_date)
+
+    paste0(app_metadata$min_date, "_", app_metadata$max_date)
+  })
 
   # Load modules
   mod_yellow_taxis_parent_server(
@@ -18,7 +21,6 @@ server <- function(input, output, session) {
   )
 
   # mod_info_page_server("info_page")
-
 
   # Show the warning modal 60 seconds before timeout
   observeEvent(input$idle_warning, {
@@ -44,6 +46,8 @@ server <- function(input, output, session) {
     logger::log_info("User session closed due to inactivity.")
     session$close()
   })
+
+  toastr_info("Setup complete... creating chart", timeOut = 2000, position = "bottom-right")
 }
 
 app_theme <- bs_theme(

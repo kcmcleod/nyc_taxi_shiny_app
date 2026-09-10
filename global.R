@@ -28,7 +28,6 @@ while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePat
 }
 
 uiFilesPath <- paste0(codePath, "/uiFiles/")
-serverFilesPath <- paste0(codePath, "/serverFiles/")
 dataPath <- paste0(codePath, "/data/")
 cachePath <- paste0(codePath, "/shared_app_cache/")
 
