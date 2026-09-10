@@ -1,4 +1,4 @@
-.PHONY: sync test prune download poll
+.PHONY: sync test prune download poll coverage
 
 sync:
 	Rscript dev/sync_data_to_s3.R
@@ -14,3 +14,6 @@ download:
 	
 poll:
 	Rscript dev/data_and_data_prep/polling_nyc_for_data.R
+	
+coverage:
+	Rscript dev/testing/coverage.R
