@@ -12,7 +12,7 @@ mod_yellow_taxis_availability_ui <- function(id, config, app_metadata) {
         pickerInput(ns("pi_range"),
           label = "Data range:", multiple = FALSE,
           choices = c("From above data input", "Full data range"),
-          selected = "Full data range",
+          selected = "From above data input",
           options = pickerOptions(container = "body")
         ),
         tags$div(
@@ -43,6 +43,11 @@ mod_yellow_taxis_availability_server <- function(id, app_metadata, config,
   moduleServer(id, function(input, output, session) {
     observeEvent(input$pi_range, {
       if (input$pi_range == "Full data range") {
+        updatePickerInput(
+          session,
+          "pi_level",
+          selected = "Month"
+        )
         shinyjs::disable("pi_level_wrapper")
       } else {
         shinyjs::enable("pi_level_wrapper")
