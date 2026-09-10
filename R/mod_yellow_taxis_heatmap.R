@@ -13,7 +13,7 @@ mod_yellow_taxis_heatmap_ui <- function(id, config) {
       radioButtons(ns("ri_heatmap_period"),
         label = "Heatmaps period:",
         choices = config$ui_values$heatmap_level,
-        selected = "Weekly",
+        selected = "Monthly",
         inline = TRUE
       )
     ),
