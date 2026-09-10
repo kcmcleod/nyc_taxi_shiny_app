@@ -8,7 +8,6 @@ rsconnect::deployApp(
     ".Rprofile",
     "config",
     "app_data",
-    "serverFiles",
     "R",
     "www",
     "data"

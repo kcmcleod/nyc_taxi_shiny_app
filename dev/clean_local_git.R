@@ -19,24 +19,22 @@ if (length(branches_to_check) == 0) {
   cat("\nFound the following local branches:\n")
   print(branches_to_check)
 
-  # Pause and ask the user if they want to proceed
-  proceed <- menu(
-    c("Yes", "No"),
-    title = "\nWould you like to review and delete any of these branches?"
-  )
+  # Prompt using readLines for Rscript compatibility
+  cat("\nWould you like to review and delete any of these branches? (y/n): ")
+  proceed <- readLines("stdin", n = 1)
 
-  if (proceed == 1) {
+  if (tolower(trimws(proceed)) %in% c("y", "yes")) {
     # Loop through each branch and ask for instructions
     for (branch in branches_to_check) {
-      action <- menu(
-        c("Keep", "Delete (Safe)", "Force Delete"),
-        title = paste0("\nWhat would you like to do with branch '", branch, "'?")
-      )
+      cat(sprintf("\nWhat would you like to do with branch '%s'?\n", branch))
+      cat("1: Keep\n2: Delete (Safe)\n3: Force Delete\nChoice (1/2/3): ")
 
-      if (action == 2) {
+      action <- trimws(readLines("stdin", n = 1))
+
+      if (action == "2") {
         # Safe delete: Git will block this if the branch is unmerged
         system(paste("git branch -d", branch))
-      } else if (action == 3) {
+      } else if (action == "3") {
         # Force delete: Git will delete the branch regardless of merge status
         system(paste("git branch -D", branch))
       }

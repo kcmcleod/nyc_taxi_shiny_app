@@ -183,7 +183,6 @@ jobs:
                 ".Rprofile",
                 "config",
                 "app_data",
-                "serverFiles",
                 "R",
                 "www",
                 "data"
