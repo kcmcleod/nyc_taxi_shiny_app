@@ -98,12 +98,12 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["PULocation", "DOLocation", "date_week", "trips"]
+          "value": ["PULocation", "DOLocation", "date_month", "trips"]
         },
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82]
+          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         },
         "class": {
           "type": "character",
@@ -115,22 +115,22 @@
         {
           "type": "character",
           "attributes": {},
-          "value": ["Bronx", "Bronx", "Bronx", "Bronx", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "N/A", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens"]
+          "value": ["Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Unknown"]
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["Bronx", "Bronx", "Brooklyn", "Manhattan", "Queens", "Queens", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Queens", "Queens", "Bronx", "Bronx", "Bronx", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "N/A", "N/A", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "N/A", "Bronx", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens"]
+          "value": ["Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Bronx", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Queens", "Queens", "Brooklyn", "Manhattan", "Manhattan", "N/A", "Queens", "Queens", "Queens"]
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["2026 week:13", "2026 week:21", "2026 week:12", "2026 week:16", "2026 week:18", "2026 week:20", "2026 week:19", "2026 week:21", "2026 week:13", "2026 week:14", "2026 week:16", "2026 week:18", "2026 week:19", "2026 week:20", "2026 week:22", "2026 week:09", "2026 week:10", "2026 week:13", "2026 week:14", "2026 week:17", "2026 week:21", "2026 week:12", "2026 week:15", "2026 week:16", "2026 week:17", "2026 week:21", "2026 week:11", "2026 week:14", "2026 week:19", "2026 week:22", "2026 week:09", "2026 week:10", "2026 week:11", "2026 week:12", "2026 week:13", "2026 week:14", "2026 week:15", "2026 week:16", "2026 week:17", "2026 week:18", "2026 week:19", "2026 week:20", "2026 week:21", "2026 week:22", "2026 week:18", "2026 week:22", "2026 week:09", "2026 week:10", "2026 week:11", "2026 week:12", "2026 week:15", "2026 week:16", "2026 week:18", "2026 week:19", "2026 week:20", "2026 week:12", "2026 week:12", "2026 week:17", "2026 week:18", "2026 week:09", "2026 week:10", "2026 week:17", "2026 week:21", "2026 week:22", "2026 week:09", "2026 week:11", "2026 week:12", "2026 week:13", "2026 week:14", "2026 week:17", "2026 week:19", "2026 week:20", "2026 week:09", "2026 week:10", "2026 week:11", "2026 week:13", "2026 week:14", "2026 week:15", "2026 week:19", "2026 week:20", "2026 week:21", "2026 week:22"]
+          "value": ["2026 month:03", "2026 month:04", "2026 month:05", "2026 month:04", "2026 month:04", "2026 month:03", "2026 month:05", "2026 month:03", "2026 month:04", "2026 month:05", "2026 month:04", "2026 month:05", "2026 month:04", "2026 month:03", "2026 month:05", "2026 month:05", "2026 month:03", "2026 month:05", "2026 month:03"]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [1, 1, 1, 5, 2, 1, 1, 1, 1, 1, 4, 1, 6, 4, 1, 2, 2, 1, 1, 1, 3, 2, 1, 2, 1, 1, 1, 2, 3, 1, 15, 158, 71, 13, 33, 418, 62, 22, 65, 29, 30, 56, 493, 11, 1, 1, 3, 2, 6, 2, 3, 2, 2, 2, 3, 2, 1, 1, 1, 1, 5, 2, 1, 24, 2, 1, 3, 1, 1, 2, 1, 1, 2, 1, 1, 7, 2, 19, 16, 1, 2, 1]
+          "value": [1, 7, 1, 9, 1, 15, 1, 97, 24, 25, 34, 2, 3, 5, 10, 2, 1, 1, 1]
         }
       ]
     }

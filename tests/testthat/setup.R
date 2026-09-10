@@ -21,7 +21,7 @@ if (Sys.getenv("R_COVR") == "true") {
 }
 
 # Automatically source all dataPrep helper functions before running tests
-helper_dir <- testthat::test_path("../../dataPrep/yellow_taxi_helpers")
+helper_dir <- testthat::test_path("../../data-raw/yellow_taxi_helpers")
 
 if (dir.exists(helper_dir)) {
   helper_files <- list.files(helper_dir, pattern = "\\.R$", full.names = TRUE)
