@@ -70,8 +70,8 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
 }
 
 #' Parent level server
-mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
-                                           data_version) {
+mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, config,
+                                           app_metadata, data_version) {
   moduleServer(id, function(input, output, session) {
     ############################################################################
     # 1-YEAR GUARDRAIL
@@ -138,14 +138,14 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
 
     mod_yellow_taxis_main_server(
       id = "yt_main",
-      rv_main_date_filtered_data, app_metadata,
+      rv_main_date_filtered_data, config, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )
 
     mod_yellow_taxis_heatmap_server(
       id = "yt_heat",
-      rv_main_date_filtered_data, app_metadata,
+      rv_main_date_filtered_data, config, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )

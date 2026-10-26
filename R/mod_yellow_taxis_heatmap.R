@@ -29,7 +29,7 @@ mod_yellow_taxis_heatmap_ui <- function(id, config) {
 }
 
 #'
-mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
+mod_yellow_taxis_heatmap_server <- function(id, filtered_data, config, app_metadata,
                                             data_version, start_date, end_date) {
   moduleServer(id, function(input, output, session) {
     ############################################################################

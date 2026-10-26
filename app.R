@@ -16,11 +16,11 @@ server <- function(input, output, session) {
 
   # Load modules
   mod_yellow_taxis_parent_server(
-    "yt_parent", yellow_taxi_data, app_metadata,
+    "yt_parent", yellow_taxi_data, config, app_metadata,
     yellow_data_version
   )
 
-  # mod_info_page_server("info_page")
+  # mod_info_page_server("info_page", config)
 
   # Show the warning modal 60 seconds before timeout
   observeEvent(input$idle_warning, {

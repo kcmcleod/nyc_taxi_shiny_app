@@ -23,7 +23,7 @@ mod_info_page_ui <- function(id) {
 }
 
 #' Info Page Module Server
-mod_info_page_server <- function(id) {
+mod_info_page_server <- function(id, config) {
   moduleServer(id, function(input, output, session) {
     # These read directly from the global environment established in global.R
     output$ui_text_appName <- renderText({
