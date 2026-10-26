@@ -107,7 +107,7 @@ sourceRFilesFromFolder <- function(folderPath) {
 # disable autoload of R folder using: touch R/_disable_autoload.R
 sourceRFilesFromFolder(paste0(codePath, "/R"))
 
-config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr = TRUE)
+config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr = FALSE)
 
 ################################################################################
 # DATA
