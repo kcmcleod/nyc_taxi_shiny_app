@@ -19,8 +19,7 @@ test_that("sf_trip_data - main chart", {
     "yt_parent-yt_main-pi_vendor" = "Myle Technologies Inc",
     "yt_parent-yt_main-pi_pay_type" = "Flex Fare trip"
   )
-  Sys.sleep(1.5)
-  app$wait_for_idle()
+  app$wait_for_idle(duration = 1000)
 
   app_data <- app$get_value(export = "yt_parent-yt_main-exported_main_chart_data")
   expect_true(!is.null(app_data))
@@ -45,8 +44,7 @@ test_that("sf_trip_data - heatmap chart", {
     "yt_parent-yt_heat-ri_heatmap_period" = "Combined",
     "yt_parent-di_date_range" = c("2026-01-01", "2026-03-31")
   )
-  Sys.sleep(1.5)
-  app$wait_for_idle()
+  app$wait_for_idle(duration = 1000)
 
   print(app$get_logs())
   app_data <- app$get_value(export = "yt_parent-yt_heat-exported_heatmap_data")
@@ -71,8 +69,7 @@ test_that("sf_trip_data - table", {
   app$set_inputs(
     "yt_parent-di_date_range" = c("2026-01-01", "2026-03-31")
   )
-  Sys.sleep(1.5)
-  app$wait_for_idle()
+  app$wait_for_idle(duration = 1000)
 
   print(app$get_logs())
   app_data <- app$get_value(export = "yt_parent-yt_table-exported_table_data")

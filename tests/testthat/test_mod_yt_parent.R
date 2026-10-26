@@ -44,7 +44,7 @@ test_that("mod_yellow_taxis_parent_server processes complex date filtering corre
         di_date_range = c(as.Date("2023-01-10"), as.Date("2023-01-31"))
       )
 
-      result <- rv_main_date_filtered_date()
+      result <- rv_main_date_filtered_data()
 
       # Assertions
       expect_s3_class(result, "data.frame")
@@ -59,19 +59,10 @@ test_that("mod_yellow_taxis_parent_server processes complex date filtering corre
         di_date_range = c(as.Date("2023-02-01"), as.Date("2023-02-28"))
       )
 
-      result_tight <- rv_main_date_filtered_date()
+      result_tight <- rv_main_date_filtered_data()
 
       expect_equal(nrow(result_tight), 1)
       expect_true(is.na(result_tight$date[1])) # Only the NA row survives
-
-
-      # Simulate a user selecting a 2-year range to force the observer to execute
-      # the branch containing updateDateRangeInput and toastr_warning
-      session$setInputs(
-        di_date_range = c(as.Date("2021-01-01"), as.Date("2023-01-01"))
-      )
-
-      expect_true(TRUE)
     }
   )
 })

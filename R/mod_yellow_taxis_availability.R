@@ -59,7 +59,7 @@ mod_yellow_taxis_availability_server <- function(id, app_metadata, config,
       req(app_metadata, input$pi_range)
 
       date_range <- input$pi_range
-      granularity <- ifelse(date_range == "Full data range", "Month", input$pi_level)
+      granularity <- if (date_range == "Full data range") "Month" else input$pi_level
 
       if (date_range == "Full data range") {
         start_date <- app_metadata$min_date
@@ -110,7 +110,7 @@ mod_yellow_taxis_availability_server <- function(id, app_metadata, config,
       )
 
       date_range <- input$pi_range
-      granularity <- ifelse(date_range == "Full data range", "Month", input$pi_level)
+      granularity <- if (date_range == "Full data range") "Month" else input$pi_level
 
       chart <- tryCatch(
         {

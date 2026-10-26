@@ -66,7 +66,7 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
     stop(err_msg)
   }
 
-  date_format_string <- ifelse(month_agg == TRUE, "%b %Y", "%d %b %Y")
+  date_format_string <- if (month_agg == TRUE) "%b %Y" else "%d %b %Y"
 
   main_data <- base_data |>
     filter(

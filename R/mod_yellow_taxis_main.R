@@ -77,11 +77,14 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
       vendor_list <- input$pi_vendor
       payment_list <- input$pi_pay_type
       time_period <- input$pi_level
-      month_agg <- ifelse(time_period == "Month", TRUE, FALSE)
-      week_agg <- ifelse(time_period == "Week", TRUE, FALSE)
-      data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance",
-        "total_distance", "total_number_trips"
-      )
+      month_agg <- (time_period == "Month")
+      week_agg <- (time_period == "Week")
+      data_field <- if (input$rb_journeys_or_passengers == "Total Distance") {
+        "total_distance"
+      } else {
+        "total_number_trips"
+      }
+
       split_by <- input$rb_split_by
 
       data <- fn_calculate_line_chart_data(
@@ -133,9 +136,11 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
         need(nrow(base_data) > 0, "No data for that query")
       )
 
-      y_lab_title <- ifelse(input$rb_journeys_or_passengers == "Total Distance",
-        "Distance in miles", "Total number of trips"
-      )
+      y_lab_title <- if (input$rb_journeys_or_passengers == "Total Distance") {
+        "Distance in miles"
+      } else {
+        "Total number of trips"
+      }
 
       chart <- tryCatch(
         {
