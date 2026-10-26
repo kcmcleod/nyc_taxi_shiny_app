@@ -66,10 +66,10 @@ appTitle <- "NYC Taxi"
 isLiveVersion <- grepl("live", codePath)
 
 if (isLiveVersion) {
-  appVersion <- paste0(
-    appTitle,
-    system("git describe --tags --abbrev=0", intern = TRUE)
-  )
+  # On shinyapps.io: Read the VERSION file baked in by GitHub Actions
+  raw_ver <- trimws(readLines(version_file, n = 1, warn = FALSE))
+  appVersion <- paste0(appTitle, "-", sub("^v", "", raw_ver))
+  folder <- "run"
 
   appVersion <- gsub("-v", "-", appVersion)
 
@@ -107,7 +107,6 @@ sourceRFilesFromFolder <- function(folderPath) {
   return(sapply(listOfFiles(folderPath), function(x) source(x)))
 }
 
-# disable autoload of R folder using: touch R/_disable_autoload.R
 sourceRFilesFromFolder(paste0(codePath, "/R"))
 
 config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr = FALSE)
