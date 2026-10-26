@@ -69,10 +69,11 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
     stop(err_msg)
   }
 
-  if (split_by == "Total") {
-    split_col <- ""
-  } else {
-    split_col <- ifelse(split_by == "Vendor", "Vendor", "payment_type")
+  group_vars <- "date"
+  if (split_by == "Vendor") {
+    group_vars <- c(group_vars, "Vendor")
+  } else if (split_by == "Payment Type") {
+    group_vars <- c(group_vars, "payment_type")
   }
 
   lazy_query <- base_data |>
@@ -82,9 +83,9 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
       Vendor %in% vendor_list,
       payment_type %in% payment_list
     ) |>
-    select(date, !!sym(split_col), all_of(data_field))
+    select(all_of(c(group_vars, data_field)))
 
-  # guardrail: dont want too many rows in data
+  # Guardrail: check number of rows before processing
   row_count <- lazy_query |>
     summarise(n = n()) |>
     collect() |>
@@ -98,9 +99,11 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
   }
 
   lazy_query |>
-    group_by(date, !!sym(split_col)) |>
+    group_by(across(all_of(group_vars))) |>
     summarise(
       total_value = sum(!!sym(data_field), na.rm = TRUE),
+      # total_value = sum(across(all_of(data_field)), na.rm = TRUE), # not supported by arrow
+      # total_value = sum(.data[[data_field]], na.rm = TRUE), # not supported by arrow
       .groups = "drop"
     ) |>
     collect() |>
@@ -182,25 +185,25 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
 
   if (split_by == "Total") {
     fig <- plot_ly(base_data,
-      x = ~ get(x_col), y = ~ get(y_col), type = "scattergl",
+      x = ~ .data[[x_col]], y = ~ .data[[y_col]], type = "scattergl",
       mode = "lines",
       line = list(color = config$colours$theme$primary_accent),
       name = "Total"
     )
   } else {
-    colour_col <- ifelse(split_by == "Vendor", "Vendor", "payment_type")
+    colour_col <- if (split_by == "Vendor") "Vendor" else "payment_type"
 
     fig <- plot_ly(base_data,
-      x = ~ get(x_col), y = ~ get(y_col),
-      color = as.formula(paste0("~`", colour_col, "`")),
+      x = ~ .data[[x_col]], y = ~ .data[[y_col]],
+      color = ~ .data[[colour_col]],
       type = "scattergl",
       mode = "lines"
     )
 
     # Calculate the grand total on the fly for the selected dates/filters
     total_data <- base_data |>
-      dplyr::group_by(.data[[x_col]]) |>
-      dplyr::summarise(!!y_col := sum(.data[[y_col]], na.rm = TRUE), .groups = "drop")
+      group_by(.data[[x_col]]) |>
+      summarise(!!y_col := sum(.data[[y_col]], na.rm = TRUE), .groups = "drop")
 
     # Add the Total line as a hidden trace
     fig <- fig |>
@@ -217,6 +220,8 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
       )
   }
 
+  unique_x_vals <- unique(base_data[[x_col]])
+
   fig <- fig |>
     layout(
       title = title,
@@ -224,8 +229,8 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
       xaxis = list(
         title = "Journey date",
         tickmode = "array",
-        tickvals = base_data[[x_col]],
-        ticktext = format(base_data[[x_col]], x_lab_format)
+        tickvals = unique_x_vals,
+        ticktext = format(unique_x_vals, x_lab_format)
       ),
       yaxis = list(
         title = y_lab_title
