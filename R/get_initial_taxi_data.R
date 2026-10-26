@@ -13,7 +13,7 @@ get_initial_taxi_data <- function(data_path) {
 
   log_info("READING DATA FROM ", latest_yellow_file)
   tDF <- arrow::open_dataset(latest_yellow_file)
-  log_info(".... ", nrow(tDF), " yellow rows read")
+  log_info(".... ", tDF$num_rows, " yellow rows read")
 
   return(tDF)
 }
