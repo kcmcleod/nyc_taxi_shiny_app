@@ -36,5 +36,5 @@ ram_bytes <- object.size(tDF)
 message("Total in-memory RAM: ", format(ram_bytes, units = "auto"))
 
 # Clean up memory
-rm(tDF_full)
+rm(tDF)
 gc()
