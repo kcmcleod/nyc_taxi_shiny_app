@@ -74,13 +74,22 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
       full_week_aggregation == week_agg,
       PULocation %in% pu_locations,
       DOLocation %in% do_locations
-    )
+    ) |>
+    group_by(date) |>
+    summarise(
+      # arrow doesnt support across in this version
+      .n_row_count = n(),
+      total_number_trips = sum(total_number_trips, na.rm = TRUE),
+      total_distance = sum(total_distance, na.rm = TRUE),
+      total_passenger_count = sum(total_passenger_count, na.rm = TRUE),
+      total_fare = sum(total_fare, na.rm = TRUE),
+      total_charges = sum(total_charges, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    collect()
 
-  # guardrail: dont want too many rows in data
-  row_count <- main_data |>
-    summarise(n = n()) |>
-    collect() |>
-    pull(n)
+  # Guardrail:
+  row_count <- sum(main_data$.n_row_count, na.rm = TRUE)
 
   if (row_count > row_limit) {
     message(row_count)
@@ -90,17 +99,7 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
   }
 
   main_data <- main_data |>
-    group_by(date) |>
-    summarise(
-      # not DRY cos arrow doesnt support across or anonymous
-      total_number_trips = sum(total_number_trips, na.rm = TRUE),
-      total_distance = sum(total_distance, na.rm = TRUE),
-      total_passenger_count = sum(total_passenger_count, na.rm = TRUE),
-      total_fare = sum(total_fare, na.rm = TRUE),
-      total_charges = sum(total_charges, na.rm = TRUE),
-      .groups = "drop"
-    ) |>
-    collect() |>
+    select(-.n_row_count) |>
     arrange(date) |>
     mutate(
       date = format(date, date_format_string),
@@ -114,10 +113,10 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
   )
 
   totals <- main_data |>
-    dplyr::summarise(
-      dplyr::across(all_of(metrics), \(x) sum(x, na.rm = TRUE))
+    summarise(
+      across(all_of(metrics), \(x) sum(x, na.rm = TRUE))
     ) |>
-    dplyr::mutate(date = "TOTALS")
+    mutate(date = "TOTALS")
 
   renamed_metrics <- c(
     "Date", "Trip Count", "Total Distance (miles)",
