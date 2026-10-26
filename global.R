@@ -1,6 +1,9 @@
 ################################################################################
 # PACKAGES
-suppressPackageStartupMessages(library("tidyverse"))
+suppressPackageStartupMessages(library("dplyr"))
+suppressPackageStartupMessages(library("tidyr"))
+suppressPackageStartupMessages(library("stringr"))
+suppressPackageStartupMessages(library("lubridate"))
 
 suppressPackageStartupMessages(library("shinyjs"))
 
