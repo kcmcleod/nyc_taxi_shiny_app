@@ -106,7 +106,7 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
 
     ############################################################################
     # TOP LEVEL DATA PROCESSING
-    rv_main_date_filtered_date <- reactive({
+    rv_main_date_filtered_data <- reactive({
       req(yellow_taxi_data(), input$di_date_range[1], input$di_date_range[2])
 
       user_start_date <- as.Date(input$di_date_range[1])
@@ -138,21 +138,21 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
 
     mod_yellow_taxis_main_server(
       id = "yt_main",
-      rv_main_date_filtered_date, app_metadata,
+      rv_main_date_filtered_data, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )
 
     mod_yellow_taxis_heatmap_server(
       id = "yt_heat",
-      rv_main_date_filtered_date, app_metadata,
+      rv_main_date_filtered_data, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )
 
     mod_yellow_taxis_table_server(
       id = "yt_table",
-      rv_main_date_filtered_date, app_metadata,
+      rv_main_date_filtered_data, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )
