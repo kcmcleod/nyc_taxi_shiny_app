@@ -14,7 +14,7 @@ library(readr)
 
 # 1. Load project environment & helper functions
 source("global.R")
-sourceRFilesFromFolder("dataPrep/yellow_taxi_helpers/")
+sourceRFilesFromFolder("data-raw/yellow_taxi_helpers/")
 
 # Ensure the testdata directory exists
 testdata_dir <- file.path("tests", "testdata")

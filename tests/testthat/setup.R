@@ -20,7 +20,7 @@ if (Sys.getenv("R_COVR") == "true") {
   log_fatal <- function(...) invisible()
 }
 
-# Automatically source all dataPrep helper functions before running tests
+# Automatically source all data-raw helper functions before running tests
 helper_dir <- testthat::test_path("../../data-raw/yellow_taxi_helpers")
 
 if (dir.exists(helper_dir)) {

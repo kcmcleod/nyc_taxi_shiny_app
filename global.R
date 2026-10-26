@@ -21,7 +21,7 @@ suppressPackageStartupMessages(library("scales"))
 
 ################################################################################
 # PATHS
-# Dynamically locate project root whether running from root, tests/, or dataPrep/
+# Dynamically locate project root whether running from root, tests/, or data-raw/
 codePath <- getwd()
 while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePath)) {
   codePath <- dirname(codePath)

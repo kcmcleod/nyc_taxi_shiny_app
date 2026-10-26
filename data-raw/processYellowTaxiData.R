@@ -8,7 +8,7 @@ library(data.table)
 library(logger)
 library(prettyunits)
 
-sourceRFilesFromFolder(paste0(getwd(), "/dataPrep/yellow_taxi_helpers/"))
+sourceRFilesFromFolder(paste0(getwd(), "/data-raw/yellow_taxi_helpers/"))
 
 ################################################################################
 # SETUP LOGGING

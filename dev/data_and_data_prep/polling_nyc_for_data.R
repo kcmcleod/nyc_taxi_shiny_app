@@ -25,7 +25,7 @@ if (file.exists(destination_path)) {
     message("Download complete. Triggering aggregation pipeline...")
 
     # Automatically kick off your processing script
-    source("dataPrep/processYellowTaxiData.R")
+    source("data-raw/processYellowTaxiData.R")
   } else {
     message("File not published by NYC TLC yet. Status code: ", status_code(response))
   }
