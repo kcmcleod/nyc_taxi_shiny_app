@@ -76,7 +76,12 @@ log_info("Found ", length(new_files), " files to process...")
 combinedDF <- NULL
 expected_cols <- NULL
 
-new_files <- new_files[1:15]
+# reduce number of files for easy local processing
+new_files <- head(new_files, config$data_processing$max_num_of_parquet_to_process)
+
+res_list <- vector("list", length(new_files))
+i <- 1 # loop counter
+row_count <- 0 # accumulating number of rows processed
 
 for (file in new_files) {
   log_info("Processing file: ", file)
@@ -92,17 +97,17 @@ for (file in new_files) {
         Month = as.integer(substr(file_month_str, 6, 7))
       )
 
-    if (is.null(combinedDF)) {
-      combinedDF <- tmp
-      expected_cols <- names(tmp)
-    } else {
-      # should ignore any extra cols
-      combinedDF <- as_tibble(rbindlist(list(combinedDF, tmp), fill = TRUE))
-    }
+    res_list[[i]] <- tmp
+    i <- 1 + 1
+    row_count <- row_count + nrow(i)
+
     remove(tmp)
-    log_info("size of combined data is now: ", nrow(combinedDF))
+    log_info("size of combined data is now: ", row_count)
   }
 }
+
+# make combined DF Ignoring extra cols
+combinedDF <- as_tibble(rbindlist(res_list, fill = TRUE))
 
 if (is.null(combinedDF) || nrow(combinedDF) == 0) {
   log_error("Failed to extract any valid data from the new files. STOPPING!")
