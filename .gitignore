@@ -13,3 +13,5 @@ dev_data_folder
 shared_app_cache
 .Renviron
 data
+coverage_report.html
+lib

@@ -15,9 +15,9 @@ test: ## Run testhat and shinytests2
 
 coverage: ## Run dedicated covr 
 	Rscript dev/testing/coverage.R
+
 	
 ##@ Misc	
-
 
 prune: ## Clean local repo
 	Rscript dev/clean_local_git.R

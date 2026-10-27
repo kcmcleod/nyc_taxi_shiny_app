@@ -14,4 +14,20 @@ cov_results <- covr::file_coverage(
   test_files = unit_tests
 )
 
-covr::report(cov_results)
+# save report so it can be seen from make
+report_path <- file.path(getwd(), "coverage_report.html")
+covr::report(cov_results, file = report_path, browse = FALSE)
+
+if (interactive()) {
+  viewer <- getOption("viewer", utils::browseURL)
+  viewer(report_path)
+} else if (Sys.getenv("CI") == "") {
+  sys_name <- Sys.info()[["sysname"]]
+  if (sys_name == "Darwin") {
+    system2("open", shQuote(report_path), wait = FALSE)
+  } else if (sys_name == "Windows") {
+    shell.exec(report_path)
+  } else if (sys_name == "Linux" && nzchar(Sys.which("xdg-open"))) {
+    system2("xdg-open", shQuote(report_path), wait = FALSE)
+  }
+}
