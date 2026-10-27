@@ -6,11 +6,6 @@ library(testthat)
 library(dplyr)
 library(logger)
 
-# Silence loggers during testthat / covr execution
-if (Sys.getenv("R_COVR") == "true") {
-  if (exists("log_info", mode = "function")) log_info <- function(...) invisible()
-  if (exists("log_error", mode = "function")) log_error <- function(...) invisible()
-}
 
 # ------------------------------------------------------------------------------
 # 1. SETUP: Tiny In-Memory Mock Lookups

@@ -2,17 +2,6 @@ library(testthat)
 library(dplyr)
 library(logger)
 
-# Prevent logger from crashing the covr sandbox
-if (Sys.getenv("R_COVR") == "true") {
-  environment(get_initial_taxi_data)$log_info <- function(...) invisible()
-  environment(get_initial_taxi_data)$log_error <- function(...) invisible()
-  environment(get_initial_taxi_data_aws)$log_info <- function(...) invisible()
-  environment(get_initial_taxi_data_aws)$log_error <- function(...) invisible()
-  environment(get_initial_taxi_metadata)$log_info <- function(...) invisible()
-  environment(get_initial_taxi_metadata)$log_error <- function(...) invisible()
-}
-
-log_threshold(FATAL)
 
 # --- SETUP: Ensure test data directory and files exist for testmode ---
 # Because testthat runs inside tests/testthat/, we create the directory structure here if missing

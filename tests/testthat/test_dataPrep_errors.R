@@ -2,16 +2,6 @@ library(testthat)
 library(dplyr)
 library(logger)
 
-# Neutralize all logger levels inside the covr sandbox so namespace lookups don't crash
-if (Sys.getenv("R_COVR") == "true") {
-  log_info <- function(...) invisible()
-  log_warn <- function(...) invisible()
-  log_error <- function(...) invisible()
-  log_debug <- function(...) invisible()
-  log_fatal <- function(...) invisible()
-}
-
-
 test_that("fn_validate_columns triggers all defensive and warning branches", {
   df <- data.frame(col_a = 1, col_b = 2, col_c = 3)
 

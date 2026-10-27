@@ -11,15 +11,6 @@ if (file.exists(global_path)) {
   source(global_path, local = FALSE)
 }
 
-# stop covr creating issues with logger
-if (Sys.getenv("R_COVR") == "true") {
-  log_info <- function(...) invisible()
-  log_warn <- function(...) invisible()
-  log_error <- function(...) invisible()
-  log_debug <- function(...) invisible()
-  log_fatal <- function(...) invisible()
-}
-
 # Automatically source all data-raw helper functions before running tests
 helper_dir <- testthat::test_path("../../data-raw/yellow_taxi_helpers")
 
@@ -29,3 +20,10 @@ if (dir.exists(helper_dir)) {
     source(file, local = FALSE)
   }
 }
+
+# stop covr creating issues with logger & keeps the testing output clean
+log_info <- function(...) invisible()
+log_warn <- function(...) invisible()
+log_error <- function(...) invisible()
+log_debug <- function(...) invisible()
+log_fatal <- function(...) invisible()

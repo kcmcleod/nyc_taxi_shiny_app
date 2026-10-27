@@ -3,13 +3,6 @@ library(dplyr)
 library(plotly)
 library(lubridate)
 
-if (Sys.getenv("R_COVR") == "true") {
-  environment(fn_calculate_availability_data)$log_info <- function(...) invisible()
-  environment(fn_calculate_availability_data)$log_error <- function(...) invisible()
-  environment(fn_generate_availability_chart)$log_info <- function(...) invisible()
-  environment(fn_generate_availability_chart)$log_error <- function(...) invisible()
-}
-
 
 # ==============================================================================
 # MOCK DATA & CONFIGURATION
