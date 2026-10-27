@@ -24,7 +24,13 @@ mock_taxi_data <- tibble::tibble(
 # 2. AGGREGATED DATA (Used for testing fn_generate_main_line_chart)
 mock_chart_data <- data.frame(
   journey_date = as.Date(c("2023-01-01", "2023-02-01", "2023-03-01")),
-  total_volume = c(100, 150, 200)
+  total_value = c(100, 150, 200)
+)
+
+mock_chart_data_vendor <- data.frame(
+  journey_date = as.Date(c("2023-01-01", "2023-02-01", "2023-03-01")),
+  Vendor = c("VTS", "VTS", "CMT"),
+  total_value = c(100, 150, 200)
 )
 
 # 3. CONFIGURATION
@@ -80,6 +86,31 @@ test_that("fn_calculate_line_chart_data handles strict filtering correctly", {
   expect_equal(result$total_value[result$date == as.Date("2023-01-01")], 2)
   # 2023-01-02 VTS Cash has 1 trip
   expect_equal(result$total_value[result$date == as.Date("2023-01-02")], 1)
+})
+
+test_that("fn_calculate_line_chart_data correctly filters and sums data - Payment Type", {
+  # Action: Run the function with standard inputs
+  result <- fn_calculate_line_chart_data(
+    base_data = mock_taxi_data,
+    vendor_list = c("VTS", "CMT"),
+    payment_list = c("Cash", "Credit"),
+    month_agg = TRUE,
+    week_agg = FALSE,
+    data_field = "total_distance",
+    split_by = "Payment Type"
+  )
+
+  # Assertions
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 3)
+  expect_equal(names(result), c("date", "payment_type", "total_value"))
+
+  # 2023-01-01 2 results 1st for cash and 2nd for credit card
+  expect_equal(result$total_value[result$date == as.Date("2023-01-01")], c(10, 15))
+
+  # 2023-01-02 only cash result (NA so 0 expected) as 2nd entry for this
+  # date for weekly not monthly agg
+  expect_equal(result$total_value[result$date == as.Date("2023-01-02")], 0)
 })
 
 test_that("fn_calculate_line_chart_data returns empty dataframe when no match is found", {
@@ -215,7 +246,7 @@ test_that("fn_generate_main_line_chart generates a valid plotly object", {
     base_data = mock_chart_data,
     granularity = "Month",
     x_col = "journey_date",
-    y_col = "total_volume",
+    y_col = "total_value",
     title = "Test Chart",
     y_lab_title = "Volume",
     split_by = "Total",
@@ -235,12 +266,37 @@ test_that("fn_generate_main_line_chart generates a valid plotly object", {
 })
 
 
+test_that("fn_generate_main_line_chart generates a valid plotly object - Vendor", {
+  raw_fig <- fn_generate_main_line_chart(
+    base_data = mock_chart_data_vendor,
+    granularity = "Month",
+    x_col = "journey_date",
+    y_col = "total_value",
+    title = "Test Chart",
+    y_lab_title = "Volume",
+    split_by = "Vendor",
+    config = mock_config
+  )
+
+  # Force Plotly to compile the lazy object into its final list structure
+  built_fig <- suppressWarnings(plotly::plotly_build(raw_fig))
+
+  # Assertions
+  expect_s3_class(raw_fig, "plotly")
+  expect_s3_class(raw_fig, "htmlwidget")
+
+  # Verify the internal structure contains the data using the BUILT figure
+  expect_true(!is.null(built_fig$x$data[[1]]$x))
+  expect_true(!is.null(built_fig$x$data[[1]]$y))
+})
+
+
 test_that("fn_generate_main_line_chart defensive blocks execute", {
   # Non-dataframe validation
-  bad_data <- list(journey_date = c("2023-01-01"), total_volume = c(100))
+  bad_data <- list(journey_date = c("2023-01-01"), total_value = c(100))
   expect_error(
     fn_generate_main_line_chart(
-      bad_data, "Month", "journey_date", "total_volume",
+      bad_data, "Month", "journey_date", "total_value",
       "Test Chart", "Volume", "Total", mock_config
     ),
     regexp = "System Error: The underlying data source"
@@ -250,7 +306,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       mock_chart_data, "Month", "journey_date",
-      "total_volume", 12345, "Volume", "Total", mock_config
+      "total_value", 12345, "Volume", "Total", mock_config
     ),
     regexp = "System Error: Please supply a valid title for the chart$"
   )
@@ -259,7 +315,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       mock_chart_data, "Month", "journey_date",
-      "total_volume", "Test Chart", NULL, "Total", mock_config
+      "total_value", "Test Chart", NULL, "Total", mock_config
     ),
     regexp = "System Error: Please supply a valid title for the chart's y-axis"
   )
@@ -268,7 +324,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
   expect_error(
     fn_generate_main_line_chart(
       mock_chart_data, "Year", "journey_date",
-      "total_volume", "Test Chart", "Volume", "Total", mock_config
+      "total_value", "Test Chart", "Volume", "Total", mock_config
     ),
     regexp = "System Error: Selected granularity is not permitted"
   )
@@ -287,7 +343,7 @@ test_that("fn_generate_main_line_chart defensive blocks execute", {
       base_data = mock_chart_data,
       granularity = "Month",
       x_col = "journey_date",
-      y_col = "total_volume",
+      y_col = "total_value",
       title = "Test Chart",
       y_lab_title = "Volume",
       split_by = "banana",
