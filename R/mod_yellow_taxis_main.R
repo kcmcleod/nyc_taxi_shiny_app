@@ -67,10 +67,10 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
   moduleServer(id, function(input, output, session) {
     ################################################################################
     # DATA
-    rv_main_chart_filtered_data_raw <- reactive({
+    rv_main_chart_filtered_data <- reactive({
       req(
         filtered_data(), input$pi_vendor, input$pi_pay_type,
-        input$pi_level, input$rb_split_by
+        input$pi_level, input$rb_split_by, input$rb_journeys_or_passengers
       )
 
       base_data <- filtered_data()
@@ -95,11 +95,20 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
       return(data)
     })
 
-    rv_main_chart_filtered_data <- debounce(rv_main_chart_filtered_data_raw, 800)
 
     ############################################################################
     # CHART
     output$po_tripVolumesOverTime <- renderPlotly({
+      base_data <- tryCatch(
+        {
+          rv_main_chart_filtered_data()
+        },
+        error = function(e) {
+          toastr_error(e$message)
+          return(NULL)
+        }
+      )
+
       # User-facing validations for interactive selections
       validate(
         need(
@@ -118,15 +127,6 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
              Please select exactly one time period.")
       )
 
-      base_data <- tryCatch(
-        {
-          rv_main_chart_filtered_data()
-        },
-        error = function(e) {
-          toastr_error(e$message)
-          return(NULL)
-        }
-      )
 
       validate(
         need(!is.null(base_data), "Chart unavailable due to data error")
@@ -172,6 +172,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
         input$pi_level,
         input$rb_split_by
       )
+
 
     ############################################################################
     # EXPORT FOR TESTING
