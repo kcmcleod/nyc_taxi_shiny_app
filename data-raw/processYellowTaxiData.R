@@ -7,6 +7,9 @@ library(arrow)
 library(data.table)
 library(logger)
 library(prettyunits)
+library(tidyr)
+library(readr)
+library(tibble)
 
 sourceRFilesFromFolder(paste0(getwd(), "/data-raw/yellow_taxi_helpers/"))
 
@@ -16,6 +19,7 @@ log_name <- paste0(dataPath, "logs/", format(Sys.time(), "%Y%m%d_%H%M"), "_yello
 log_appender(appender_tee(log_name))
 log_threshold(INFO)
 log_info("STARTING TO PROCESS YELLOW DATA")
+
 
 ################################################################################
 # GETTING EXISTING PROCESSED DATA
@@ -64,7 +68,6 @@ if (length(new_files) == 0) {
   log_info("Finished! This took: ", pretty_ms(as.numeric(total_time, units = "secs") * 1000))
   message("GOOD BYE!")
 
-  # Note: Use q() or stop() here depending on your pipeline runner, return(NULL) is fine if this is a function.
   stop("Pipeline up to date", call. = FALSE)
 }
 
@@ -72,95 +75,120 @@ log_info("Found ", length(new_files), " files to process...")
 
 
 ################################################################################
+# CHECKING LOOKUPS EXIST
+
+zone_lkup_file <- paste0(dataPath, "src/taxi_zone_lookup.csv")
+rate_lkup_file <- paste0(dataPath, "src/rate_code_lookup.csv")
+payment_lkup_file <- paste0(dataPath, "src/payment_type_lookup.csv")
+vendor_lkup_file <- paste0(dataPath, "src/vendor_lookup.csv")
+
+all_lkups <- c(zone_lkup_file, rate_lkup_file, payment_lkup_file, vendor_lkup_file)
+missing_files <- all_lkups[!file.exists(all_lkups)]
+
+if (length(missing_files) > 0) {
+  log_error(paste0("Lookup files are missing: ", paste0(missing_files, collapse = ", ")))
+  stop("Missing lookup files!")
+}
+
+
+################################################################################
 # LOOP THRU DATA FILES
 combinedDF <- NULL
 expected_cols <- NULL
 
-# reduce number of files for easy local processing
-new_files <- head(new_files, config$data_processing$max_num_of_parquet_to_process)
+# groups files into batches
+batch_size <- config$data_processing$max_num_of_parquet_to_process
+file_batches <- split(new_files, ceiling(seq_along(new_files) / batch_size))
 
-res_list <- vector("list", length(new_files))
-i <- 1 # loop counter
-row_count <- 0 # accumulating number of rows processed
+log_info(paste0(
+  "Processing ", length(new_files), " files across ",
+  length(file_batches), " in batches of up to ", batch_size, "files."
+))
 
-for (file in new_files) {
-  log_info("Processing file: ", file)
-  tmp <- fn_process_yellow_file(file)
-
-  if (!is.null(tmp) && is_tibble(tmp)) {
-    # use for partitioning later
-    file_month_str <- str_match(file, pattern = "\\d{4}-\\d{2}")[1]
-
-    tmp <- tmp |>
-      mutate(
-        Year = as.integer(substr(file_month_str, 1, 4)),
-        Month = as.integer(substr(file_month_str, 6, 7))
-      )
-
-    res_list[[i]] <- tmp
-    i <- 1 + 1
-    row_count <- row_count + nrow(i)
-
-    remove(tmp)
-    log_info("size of combined data is now: ", row_count)
-  }
-}
-
-# make combined DF Ignoring extra cols
-combinedDF <- as_tibble(rbindlist(res_list, fill = TRUE))
-
-if (is.null(combinedDF) || nrow(combinedDF) == 0) {
-  log_error("Failed to extract any valid data from the new files. STOPPING!")
-  stop("No valid data processed", call. = FALSE)
-}
-
-################################################################################
-# SORT
+# set up & load lookups
 sort_cols <- c("full_month_aggregation", "full_week_aggregation", "date")
-combinedDF <- arrange(combinedDF, across(all_of(sort_cols)))
 
-################################################################################
-# LOOKUPS
-# todo need to check files exists
-
-log_info("Starting to join lookups...")
-
-zone_lookups <- read_csv(paste0(dataPath, "src/taxi_zone_lookup.csv")) |>
-  select("LocationID", "Borough")
-rate_lookups <- read_csv(paste0(dataPath, "src/rate_code_lookup.csv"), col_types = c("ic"))
-payment_lookups <- read_csv(paste0(dataPath, "src/payment_type_lookup.csv"), col_types = c("ic"))
-vendor_lookups <- read_csv(paste0(dataPath, "src/vendor_lookup.csv"), col_types = c("ic"))
-
-combinedDF <- fn_perform_joins(
-  combinedDF, zone_lookups, rate_lookups,
-  payment_lookups, vendor_lookups
-)
-
-
-################################################################################
-# WRITE NEW ASSET
-
-log_info("Writing new partitioned data asset...")
-
-# Create partition columns from the og file name
-combinedDF <- combinedDF |>
-  group_by(Year, Month)
-
-# Define the folder path instead of a file path
 partition_dir <- paste0(dataPath, "yellow_aggregation_partitioned")
 
-# Write the partitioned dataset
-write_dataset(
-  dataset = combinedDF,
-  path = partition_dir,
-  format = "parquet",
-  # Dec data is split between Dec and Jan file so to handle this we create 2 files
-  basename_template = paste0("run_", format(Sys.time(), "%Y%m%d_%H%M%S"), "-{i}.parquet")
-)
+zone_lookups <- read_csv(zone_lkup_file) |>
+  select("LocationID", "Borough")
+rate_lookups <- read_csv(rate_lkup_file, col_types = c("ic"))
+payment_lookups <- read_csv(payment_lkup_file, col_types = c("ic"))
+vendor_lookups <- read_csv(vendor_lkup_file, col_types = c("ic"))
 
-log_info("Partitioned data successfully written to: ", partition_dir)
 
-gc()
+# running batches
+for (b_idx in seq_along(file_batches)) {
+  log_info(paste0("--- Starting Batch ", b_idx, " of ", length(file_batches), " ---"))
+  batch_files <- file_batches[[b_idx]]
+
+  res_list <- vector("list", length(batch_files))
+  row_count <- 0L # accumulating number of rows processed
+
+  for (i in seq_along(batch_files)) {
+    file <- batch_files[[i]]
+    log_info("Processing file: ", file)
+    tmp <- fn_process_yellow_file(file)
+
+    if (!is.null(tmp) && is_tibble(tmp)) {
+      # use for partitioning later
+      file_month_str <- str_match(file, pattern = "\\d{4}-\\d{2}")[1]
+
+      tmp <- tmp |>
+        mutate(
+          Year = as.integer(substr(file_month_str, 1, 4)),
+          Month = as.integer(substr(file_month_str, 6, 7))
+        )
+
+      res_list[[i]] <- tmp
+      row_count <- row_count + nrow(tmp)
+
+      remove(tmp)
+      log_info("size of combined data is now: ", row_count)
+    }
+  }
+
+  # make combined DF Ignoring extra cols
+  combinedDF <- as_tibble(rbindlist(res_list, fill = TRUE)) |>
+    filter(!is.na(date))
+
+  remove(res_list)
+
+  if (is.null(combinedDF) || nrow(combinedDF) == 0) {
+    log_warn(paste0("Batch ", b_idx, " produced 0 valid rows. Skipping write."))
+    next
+  }
+
+  # SORT
+  combinedDF <- arrange(combinedDF, across(all_of(sort_cols)))
+
+  # LOOKUPS
+  combinedDF <- fn_perform_joins(
+    combinedDF, zone_lookups, rate_lookups,
+    payment_lookups, vendor_lookups
+  )
+
+  # PARTITION FOR WRITING PARQUET
+  combinedDF <- combinedDF |>
+    group_by(Year, Month)
+
+  log_info(paste0("Writing Batch ", b_idx, " to partitioned dataset..."))
+  write_dataset(
+    dataset = combinedDF,
+    path = partition_dir,
+    format = "parquet",
+    # some of the Dec data is delayed till the Jan file from next year
+    # ensure the data from the Dec file isnt overwritten when we process Jan data
+    basename_template = paste0(
+      "run_", format(Sys.time(), "%Y%m%d_%H%M%S"),
+      "_b", b_idx, "-{i}.parquet"
+    )
+  )
+
+  remove(combinedDF)
+  gc()
+  log_info(paste0("--- Finished Batch ", b_idx, " --- "))
+}
 
 
 ################################################################################
@@ -195,15 +223,22 @@ yellow_taxi_meta_data <- list(
   "daily_volumes" = daily_volumes
 )
 
-saveRDS(yellow_taxi_meta_data, file = paste0(
-  paste0(getwd(), "/app_data/"),
-  format(Sys.Date(), "%Y%m%d"), "_yellow_metadata.rds"
-))
+# save metadate object used by shiny for faster loading
+app_data_dir <- file.path(codePath, "app_data")
+if (!dir.exists(app_data_dir)) dir.create(app_data_dir, recursive = TRUE)
+
+old_meta <- list.files(app_data_dir, pattern = "_yellow_metadata\\.rds$", full.names = TRUE)
+if (length(old_meta) > 0) file.remove(old_meta)
+
+saveRDS(
+  yellow_taxi_meta_data,
+  file = file.path(app_data_dir, paste0(format(Sys.Date(), "%Y%m%d"), "_yellow_metadata.rds"))
+)
 
 
 ################################################################################
 # BYE TIME!
-remove(combinedDF)
+remove(yellow_taxi_meta_data)
 gc()
 
 total_time <- Sys.time() - start_time
