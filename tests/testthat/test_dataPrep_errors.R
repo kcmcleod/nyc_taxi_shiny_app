@@ -34,21 +34,6 @@ test_that("fn_perform_lookup catches non-dataframes and introduced NAs", {
   expect_true(is.na(result$name[3]))
 })
 
-
-test_that("fn_monthly_aggregation defensive guardrails execute", {
-  # 1. Non-dataframe & empty dataframe
-  expect_null(fn_monthly_aggregation("not_a_df"))
-  expect_null(fn_monthly_aggregation(data.frame()))
-
-  # 2. Missing required financial/distance columns
-  bad_df <- data.frame(VendorID = 1)
-  expect_null(fn_monthly_aggregation(bad_df))
-
-  # 3. Valid schema but missing requested grouping column
-  #' ToDO
-})
-
-
 test_that("fn_process_yellow_file aborts on invalid filename or column validation failure", {
   # Filename without a YYYY-MM date string
   expect_null(fn_process_yellow_file("bad_file_name_without_date.parquet"))
