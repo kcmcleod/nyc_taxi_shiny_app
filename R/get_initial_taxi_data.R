@@ -1,7 +1,7 @@
 get_initial_taxi_data <- function(data_path) {
   if (isTRUE(getOption("shiny.testmode"))) {
     log_info(".... loading TEST data !")
-    return(base::readRDS("tests/testdata/mock_taxi_trips.rds"))
+    return(base::readRDS(paste0(codePath, "/tests/testdata/mock_taxi_trips.rds")))
   }
 
   latest_yellow_file <- file.path(data_path, "yellow_aggregation_partitioned")
@@ -22,7 +22,7 @@ get_initial_taxi_data_aws <- function() {
   # TEST MODE: Automatically triggered by shinytest2
   if (isTRUE(getOption("shiny.testmode"))) {
     log_info(".... loading TEST data !")
-    return(base::readRDS("tests/testdata/mock_taxi_trips.rds"))
+    return(base::readRDS(paste0(codePath, "/tests/testdata/mock_taxi_trips.rds")))
   }
 
   # PROD MODE
@@ -63,7 +63,7 @@ get_initial_taxi_data_aws <- function() {
 get_initial_taxi_metadata <- function(data_path) {
   if (isTRUE(getOption("shiny.testmode"))) {
     log_info(".... loading TEST metadata !")
-    return(base::readRDS("tests/testdata/yellow_metadata.rds"))
+    return(base::readRDS(paste0(codePath, "/tests/testdata/yellow_metadata.rds")))
   }
 
   all_yellow_metadata <- list.files(data_path, pattern = "yellow.*rds", full.names = TRUE)

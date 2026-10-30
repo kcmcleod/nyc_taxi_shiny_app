@@ -1,8 +1,6 @@
 offline_data_prep <- TRUE
-
 source(paste0(getwd(), "/global.R"))
 
-dataPath <- "/Users/kcm/data/shiny_data/build/NYC Taxi/"
 
 # CHECKING FOR FILES TO PROCESS
 all_yellow_files <- list.files(
