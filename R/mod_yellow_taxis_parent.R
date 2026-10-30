@@ -112,13 +112,21 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, config,
       user_start_date <- as.Date(input$di_date_range[1])
       user_end_date <- as.Date(input$di_date_range[2])
 
+      # Calculate earliest possible date needed (accounting for monthly/weekly snapping)
+      min_required_date <- min(
+        lubridate::floor_date(user_start_date, "month"),
+        lubridate::floor_date(user_start_date, "week", week_start = 7)
+      )
+      start_yr <- lubridate::year(min_required_date)
+      end_yr <- lubridate::year(user_end_date)
+
       tmpDF <- yellow_taxi_data() |>
         filter(
-          # allows dates with a missing value
-          is.na(date) |
-
-            (!full_month_aggregation & !full_week_aggregation &
-              date >= user_start_date & date <= user_end_date) |
+          # Aggressively trim via Year first AFTER ETL upgraded
+          Year >= start_yr,
+          Year <= end_yr,
+          (!full_month_aggregation & !full_week_aggregation &
+            date >= user_start_date & date <= user_end_date) |
 
             # Monthly Data: Snap the user's start date to the 1st of the month
             # due to the data prep using the 1st of the month as the date

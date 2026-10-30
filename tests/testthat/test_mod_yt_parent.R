@@ -4,16 +4,16 @@ library(dplyr)
 library(lubridate)
 
 mock_parent_data <- tibble::tibble(
-  id = 1:5,
+  id = 1:4,
+  Year = c(2023L, 2023L, 2023L, 2022L),
   date = as.Date(c(
-    NA, # Condition 1: Missing dates
-    "2023-01-15", # Condition 2: Daily data (Middle of Jan)
-    "2023-01-01", # Condition 3: Monthly data (1st of Jan)
-    "2023-01-08", # Condition 4: Weekly data (Starts on a Sunday)
-    "2022-01-01" # Condition 5: Out of bounds (Should be filtered out)
+    "2023-01-15", # Daily data (Middle of Jan)
+    "2023-01-01", # Monthly data (1st of Jan)
+    "2023-01-08", # Weekly data (Starts on a Sunday)
+    "2022-01-01" # Out of bounds (Should be filtered out)
   )),
-  full_month_aggregation = c(FALSE, FALSE, TRUE, FALSE, FALSE),
-  full_week_aggregation = c(FALSE, FALSE, FALSE, TRUE, FALSE)
+  full_month_aggregation = c(FALSE, TRUE, FALSE, FALSE),
+  full_week_aggregation = c(FALSE, FALSE, TRUE, FALSE)
 )
 
 mock_metadata <- list(
@@ -48,21 +48,20 @@ test_that("mod_yellow_taxis_parent_server processes complex date filtering corre
 
       # Assertions
       expect_s3_class(result, "data.frame")
-      expect_equal(nrow(result), 4) # Rows 1, 2, 3, and 4 should be kept
-      expect_false(5 %in% result$id) # Row 5 (2022) must be dropped
+      expect_equal(nrow(result), 3) # Rows 1, 2, & 3 should be kept
+      expect_false(4 %in% result$id) # Row 4 (2022) must be dropped
 
 
       # Push the start date to Feb 1st.
       # Now, the Jan 15th (daily), Jan 1st (monthly), and Jan 8th (weekly) rows
-      # should all fail the filter. Only the NA row should remain.
+      # should all fail the filter.Nothing should remain
       session$setInputs(
         di_date_range = c(as.Date("2023-02-01"), as.Date("2023-02-28"))
       )
 
       result_tight <- rv_main_date_filtered_data()
 
-      expect_equal(nrow(result_tight), 1)
-      expect_true(is.na(result_tight$date[1])) # Only the NA row survives
+      expect_equal(nrow(result_tight), 0) # No NAs
     }
   )
 })
