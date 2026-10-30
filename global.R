@@ -62,17 +62,13 @@ if (!exists("offline_data_prep")) {
 ################################################################################
 # APP INFO
 appTitle <- "NYC Taxi"
-
-isLiveVersion <- grepl("live", codePath)
+version_file <- file.path(codePath, "VERSION")
+isLiveVersion <- file.exists(version_file)
 
 if (isLiveVersion) {
   # On shinyapps.io: Read the VERSION file baked in by GitHub Actions
   raw_ver <- trimws(readLines(version_file, n = 1, warn = FALSE))
   appVersion <- paste0(appTitle, "-", sub("^v", "", raw_ver))
-  folder <- "run"
-
-  appVersion <- gsub("-v", "-", appVersion)
-
   folder <- "run"
 } else {
   res <- stringr::str_match(codePath, "[0-9]+$")[1, 1]
@@ -117,7 +113,7 @@ config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr
 # no need to load data if only doing local data processing
 if (!exists("offline_data_prep")) {
   # Load the pre-computed metadata
-  app_metadata <- get_initial_taxi_metadata(data_path = paste0(getwd(), "/app_data/"))
+  app_metadata <- get_initial_taxi_metadata(data_path = paste0(codePath, "/app_data/"))
 
   # save aws bill if running locally
   if (Sys.getenv("DEPLOY_ENV") == "DEVELOPER") {
