@@ -22,6 +22,7 @@ if (dir.exists(helper_dir)) {
 }
 
 # stop covr creating issues with logger & keeps the testing output clean
+logger::log_threshold(logger::FATAL)
 log_info <- function(...) invisible()
 log_warn <- function(...) invisible()
 log_error <- function(...) invisible()
