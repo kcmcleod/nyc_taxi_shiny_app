@@ -8,7 +8,9 @@ target_date <- Sys.Date() %m-% months(2)
 year_month <- format(target_date, "%Y-%m")
 
 file_url <- paste0("https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_", year_month, ".parquet")
-destination_path <- paste0(Sys.getenv("HOME"), "/data/nyc_taxi/yellow_tripdata_", year_month, ".parquet")
+src_dir <- file.path(dataPath, "src")
+if (!dir.exists(src_dir)) dir.create(src_dir, recursive = TRUE)
+destination_path <- paste0(src_dir, "/yellow_tripdata_", year_month, ".parquet")
 
 # Check if we already have it locally
 if (file.exists(destination_path)) {
