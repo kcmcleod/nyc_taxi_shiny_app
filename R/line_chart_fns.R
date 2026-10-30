@@ -76,20 +76,27 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
     group_vars <- c(group_vars, "payment_type")
   }
 
-  lazy_query <- base_data |>
+  main_data <- base_data |>
     filter(
       full_month_aggregation == month_agg,
       full_week_aggregation == week_agg,
       Vendor %in% vendor_list,
       payment_type %in% payment_list
     ) |>
-    select(all_of(c(group_vars, data_field)))
+    select(all_of(c(group_vars, data_field))) |>
+    group_by(across(all_of(group_vars))) |>
+    summarise(
+      .n_row_count = n(),
+      total_value = sum(!!sym(data_field), na.rm = TRUE),
+      # total_value = sum(across(all_of(data_field)), na.rm = TRUE), # not supported by arrow
+      # total_value = sum(.data[[data_field]], na.rm = TRUE), # not supported by arrow
+      .groups = "drop"
+    ) |>
+    collect() |>
+    arrange(date)
 
   # Guardrail: check number of rows before processing
-  row_count <- lazy_query |>
-    summarise(n = n()) |>
-    collect() |>
-    pull(n)
+  row_count <- sum(main_data$.n_row_count, na.rm = TRUE)
 
   if (row_count > row_limit) {
     message(row_count)
@@ -98,16 +105,10 @@ fn_calculate_line_chart_data <- function(base_data, vendor_list, payment_list,
     stop(err_msg)
   }
 
-  lazy_query |>
-    group_by(across(all_of(group_vars))) |>
-    summarise(
-      total_value = sum(!!sym(data_field), na.rm = TRUE),
-      # total_value = sum(across(all_of(data_field)), na.rm = TRUE), # not supported by arrow
-      # total_value = sum(.data[[data_field]], na.rm = TRUE), # not supported by arrow
-      .groups = "drop"
-    ) |>
-    collect() |>
-    arrange(date)
+
+  main_data <- select(main_data, -.n_row_count)
+
+  return(main_data)
 }
 
 ################################################################################
@@ -194,7 +195,8 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
     colour_col <- if (split_by == "Vendor") "Vendor" else "payment_type"
 
     fig <- plot_ly(base_data,
-      x = ~ .data[[x_col]], y = ~ .data[[y_col]],
+      x = ~ .data[[x_col]],
+      y = ~ .data[[y_col]],
       color = ~ .data[[colour_col]],
       type = "scattergl",
       mode = "lines"
@@ -209,8 +211,8 @@ fn_generate_main_line_chart <- function(base_data, granularity, x_col, y_col,
     fig <- fig |>
       plotly::add_trace(
         data = total_data,
-        x = as.formula(paste0("~", x_col)),
-        y = as.formula(paste0("~", y_col)),
+        x = ~ .data[[x_col]],
+        y = ~ .data[[y_col]],
         type = "scattergl",
         mode = "lines",
         name = "Grand Total",
