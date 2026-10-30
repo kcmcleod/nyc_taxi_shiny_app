@@ -22,9 +22,9 @@ fn_perform_lookup <- function(df, lookup_df, join_by_cols, check_col_pre,
 
   # Log results safely
   if (new_na_count == og_na_count) {
-    log_info(".... no new NAs introduced in {label} data. We have: {og_na_count}")
+    log_info(paste0(".... no new NAs introduced in ", label, " data. We have: ", og_na_count))
   } else {
-    log_error(".... new NAs introduced in {label} data. We have {og_na_count} vs {new_na_count}")
+    log_error(paste0(".... new NAs introduced in ", label, " data. We have ", og_na_count, " vs ", new_na_count))
   }
 
   return(df)
