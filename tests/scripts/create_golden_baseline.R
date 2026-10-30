@@ -17,7 +17,7 @@ source("global.R")
 sourceRFilesFromFolder("data-raw/yellow_taxi_helpers/")
 
 # Ensure the testdata directory exists
-testdata_dir <- file.path("tests", "testdata")
+testdata_dir <- paste0(codePath, "tests/testdata/")
 if (!dir.exists(testdata_dir)) {
   dir.create(testdata_dir, recursive = TRUE, showWarnings = FALSE)
 }
@@ -53,6 +53,7 @@ stratified_sample <- raw_df |>
     !is.na(total_amount)
   ) |>
   dplyr::group_by(VendorID, payment_type) |>
+  collect() |>
   dplyr::slice_sample(n = 50, replace = FALSE) |>
   dplyr::ungroup() |>
   dplyr::slice_head(n = 480)
