@@ -3,8 +3,10 @@ library(peakRAM)
 library(arrow)
 library(dplyr)
 
-# Point to your local partitioned dataset
-dataPath <- "/Users/kcm/data/shiny_data/build/NYC Taxi/"
+offline_data_prep <- TRUE
+source(file.path(getwd(), "global.R"))
+
+# Point to local partitioned dataset
 partitioned_parquet <- file.path(dataPath, "yellow_aggregation_partitioned")
 
 # 1. The Optimised Arrow Pipeline (Your architecture)
