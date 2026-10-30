@@ -3,21 +3,6 @@ library(dplyr)
 library(logger)
 
 
-# --- SETUP: Ensure test data directory and files exist for testmode ---
-# Because testthat runs inside tests/testthat/, we create the directory structure here if missing
-if (!dir.exists("tests/testdata")) {
-  dir.create("tests/testdata", recursive = TRUE, showWarnings = FALSE)
-}
-
-if (!file.exists("tests/testdata/mock_taxi_trips.rds")) {
-  saveRDS(data.frame(trip_id = 1:3), "tests/testdata/mock_taxi_trips.rds")
-}
-
-if (!file.exists("tests/testdata/yellow_metadata.rds")) {
-  saveRDS(list(zones = c("A", "B")), "tests/testdata/yellow_metadata.rds")
-}
-
-
 # ==============================================================================
 # TESTS FOR get_initial_taxi_data
 # ==============================================================================
