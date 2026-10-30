@@ -13,7 +13,7 @@ fn_process_yellow_file <- function(fullFileName) {
   valid_start <- ymd(paste0(currentDate, "-01"))
   valid_end <- ymd(paste0(currentDate, "-01")) %m+% months(1)
 
-  tDF_clean <- mutate(
+  tDF_clean_dates <- mutate(
     tDF,
     tpep_pickup_datetime = if_else(
       tpep_pickup_datetime < valid_start | tpep_pickup_datetime >= valid_end,
@@ -27,15 +27,46 @@ fn_process_yellow_file <- function(fullFileName) {
     )
   )
 
-  count_mutated_rows <- sum(is.na(tDF_clean$tpep_pickup_datetime))
+  count_mutated_rows <- sum(is.na(tDF_clean_dates$tpep_pickup_datetime) |
+    is.na(tDF_clean_dates$tpep_dropoff_datetime))
   log_info(".... number of rows with wrong dates: ", count_mutated_rows)
   remove(count_mutated_rows, tDF)
 
-  tDF_clean <- dplyr::filter(
+  tDF_clean <- drop_na(tDF_clean_dates, c("tpep_pickup_datetime", "tpep_dropoff_datetime")) |>
+    mutate(
+      tmp_total = trip_distance + fare_amount,
+      cpm = fare_amount / trip_distance,
+      cpm = if_else(is.infinite(cpm), 0, cpm)
+    ) |>
+    filter(
+      # removing ultra short duration
+      tpep_pickup_datetime %m+% seconds(60) < tpep_dropoff_datetime,
+      # removing long duration
+      interval(tpep_pickup_datetime, tpep_dropoff_datetime) <= hours(6),
+      # negative mile journeys
+      trip_distance >= 0,
+      # taxis have a limit of 8 passengers
+      (passenger_count >= 0 & passenger_count < 9),
+      # either distance or fare must be above 0
+      tmp_total > 0,
+      # removing ultra low cpm
+      !(trip_distance > 5 & cpm < 0.5),
+      # # can be super high cost if very low distance
+      !(trip_distance < 1 & cpm > 100),
+      # short distance capped at 20 per mile
+      !(trip_distance >= 1 & trip_distance <= 10 & cpm > 20),
+      # rest capped at 10 per mile
+      !(trip_distance >= 10 & cpm > 10)
+    ) |>
+    select(-tmp_total)
+
+  tDF_clean <- filter(
     tDF_clean,
     !is.na(tpep_pickup_datetime),
     !is.na(tpep_dropoff_datetime)
   )
+
+  remove(tDF_clean_dates)
 
   # trip dates
   tDF_clean$trip_start_date <- lubridate::as_date(tDF_clean$tpep_pickup_datetime)
@@ -52,6 +83,10 @@ fn_process_yellow_file <- function(fullFileName) {
     tDF_clean$cbd_congestion_fee <- 0.00
   }
 
+  # Airport_fee might be missing or changed Capitalisation
+  if ("airport_fee" %in% names(tDF_clean) && !"Airport_fee" %in% names(tDF_clean)) {
+    tDF_clean <- dplyr::rename(tDF_clean, Airport_fee = airport_fee)
+  }
   if (!"Airport_fee" %in% names(tDF_clean)) {
     tDF_clean$Airport_fee <- 0.00
   }
