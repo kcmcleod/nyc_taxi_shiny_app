@@ -92,7 +92,6 @@ fn_calculate_table_data <- function(base_data, week_agg, month_agg,
   row_count <- sum(main_data$.n_row_count, na.rm = TRUE)
 
   if (row_count > row_limit) {
-    message(row_count)
     err_msg <- "Query too large. Please refine your filters to visualise the data."
     log_error(err_msg)
     stop(err_msg)

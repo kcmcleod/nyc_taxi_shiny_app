@@ -46,7 +46,6 @@ test_that("sf_trip_data - heatmap chart", {
   )
   app$wait_for_idle(duration = 1000)
 
-  print(app$get_logs())
   app_data <- app$get_value(export = "yt_parent-yt_heat-exported_heatmap_data")
   expect_true(!is.null(app_data))
   expect_snapshot_value(app_data, style = "json2")
@@ -71,7 +70,6 @@ test_that("sf_trip_data - table", {
   )
   app$wait_for_idle(duration = 1000)
 
-  print(app$get_logs())
   app_data <- app$get_value(export = "yt_parent-yt_table-exported_table_data")
   expect_true(!is.null(app_data))
   expect_snapshot_value(app_data, style = "json2")
