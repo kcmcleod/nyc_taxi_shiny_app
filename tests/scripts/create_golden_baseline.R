@@ -13,11 +13,12 @@ library(stringr)
 library(readr)
 
 # 1. Load project environment & helper functions
+offline_data_prep <- TRUE
 source("global.R")
 sourceRFilesFromFolder("data-raw/yellow_taxi_helpers/")
 
 # Ensure the testdata directory exists
-testdata_dir <- paste0(codePath, "tests/testdata/")
+testdata_dir <- paste0(codePath, "/tests/testdata/")
 if (!dir.exists(testdata_dir)) {
   dir.create(testdata_dir, recursive = TRUE, showWarnings = FALSE)
 }
@@ -103,24 +104,10 @@ vendor_lookups <- readr::read_csv(file.path(dataPath, "src/vendor_lookup.csv"),
   col_types = "ic", show_col_types = FALSE
 )
 
-golden_processed_output <- fn_perform_lookup(
-  combinedDF, rate_lookups, "RatecodeID",
-  "RatecodeID", "Rate", "rate"
-) |>
-  fn_perform_lookup(zone_lookups, c("PULocationID" = "LocationID"), "PULocationID",
-    "PULocation", "PU",
-    post_process_fn = function(df) dplyr::rename(df, PULocation = Borough)
-  ) |>
-  fn_perform_lookup(zone_lookups, c("DOLocationID" = "LocationID"), "DOLocationID",
-    "DOLocation", "DO",
-    post_process_fn = function(df) dplyr::rename(df, DOLocation = Borough)
-  ) |>
-  fn_perform_lookup(payment_lookups, "payment_type", "payment_type", "payment_type",
-    "payment",
-    post_process_fn = function(df) dplyr::mutate(df, payment_type = payment_class)
-  ) |>
-  dplyr::select(-c(payment_class)) |>
-  fn_perform_lookup(vendor_lookups, "VendorID", "VendorID", "Vendor", "vendor")
+golden_processed_output <- fn_perform_joins(
+  combinedDF, zone_lookups, rate_lookups,
+  payment_lookups, vendor_lookups
+)
 
 # Verify Joins Passed
 all_names <- names(golden_processed_output)
