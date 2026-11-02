@@ -128,17 +128,17 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, config,
           (!full_month_aggregation & !full_week_aggregation &
             date >= user_start_date & date <= user_end_date) |
 
-            # Monthly Data: Snap the user's start date to the 1st of the month
-            # due to the data prep using the 1st of the month as the date
-            (full_month_aggregation &
-              date >= floor_date(user_start_date, "month") &
-              date <= user_end_date) |
+            ( # Monthly Data: Snap the user's start date to the 1st of the month
+              # due to the data prep using the 1st of the month as the date
+              (full_month_aggregation &
+                date >= floor_date(user_start_date, "month") &
+                date <= user_end_date) |
 
-            # Weekly Data: Snap the user's start date to the start of the week.
-            # due to ata prep using week_start = 7 (Sunday)
-            (full_week_aggregation &
-              date >= floor_date(user_start_date, "week", week_start = 7) &
-              date <= user_end_date)
+                # Weekly Data: Snap the user's start date to the start of the week.
+                # due to data prep using week_start = 7 (Sunday)
+                (full_week_aggregation &
+                  date >= floor_date(user_start_date, "week", week_start = 7) &
+                  date <= user_end_date))
         )
 
       return(tmpDF)
