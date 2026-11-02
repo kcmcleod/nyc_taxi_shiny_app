@@ -1,5 +1,5 @@
 offline_data_prep <- TRUE
-options(shiny.testmode = TRUE)
+Sys.setenv(NOT_CRAN = "true")
 
 codePath <- getwd()
 while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePath)) {
