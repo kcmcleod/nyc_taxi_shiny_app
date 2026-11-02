@@ -1,5 +1,6 @@
 ################################################################################
 # PACKAGES
+suppressPackageStartupMessages(library("shiny"))
 suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("tidyr"))
 suppressPackageStartupMessages(library("stringr"))
