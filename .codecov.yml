@@ -15,5 +15,5 @@ coverage:
 # Tell Codecov to ignore testing files and scripts when calculating the percentage
 ignore:
   - "tests/**/*"
-  - "scripts/**/*"
-  - "data-raw/**/*"
+  - "dev/**/*"
+  - "data-raw/processYellowTaxiData.R"

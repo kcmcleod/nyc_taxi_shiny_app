@@ -71,7 +71,7 @@ jobs:
       - name: Calculate Code Coverage & Generate Summary Report
         run: |
           app_sources <- list.files("R", pattern = "\\.[Rr]$", full.names = TRUE)
-          dp_sources  <- list.files("dataPrep/yellow_taxi_helpers", pattern = "\\.[Rr]$", full.names = TRUE)
+          dp_sources  <- list.files("data-raw/yellow_taxi_helpers", pattern = "\\.[Rr]$", full.names = TRUE)
           all_sources <- c(app_sources, dp_sources)
           
           app_tests   <- list.files("tests/testthat", pattern = "\\.[Rr]$", full.names = TRUE)
@@ -84,7 +84,7 @@ jobs:
           
           source("tests/testthat/setup.R")
           
-          # 3. Run coverage across both R/ and dataPrep/ helpers
+          # 3. Run coverage across both R/ and data-raw/ helpers
           cov_results  <- covr::file_coverage(
             source_files = core_sources, 
             test_files   = unit_tests 
@@ -104,7 +104,7 @@ jobs:
               "| Module Layer | Included in CI |",
               "| :--- | :---: |",
               "| **Core App Functions (`R/`)** | ✅ |",
-              "| **ETL Helpers (`dataPrep/yellow_taxi_helpers/`)** | ✅ |",
+              "| **ETL Helpers (`data-raw/yellow_taxi_helpers/`)** | ✅ |",
               ""
             )
             cat(paste(summary_lines, collapse = "\n"), file = step_summary_file, append = TRUE)
@@ -134,6 +134,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Bake Git version into VERSION file
+        run: |
+          VERSION_STR=$(git describe --tags --abbrev=0 2>/dev/null || echo "sha-$(git rev-parse --short HEAD)")
+          echo "$VERSION_STR" > VERSION
+          echo "Baked version: $VERSION_STR"
 
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
@@ -144,9 +152,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev
-
-      - name: Restore renv environment
-        uses: r-lib/actions/setup-renv@v2
 
       - name: Restore renv environment
         uses: r-lib/actions/setup-renv@v2
@@ -180,7 +185,7 @@ jobs:
                 "app.R",
                 "global.R",
                 ".Renviron",
-                ".Rprofile",
+                "VERSION",
                 "config",
                 "app_data",
                 "R",

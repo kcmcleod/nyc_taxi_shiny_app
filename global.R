@@ -1,6 +1,10 @@
 ################################################################################
 # PACKAGES
-suppressPackageStartupMessages(library("tidyverse"))
+suppressPackageStartupMessages(library("shiny"))
+suppressPackageStartupMessages(library("dplyr"))
+suppressPackageStartupMessages(library("tidyr"))
+suppressPackageStartupMessages(library("stringr"))
+suppressPackageStartupMessages(library("lubridate"))
 
 suppressPackageStartupMessages(library("shinyjs"))
 
@@ -21,7 +25,7 @@ suppressPackageStartupMessages(library("scales"))
 
 ################################################################################
 # PATHS
-# Dynamically locate project root whether running from root, tests/, or dataPrep/
+# Dynamically locate project root whether running from root, tests/, or data-raw/
 codePath <- getwd()
 while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePath)) {
   codePath <- dirname(codePath)
@@ -46,7 +50,7 @@ if (!exists("offline_data_prep")) {
   } else {
     shared_app_cache <- cachem::cache_disk(
       dir = cachePath,
-      max_size = 1024 * 1024^2 # 1GB limit
+      max_size = 512 * 1024^2 # 0.5GB limit
     )
 
     log_info("Deployment detected: Persistent disk cache enabled")
@@ -59,17 +63,13 @@ if (!exists("offline_data_prep")) {
 ################################################################################
 # APP INFO
 appTitle <- "NYC Taxi"
-
-isLiveVersion <- grepl("live", codePath)
+version_file <- file.path(codePath, "VERSION")
+isLiveVersion <- file.exists(version_file)
 
 if (isLiveVersion) {
-  appVersion <- paste0(
-    appTitle,
-    system("git describe --tags --abbrev=0", intern = TRUE)
-  )
-
-  appVersion <- gsub("-v", "-", appVersion)
-
+  # On shinyapps.io: Read the VERSION file baked in by GitHub Actions
+  raw_ver <- trimws(readLines(version_file, n = 1, warn = FALSE))
+  appVersion <- paste0(appTitle, "-", sub("^v", "", raw_ver))
   folder <- "run"
 } else {
   res <- stringr::str_match(codePath, "[0-9]+$")[1, 1]
@@ -104,10 +104,9 @@ sourceRFilesFromFolder <- function(folderPath) {
   return(sapply(listOfFiles(folderPath), function(x) source(x)))
 }
 
-# disable autoload of R folder using: touch R/_disable_autoload.R
 sourceRFilesFromFolder(paste0(codePath, "/R"))
 
-config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr = TRUE)
+config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr = FALSE)
 
 ################################################################################
 # DATA
@@ -115,13 +114,13 @@ config <- yaml::yaml.load_file(paste0(codePath, "/config/config.yml"), eval.expr
 # no need to load data if only doing local data processing
 if (!exists("offline_data_prep")) {
   # Load the pre-computed metadata
-  app_metadata <- get_initial_taxi_metadata(data_path = paste0(getwd(), "/app_data/"))
+  app_metadata <- get_initial_taxi_metadata(data_path = paste0(codePath, "/app_data/"), code_path = codePath)
 
   # save aws bill if running locally
   if (Sys.getenv("DEPLOY_ENV") == "DEVELOPER") {
-    raw_taxi_data <- get_initial_taxi_data(data_path = dataPath)
+    raw_taxi_data <- get_initial_taxi_data(data_path = dataPath, code_path = codePath)
   } else {
-    raw_taxi_data <- get_initial_taxi_data_aws()
+    raw_taxi_data <- get_initial_taxi_data_aws(code_path = codePath)
   }
 }
 

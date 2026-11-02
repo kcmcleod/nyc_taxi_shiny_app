@@ -11,7 +11,7 @@
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70]
+          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56]
         },
         "class": {
           "type": "character",
@@ -29,17 +29,17 @@
               "value": ["Date"]
             }
           },
-          "value": [20513, 20513, 20513, 20513, 20513, 20520, 20520, 20520, 20520, 20520, 20527, 20527, 20527, 20527, 20527, 20534, 20534, 20534, 20534, 20534, 20541, 20541, 20541, 20541, 20541, 20548, 20548, 20548, 20548, 20548, 20555, 20555, 20555, 20555, 20555, 20562, 20562, 20562, 20562, 20562, 20569, 20569, 20569, 20569, 20569, 20576, 20576, 20576, 20576, 20576, 20583, 20583, 20583, 20583, 20583, 20590, 20590, 20590, 20590, 20590, 20597, 20597, 20597, 20597, 20597, 20604, 20604, 20604, 20604, 20604]
+          "value": [20513, 20513, 20513, 20513, 20520, 20520, 20520, 20520, 20527, 20527, 20527, 20527, 20534, 20534, 20534, 20534, 20541, 20541, 20541, 20541, 20548, 20548, 20548, 20548, 20555, 20555, 20555, 20555, 20562, 20562, 20562, 20562, 20569, 20569, 20569, 20569, 20576, 20576, 20576, 20576, 20583, 20583, 20583, 20583, 20590, 20590, 20590, 20590, 20597, 20597, 20597, 20597, 20604, 20604, 20604, 20604]
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge", "Cash", "Credit card", "Dispute", "Flex Fare trip", "No charge"]
+          "value": ["Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge", "Cash", "Credit card", "Dispute", "No charge"]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [7, 6, 4, 4, 4, 10, 103, 36, 4, 15, 7, 59, 3, 3, 8, 3, 3, 4, 9, 5, 23, 3, 8, 3, 7, 377, 3, 4, 38, 3, 50, 15, 9, 8, 3, 3, 12, 6, 6, 8, 8, 54, 3, 3, 4, 11, 12, 5, 4, 4, 19, 8, 9, 19, 4, 46, 4, 7, 5, 4, 3, 487, 4, 5, 3, 4, 26, 4, 2, 3]
+          "value": [3, 2, 4, 3, 6, 117, 2, 2, 2, 81, 2, 2, 2, 6, 2, 3, 3, 84, 2, 5, 8, 6, 2, 2, 2, 28, 5, 6, 2, 4, 2, 2, 10, 7, 2, 2, 13, 2, 2, 2, 2, 3, 2, 3, 4, 3, 2, 2, 2, 25, 2, 4, 2, 3, 3, 2]
         }
       ]
     }
@@ -57,7 +57,7 @@
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3]
+          "value": []
         },
         "class": {
           "type": "character",
@@ -75,17 +75,17 @@
               "value": ["Date"]
             }
           },
-          "value": [20513, 20544, 20574]
+          "value": []
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["Flex Fare trip", "Flex Fare trip", "Flex Fare trip"]
+          "value": []
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [1, 3, 1]
+          "value": []
         }
       ]
     }
@@ -103,7 +103,7 @@
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         },
         "class": {
           "type": "character",
@@ -115,22 +115,22 @@
         {
           "type": "character",
           "attributes": {},
-          "value": ["Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Unknown"]
+          "value": ["Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Queens", "Queens", "Queens"]
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Bronx", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Queens", "Queens", "Brooklyn", "Manhattan", "Manhattan", "N/A", "Queens", "Queens", "Queens"]
+          "value": ["Bronx", "Brooklyn", "Manhattan", "Manhattan", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "N/A", "Queens", "Manhattan", "Manhattan", "Queens"]
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["2026 month:03", "2026 month:04", "2026 month:05", "2026 month:04", "2026 month:04", "2026 month:03", "2026 month:05", "2026 month:03", "2026 month:04", "2026 month:05", "2026 month:04", "2026 month:05", "2026 month:04", "2026 month:03", "2026 month:05", "2026 month:05", "2026 month:03", "2026 month:05", "2026 month:03"]
+          "value": ["2026 month:04", "2026 month:03", "2026 month:03", "2026 month:05", "2026 month:03", "2026 month:03", "2026 month:04", "2026 month:05", "2026 month:03", "2026 month:03", "2026 month:04", "2026 month:05", "2026 month:04"]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [1, 7, 1, 9, 1, 15, 1, 97, 24, 25, 34, 2, 3, 5, 10, 2, 1, 1, 1]
+          "value": [1, 1, 3, 1, 1, 7, 10, 58, 2, 1, 2, 1, 1]
         }
       ]
     }
@@ -148,7 +148,7 @@
         "row.names": {
           "type": "integer",
           "attributes": {},
-          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+          "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
         },
         "class": {
           "type": "character",
@@ -160,17 +160,17 @@
         {
           "type": "character",
           "attributes": {},
-          "value": ["Bronx", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "N/A", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Unknown"]
+          "value": ["Bronx", "Bronx", "Bronx", "Bronx", "Bronx", "Brooklyn", "Brooklyn", "Brooklyn", "Brooklyn", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "Manhattan", "N/A", "Queens", "Queens", "Queens", "Queens", "Queens", "Queens", "Unknown", "Unknown"]
         },
         {
           "type": "character",
           "attributes": {},
-          "value": ["Bronx", "Manhattan", "Queens", "Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island", "Bronx", "Brooklyn", "EWR", "Manhattan", "N/A", "Queens", "Unknown", "N/A", "Bronx", "Brooklyn", "Manhattan", "N/A", "Queens", "Staten Island", "Unknown", "Unknown"]
+          "value": ["Bronx", "Brooklyn", "Manhattan", "N/A", "Queens", "Bronx", "Brooklyn", "Manhattan", "Queens", "Bronx", "Brooklyn", "EWR", "Manhattan", "N/A", "Queens", "Unknown", "N/A", "Bronx", "Brooklyn", "Manhattan", "N/A", "Queens", "Staten Island", "Manhattan", "Unknown"]
         },
         {
           "type": "integer",
           "attributes": {},
-          "value": [10, 9, 4, 3, 58, 33, 16, 1, 26, 72, 3, 2514, 4, 59, 2, 1, 13, 68, 264, 6, 326, 1, 1, 2]
+          "value": [3, 2, 5, 1, 1, 2, 17, 13, 4, 8, 43, 14, 1557, 2, 85, 9, 2, 10, 23, 39, 4, 79, 1, 1, 4]
         }
       ]
     }
@@ -205,27 +205,27 @@
         {
           "type": "integer",
           "attributes": {},
-          "value": [25, 168, 80, 24, 44, 425, 85, 35, 72, 36, 59, 66, 502, 39, 1660]
+          "value": [12, 127, 87, 13, 94, 18, 41, 10, 21, 19, 10, 11, 33, 10, 506]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [137.42, 371.01, 208.55, 127.8, 78.48, 486.85, 172.08, 100.57, 222.99, 127.92, 174.72, 138.68, 769.15, 323.84, 3440.06]
-        },
-        {
-          "type": "integer",
-          "attributes": {},
-          "value": [30, 191, 85, 15, 53, 463, 122, 33, 88, 40, 51, 77, 657, 43, 1948]
+          "value": [41.74, 1842.39, 237.29, 144.43, 106.28, 164.23, 54.8, 77.41, 64.51, 68.68, 82.84, 61.57, 188.42, 37.69, 3172.28]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [508.28, 2142.68, 1302.37, 1562.63, 436.37, 3927.06, 2210.47, 507.89, 1476.03, 692.04, 897.86, 835.73, 5655.27, 1522.71, 23677.39]
+          "value": [14, 152, 103, 16, 100, 21, 48, 14, 25, 22, 11, 14, 38, 14, 592]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [695.76, 3369.5, 1986.13, 1794.99, 661.55, 6023.81, 2786.21, 746.63, 2146.67, 994.95, 1308.93, 1244.12, 9918.88, 2066.78, 35744.91]
+          "value": [222.5, 7840.2, 1417.2, 651.6, 1021.4, 658.9, 414.2, 416.5, 378, 485.8, 437.3, 274.9, 878.8, 220.6, 15317.9]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [320.13, 9858.15, 2184.55, 801.95, 1745.83, 781.81, 721.01, 529.5, 541.83, 601.68, 569.77, 370.02, 1171.21, 285.14, 20482.58]
         }
       ]
     }
@@ -260,27 +260,27 @@
         {
           "type": "integer",
           "attributes": {},
-          "value": [20, 154, 172, 23, 63, 68, 85, 28, 40, 25, 168, 80, 24, 44, 994]
+          "value": [19, 13, 14, 15, 76, 16, 144, 103, 93, 12, 127, 87, 13, 94, 826]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [86.1, 400.82, 294.98, 99.91, 140.35, 462.78, 160.75, 133.19, 181.37, 137.42, 371.01, 208.55, 127.8, 78.48, 2883.51]
-        },
-        {
-          "type": "integer",
-          "attributes": {},
-          "value": [20, 216, 162, 24, 69, 55, 104, 26, 40, 30, 191, 85, 15, 53, 1090]
+          "value": [60.32, 107.11, 35.43, 158.09, 337.26, 93.46, 238.96, 197.91, 482.22, 41.74, 1842.39, 237.29, 144.43, 106.28, 4082.89]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [374.01, 2101.33, 1582.67, 548.98, 444.09, 2289.13, 1238.97, 445.55, 912.1, 508.28, 2142.68, 1302.37, 1562.63, 436.37, 15889.16]
+          "value": [23, 13, 16, 20, 83, 18, 183, 112, 117, 14, 152, 103, 16, 100, 970]
         },
         {
           "type": "double",
           "attributes": {},
-          "value": [498.88, 3216.42, 2355.58, 698.72, 592.58, 3013.53, 1725.96, 677.53, 1148.31, 695.76, 3369.5, 1986.13, 1794.99, 661.55, 22435.44]
+          "value": [372.4, 560.5, 192.5, 684.6, 1925.13, 422.2, 2037.6, 1360.1, 2422.5, 222.5, 7840.2, 1417.2, 651.6, 1021.4, 21130.43]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [491.04, 670.62, 267.5, 875.11, 2687.58, 500.16, 3321.94, 2340.07, 3315.35, 320.13, 9858.15, 2184.55, 801.95, 1745.83, 29379.98]
         }
       ]
     }

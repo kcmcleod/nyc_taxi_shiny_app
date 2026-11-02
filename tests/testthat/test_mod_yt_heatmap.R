@@ -47,7 +47,8 @@ test_that("mod_yellow_taxis_heatmap_server processes inputs and KPIs correctly",
       app_metadata  = mock_metadata,
       data_version  = mock_data_version,
       start_date    = mock_start_date,
-      end_date      = mock_end_date
+      end_date      = mock_end_date,
+      config        = list()
     ),
     expr = {
       # ------------------------------------------------------------------------

@@ -70,8 +70,8 @@ mod_yellow_taxis_parent_ui <- function(id, config, app_metadata) {
 }
 
 #' Parent level server
-mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
-                                           data_version) {
+mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, config,
+                                           app_metadata, data_version) {
   moduleServer(id, function(input, output, session) {
     ############################################################################
     # 1-YEAR GUARDRAIL
@@ -106,31 +106,39 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
 
     ############################################################################
     # TOP LEVEL DATA PROCESSING
-    rv_main_date_filtered_date <- reactive({
+    rv_main_date_filtered_data <- reactive({
       req(yellow_taxi_data(), input$di_date_range[1], input$di_date_range[2])
 
       user_start_date <- as.Date(input$di_date_range[1])
       user_end_date <- as.Date(input$di_date_range[2])
 
+      # Calculate earliest possible date needed (accounting for monthly/weekly snapping)
+      min_required_date <- min(
+        lubridate::floor_date(user_start_date, "month"),
+        lubridate::floor_date(user_start_date, "week", week_start = 7)
+      )
+      start_yr <- lubridate::year(min_required_date)
+      end_yr <- lubridate::year(user_end_date)
+
       tmpDF <- yellow_taxi_data() |>
         filter(
-          # allows dates with a missing value
-          is.na(date) |
+          # Aggressively trim via Year first AFTER ETL upgraded
+          Year >= start_yr,
+          Year <= end_yr,
+          (!full_month_aggregation & !full_week_aggregation &
+            date >= user_start_date & date <= user_end_date) |
 
-            (!full_month_aggregation & !full_week_aggregation &
-              date >= user_start_date & date <= user_end_date) |
+            ( # Monthly Data: Snap the user's start date to the 1st of the month
+              # due to the data prep using the 1st of the month as the date
+              (full_month_aggregation &
+                date >= floor_date(user_start_date, "month") &
+                date <= user_end_date) |
 
-            # Monthly Data: Snap the user's start date to the 1st of the month
-            # due to the data prep using the 1st of the month as the date
-            (full_month_aggregation &
-              date >= floor_date(user_start_date, "month") &
-              date <= user_end_date) |
-
-            # Weekly Data: Snap the user's start date to the start of the week.
-            # due to ata prep using week_start = 7 (Sunday)
-            (full_week_aggregation &
-              date >= floor_date(user_start_date, "week", week_start = 7) &
-              date <= user_end_date)
+                # Weekly Data: Snap the user's start date to the start of the week.
+                # due to data prep using week_start = 7 (Sunday)
+                (full_week_aggregation &
+                  date >= floor_date(user_start_date, "week", week_start = 7) &
+                  date <= user_end_date))
         )
 
       return(tmpDF)
@@ -138,21 +146,21 @@ mod_yellow_taxis_parent_server <- function(id, yellow_taxi_data, app_metadata,
 
     mod_yellow_taxis_main_server(
       id = "yt_main",
-      rv_main_date_filtered_date, app_metadata,
+      rv_main_date_filtered_data, config, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )
 
     mod_yellow_taxis_heatmap_server(
       id = "yt_heat",
-      rv_main_date_filtered_date, app_metadata,
+      rv_main_date_filtered_data, config, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )
 
     mod_yellow_taxis_table_server(
       id = "yt_table",
-      rv_main_date_filtered_date, app_metadata,
+      rv_main_date_filtered_data, app_metadata,
       data_version, reactive(input$di_date_range[1]),
       reactive(input$di_date_range[2])
     )

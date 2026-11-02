@@ -24,3 +24,5 @@ ui_values:
     - Combined
     - Monthly
     - Weekly
+data_processing:
+  max_num_of_parquet_to_process: 15

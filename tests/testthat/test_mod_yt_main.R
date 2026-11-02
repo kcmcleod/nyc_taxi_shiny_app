@@ -39,7 +39,8 @@ test_that("mod_yellow_taxis_main_server processes inputs, splits, and KPIs corre
       app_metadata  = mock_metadata,
       data_version  = mock_data_version,
       start_date    = mock_start_date,
-      end_date      = mock_end_date
+      end_date      = mock_end_date,
+      config        = list()
     ),
     expr = {
       session$setInputs(
@@ -94,7 +95,8 @@ test_that("mod_yellow_taxis_main_server tryCatch safely handles data failures", 
       app_metadata  = mock_metadata,
       data_version  = reactiveVal(1),
       start_date    = reactiveVal(as.Date("2023-01-01")),
-      end_date      = reactiveVal(as.Date("2023-01-31"))
+      end_date      = reactiveVal(as.Date("2023-01-31")),
+      config        = list()
     ),
     expr = {
       # 2. Set required inputs to trigger the chart render

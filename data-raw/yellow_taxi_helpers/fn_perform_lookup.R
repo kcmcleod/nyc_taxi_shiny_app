@@ -3,7 +3,7 @@ fn_perform_lookup <- function(df, lookup_df, join_by_cols, check_col_pre,
                               check_col_post, label, post_process_fn = NULL) {
   # data checks
   if (!is.data.frame(df)) {
-    log_error("Invalid dataframe passed to perform_lookup for {label}.")
+    log_error(paste0("Invalid dataframe passed to `fn_perform_lookup` for ", label, "."))
     stop("Input 'df' must be a data frame.")
   }
 
@@ -22,9 +22,9 @@ fn_perform_lookup <- function(df, lookup_df, join_by_cols, check_col_pre,
 
   # Log results safely
   if (new_na_count == og_na_count) {
-    log_info(".... no new NAs introduced in {label} data. We have: {og_na_count}")
+    log_info(paste0(".... no new NAs introduced in ", label, " data. We have: ", og_na_count))
   } else {
-    log_error(".... new NAs introduced in {label} data. We have {og_na_count} vs {new_na_count}")
+    log_error(paste0(".... new NAs introduced in ", label, " data. We have ", og_na_count, " vs ", new_na_count))
   }
 
   return(df)

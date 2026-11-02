@@ -62,26 +62,29 @@ mod_yellow_taxis_main_ui <- function(id, config, app_metadata) {
 }
 
 #' Info Page Module Server
-mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
+mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata,
                                          data_version, start_date, end_date) {
   moduleServer(id, function(input, output, session) {
     ################################################################################
     # DATA
-    rv_main_chart_filtered_data_raw <- reactive({
+    rv_main_chart_filtered_data <- reactive({
       req(
         filtered_data(), input$pi_vendor, input$pi_pay_type,
-        input$pi_level, input$rb_split_by
+        input$pi_level, input$rb_split_by, input$rb_journeys_or_passengers
       )
 
       base_data <- filtered_data()
       vendor_list <- input$pi_vendor
       payment_list <- input$pi_pay_type
       time_period <- input$pi_level
-      month_agg <- ifelse(time_period == "Month", TRUE, FALSE)
-      week_agg <- ifelse(time_period == "Week", TRUE, FALSE)
-      data_field <- ifelse(input$rb_journeys_or_passengers == "Total Distance",
-        "total_distance", "total_number_trips"
-      )
+      month_agg <- (time_period == "Month")
+      week_agg <- (time_period == "Week")
+      data_field <- if (input$rb_journeys_or_passengers == "Total Distance") {
+        "total_distance"
+      } else {
+        "total_number_trips"
+      }
+
       split_by <- input$rb_split_by
 
       data <- fn_calculate_line_chart_data(
@@ -92,11 +95,20 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
       return(data)
     })
 
-    rv_main_chart_filtered_data <- debounce(rv_main_chart_filtered_data_raw, 800)
 
     ############################################################################
     # CHART
     output$po_tripVolumesOverTime <- renderPlotly({
+      base_data <- tryCatch(
+        {
+          rv_main_chart_filtered_data()
+        },
+        error = function(e) {
+          toastr_error(e$message)
+          return(NULL)
+        }
+      )
+
       # User-facing validations for interactive selections
       validate(
         need(
@@ -109,21 +121,14 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
         ),
         need(
           length(input$pi_pay_type) > 0,
-          "Please select at least one payement type."
+          "Please select at least one payment type."
         ),
-        need(length(input$pi_level) == 1, "
-             Please select exactly one time period.")
+        need(
+          length(input$pi_level) == 1,
+          "Please select exactly one time period."
+        )
       )
 
-      base_data <- tryCatch(
-        {
-          rv_main_chart_filtered_data()
-        },
-        error = function(e) {
-          toastr_error(e$message)
-          return(NULL)
-        }
-      )
 
       validate(
         need(!is.null(base_data), "Chart unavailable due to data error")
@@ -133,9 +138,11 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
         need(nrow(base_data) > 0, "No data for that query")
       )
 
-      y_lab_title <- ifelse(input$rb_journeys_or_passengers == "Total Distance",
-        "Distance in miles", "Total number of trips"
-      )
+      y_lab_title <- if (input$rb_journeys_or_passengers == "Total Distance") {
+        "Distance in miles"
+      } else {
+        "Total number of trips"
+      }
 
       chart <- tryCatch(
         {
@@ -152,7 +159,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
       )
 
       validate(
-        need(!is.null(chart), "Chart unavailable due to data error"),
+        need(!is.null(chart), "Chart unavailable due to data error")
       )
 
       return(chart)
@@ -167,6 +174,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, app_metadata,
         input$pi_level,
         input$rb_split_by
       )
+
 
     ############################################################################
     # EXPORT FOR TESTING

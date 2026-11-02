@@ -29,7 +29,7 @@ mod_yellow_taxis_heatmap_ui <- function(id, config) {
 }
 
 #'
-mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
+mod_yellow_taxis_heatmap_server <- function(id, filtered_data, config, app_metadata,
                                             data_version, start_date, end_date) {
   moduleServer(id, function(input, output, session) {
     ############################################################################
@@ -39,8 +39,8 @@ mod_yellow_taxis_heatmap_server <- function(id, filtered_data, app_metadata,
 
       base_data <- filtered_data()
       time_period <- input$ri_heatmap_period
-      month_agg <- ifelse(time_period == "Monthly", TRUE, FALSE)
-      week_agg <- ifelse(time_period == "Weekly", TRUE, FALSE)
+      month_agg <- (time_period == "Monthly")
+      week_agg <- (time_period == "Weekly")
 
       data <- fn_calculate_heatmap_data(base_data, month_agg, week_agg)
 

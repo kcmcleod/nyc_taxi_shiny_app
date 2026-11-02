@@ -73,16 +73,19 @@ fn_monthly_aggregation <- function(df, grouping_values = c()) {
 
   # 3. actual aggregation
   tmp <- group_by(df, across(all_of(grouping_values))) |>
-    mutate(other_charges = extra + mta_tax + tolls_amount +
-      improvement_surcharge + congestion_surcharge +
-      Airport_fee + cbd_congestion_fee) |>
     summarise(
       total_number_trips = n(),
       total_distance = sum(trip_distance, na.rm = TRUE),
       total_charges = sum(total_amount, na.rm = TRUE),
       total_fare = sum(fare_amount, na.rm = TRUE),
       total_tip = sum(tip_amount, na.rm = TRUE),
-      total_other_charges = sum(other_charges, na.rm = TRUE),
+      total_other_charges = sum(extra, na.rm = TRUE) +
+        sum(mta_tax, na.rm = TRUE) +
+        sum(tolls_amount, na.rm = TRUE) +
+        sum(improvement_surcharge, na.rm = TRUE) +
+        sum(congestion_surcharge, na.rm = TRUE) +
+        sum(Airport_fee, na.rm = TRUE) +
+        sum(cbd_congestion_fee, na.rm = TRUE),
       total_passenger_count = sum(passenger_count, na.rm = TRUE),
       .groups = "drop"
     )

@@ -1,8 +1,6 @@
 offline_data_prep <- TRUE
-
 source(paste0(getwd(), "/global.R"))
 
-dataPath <- "/Users/kcm/data/shiny_data/build/NYC Taxi/"
 
 # CHECKING FOR FILES TO PROCESS
 all_yellow_files <- list.files(
@@ -36,5 +34,5 @@ ram_bytes <- object.size(tDF)
 message("Total in-memory RAM: ", format(ram_bytes, units = "auto"))
 
 # Clean up memory
-rm(tDF_full)
+rm(tDF)
 gc()

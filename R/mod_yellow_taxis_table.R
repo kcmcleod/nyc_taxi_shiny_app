@@ -60,8 +60,8 @@ mod_yellow_taxis_table_server <- function(id, filtered_data, app_metadata,
       pu_locations <- input$pi_pu_locations
       do_locations <- input$pi_do_locations
       time_period <- input$pi_level
-      month_agg <- ifelse(time_period == "Month", TRUE, FALSE)
-      week_agg <- ifelse(time_period == "Week", TRUE, FALSE)
+      month_agg <- (time_period == "Month")
+      week_agg <- (time_period == "Week")
 
       base_data <- filtered_data()
 
@@ -72,6 +72,7 @@ mod_yellow_taxis_table_server <- function(id, filtered_data, app_metadata,
 
       return(data)
     }) |>
+      # Cannot cache DT so have to cache
       bindCache(
         data_version(),
         start_date(),

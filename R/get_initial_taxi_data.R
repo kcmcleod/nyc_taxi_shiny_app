@@ -1,10 +1,11 @@
-get_initial_taxi_data <- function(data_path) {
+# returns data shiny app uses from local machine
+get_initial_taxi_data <- function(data_path, code_path = codePath) {
   if (isTRUE(getOption("shiny.testmode"))) {
     log_info(".... loading TEST data !")
-    return(base::readRDS("tests/testdata/mock_taxi_trips.rds"))
+    return(base::readRDS(paste0(code_path, "/tests/testdata/mock_taxi_trips.rds")))
   }
 
-  latest_yellow_file <- file.path(data_path, "yellow_aggregation_partitioned")
+  latest_yellow_file <- file.path(data_path, "/yellow_aggregation_partitioned")
 
   if (!dir.exists(latest_yellow_file)) {
     log_error("No yellow taxi data found")
@@ -13,16 +14,17 @@ get_initial_taxi_data <- function(data_path) {
 
   log_info("READING DATA FROM ", latest_yellow_file)
   tDF <- arrow::open_dataset(latest_yellow_file)
-  log_info(".... ", nrow(tDF), " yellow rows read")
+  log_info(".... ", tDF$num_rows, " yellow rows read")
 
   return(tDF)
 }
 
-get_initial_taxi_data_aws <- function() {
+# returns data shiny app uses from AWS
+get_initial_taxi_data_aws <- function(code_path = codePath) {
   # TEST MODE: Automatically triggered by shinytest2
   if (isTRUE(getOption("shiny.testmode"))) {
     log_info(".... loading TEST data !")
-    return(base::readRDS("tests/testdata/mock_taxi_trips.rds"))
+    return(base::readRDS(paste0(code_path, "/tests/testdata/mock_taxi_trips.rds")))
   }
 
   # PROD MODE
@@ -59,11 +61,11 @@ get_initial_taxi_data_aws <- function() {
   return(tDF)
 }
 
-
-get_initial_taxi_metadata <- function(data_path) {
+# data used by shiny to improve load speed
+get_initial_taxi_metadata <- function(data_path, code_path = codePath) {
   if (isTRUE(getOption("shiny.testmode"))) {
     log_info(".... loading TEST metadata !")
-    return(base::readRDS("tests/testdata/yellow_metadata.rds"))
+    return(base::readRDS(paste0(code_path, "/tests/testdata/yellow_metadata.rds")))
   }
 
   all_yellow_metadata <- list.files(data_path, pattern = "yellow.*rds", full.names = TRUE)

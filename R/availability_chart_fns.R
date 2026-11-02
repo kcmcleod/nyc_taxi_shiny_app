@@ -39,8 +39,8 @@ fn_calculate_availability_data <- function(base_data, granularity, config, start
 
   ##########################################################################
 
-  month_agg <- ifelse(granularity == "Month", TRUE, FALSE)
-  week_agg <- ifelse(granularity == "Week", TRUE, FALSE)
+  month_agg <- (granularity == "Month")
+  week_agg <- (granularity == "Week")
 
   chart_data <- base_data
 
