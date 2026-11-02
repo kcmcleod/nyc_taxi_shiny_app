@@ -5,7 +5,7 @@ while (!dir.exists(file.path(codePath, "config")) && codePath != dirname(codePat
   codePath <- dirname(codePath)
 }
 
-# 2. Source global.R to attach {tidyverse}, {arrow}, etc.
+# Source global.R to attach {tidyverse}, {arrow}, etc.
 global_path <- file.path(codePath, "global.R")
 if (file.exists(global_path)) {
   source(global_path, local = FALSE)
