@@ -50,7 +50,7 @@ if (!exists("offline_data_prep")) {
   } else {
     shared_app_cache <- cachem::cache_disk(
       dir = cachePath,
-      max_size = 1024 * 1024^2 # 1GB limit
+      max_size = 512 * 1024^2 # 0.5GB limit
     )
 
     log_info("Deployment detected: Persistent disk cache enabled")
