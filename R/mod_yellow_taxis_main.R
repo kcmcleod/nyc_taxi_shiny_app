@@ -121,10 +121,12 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
         ),
         need(
           length(input$pi_pay_type) > 0,
-          "Please select at least one payement type."
+          "Please select at least one payment type."
         ),
-        need(length(input$pi_level) == 1, "
-             Please select exactly one time period.")
+        need(
+          length(input$pi_level) == 1,
+          "Please select exactly one time period."
+        )
       )
 
 
@@ -157,7 +159,7 @@ mod_yellow_taxis_main_server <- function(id, filtered_data, config, app_metadata
       )
 
       validate(
-        need(!is.null(chart), "Chart unavailable due to data error"),
+        need(!is.null(chart), "Chart unavailable due to data error")
       )
 
       return(chart)

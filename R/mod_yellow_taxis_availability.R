@@ -109,7 +109,7 @@ mod_yellow_taxis_availability_server <- function(id, app_metadata, config,
         need(nrow(base_data) > 0, "No data for that query")
       )
 
-      date_range <- input$pi_range
+      date_range <- isolate(input$pi_range)
       granularity <- if (date_range == "Full data range") "Month" else input$pi_level
 
       chart <- tryCatch(
@@ -125,7 +125,7 @@ mod_yellow_taxis_availability_server <- function(id, app_metadata, config,
       )
 
       validate(
-        need(!is.null(chart), "Chart unavailable due to data error"),
+        need(!is.null(chart), "Chart unavailable due to data error")
       )
 
       return(chart)
